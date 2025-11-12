@@ -138,7 +138,7 @@ export async function registrarEncomendaPorteiro(
         id_porteiro_recebimento: porteiroId,
         data_recebimento: new Date(),
 
-        status: StatusEncomenda.PENDENTE, // Pronta para retirada
+        status: StatusEncomenda.PENDENTE, 
         id_usuario_cadastro: null,
       },
     });

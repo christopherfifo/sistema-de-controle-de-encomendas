@@ -1,4 +1,3 @@
-// Este arquivo é a nova página: /cadastrar/page.tsx
 
 import { validateAndGetCondominioData } from "@/data/get-data-by-slug";
 import { Button } from "@/components/ui/button";

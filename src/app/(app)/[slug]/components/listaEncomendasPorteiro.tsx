@@ -71,7 +71,7 @@ export function ListaEncomendasPorteiro({
               <div className="flex justify-between items-center w-full pr-4">
                 <div className="flex flex-col text-left">
                   <span className="font-semibold">
-                    {encomenda.tipo_encomenda}
+                    {encomenda.tipo_encomenda} {encomenda.forma_entrega}
                   </span>
                   <span className="text-sm text-muted-foreground">
                     Unidade: {encomenda.unidade.bloco_torre} -{" "}

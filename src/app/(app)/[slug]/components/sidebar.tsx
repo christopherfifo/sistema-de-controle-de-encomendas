@@ -53,12 +53,6 @@ export function SimpleSidebar({
       icon: History,
       pathCheck: `/${condominioId}/historico`,
     },
-    {
-      label: "cadastro de Encomendas",
-      href: createHref("/cadastroEncomendas"),
-      icon: PackagePlus,
-      pathCheck: `/${condominioId}/historico`,
-    },
   ];
 
   return (

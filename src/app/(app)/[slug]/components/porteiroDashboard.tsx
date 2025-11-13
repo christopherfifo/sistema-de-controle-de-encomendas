@@ -9,6 +9,7 @@ import {
 import { Encomenda, Unidade } from "@prisma/client";
 import { PackagePlus, PackageSearch } from "lucide-react";
 import { FormRegistrarEncomenda } from "./formRegistrarEncomenda";
+import { ListaEncomendasPorteiro } from "./listaEncomendasPorteiro";
 
 interface PorteiroDashboardProps {
   encomendasPendentes: (Encomenda & {
@@ -48,8 +49,11 @@ export function PorteiroDashboard({
       </TabsContent>
       
       <TabsContent value="pendentes" className="mt-4">
-        <p>Lista de Encomendas Pendentes (WIP)</p>
-        <p>{encomendasPendentes.length} encomendas pendentes.</p>
+        <ListaEncomendasPorteiro
+          encomendasIniciais={encomendasPendentes}
+          porteiroId={porteiroId}
+          condominioId={condominioId}
+        />
       </TabsContent>
     </Tabs>
   );

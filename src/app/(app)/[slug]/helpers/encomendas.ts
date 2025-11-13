@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { StatusEncomenda } from "@prisma/client";
+import { MoradoresUnidades, StatusEncomenda } from "@prisma/client";
 import { 
   registroEncomendaSchema, 
   RegistroEncomendaFormData 
@@ -12,6 +12,7 @@ import {
   cadastroEncomendaSchema,
   CadastroEncomendaFormData,
 } from "../schemas/schemaCadastroEncomendas";
+import { RetiradaEncomendaFormData, retiradaEncomendaSchema } from "../schemas/schemaRetiradaPorteiro";
 
 export async function cancelarEncomendaMorador(
   encomendaId: string,
@@ -150,5 +151,94 @@ export async function registrarEncomendaPorteiro(
   } catch (error) {
     console.error("Erro ao registrar encomenda:", error);
     throw new Error("Não foi possível registrar a encomenda. Tente novamente.");
+  }
+}
+
+export async function getMoradoresDaUnidade(
+  unidadeId: string,
+  condominioId: string
+) {
+  if (!unidadeId || !condominioId) {
+    throw new Error("ID da unidade ou condomínio não fornecido.");
+  }
+
+  const unidade = await db.unidade.findFirst({
+    where: {
+      id_unidade: unidadeId,
+      id_condominio: condominioId,
+    },
+  });
+
+  if (!unidade) {
+    throw new Error("Unidade não encontrada ou não pertence a este condomínio.");
+  }
+
+  const moradores = await db.moradoresUnidades.findMany({
+    where: {
+      id_unidade: unidadeId,
+    },
+    include: {
+      usuario: {
+        select: {
+          id_usuario: true,
+          nome_completo: true,
+        },
+      },
+    },
+  });
+
+  return moradores.map((morador) => morador.usuario);
+}
+
+export async function registrarRetiradaEncomenda(
+  data: RetiradaEncomendaFormData,
+  encomendaId: string,
+  porteiroId: string
+) {
+  const validatedData = retiradaEncomendaSchema.safeParse(data);
+  if (!validatedData.success) {
+    throw new Error(validatedData.error.issues[0].message);
+  }
+
+  const { id_usuario_retirada, documento_retirante } = validatedData.data;
+
+  const encomenda = await db.encomenda.findUnique({
+    where: { id_encomenda: encomendaId },
+  });
+
+  if (!encomenda) {
+    throw new Error("Encomenda não encontrada.");
+  }
+  if (encomenda.status !== StatusEncomenda.PENDENTE) {
+    throw new Error("Esta encomenda não está mais pendente de retirada.");
+  }
+
+  try {
+    const [_, retirada] = await db.$transaction([
+      db.encomenda.update({
+        where: { id_encomenda: encomendaId },
+        data: {
+          status: StatusEncomenda.ENTREGUE,
+        },
+      }),
+
+      db.retirada.create({
+        data: {
+          id_encomenda: encomendaId,
+          id_usuario_retirada: id_usuario_retirada,
+          data_retirada: new Date(),
+          forma_confirmacao: "DOCUMENTO",
+          comprovante: documento_retirante,
+        },
+      }),
+    ]);
+    
+    revalidatePath(`/(app)/[slug]`, "page");
+    
+    return { success: true, message: "Retirada registrada com sucesso!" };
+
+  } catch (error) {
+    console.error("Erro na transação de retirada:", error);
+    throw new Error("Não foi possível registrar a retirada. Tente novamente.");
   }
 }

@@ -7,7 +7,7 @@ import { SimpleSidebar } from "./components/sidebar";
 import { db } from "@/lib/prisma";
 import { HomePageSaasContent } from "./pages/homePageSaas";
 import { PerfilUsuario, StatusEncomenda } from "@prisma/client";
-import { PorteiroDashboard } from "./components/porteiro-dashboard";
+import { PorteiroDashboard } from "./components/porteiroDashboard";
 
 interface SlugPageProps {
   params: { slug: string };

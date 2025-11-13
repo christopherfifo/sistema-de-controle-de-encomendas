@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/tabs";
 import { Encomenda, Unidade } from "@prisma/client";
 import { PackagePlus, PackageSearch } from "lucide-react";
-import { FormRegistrarEncomenda } from "./form-registrar-encomenda";
+import { FormRegistrarEncomenda } from "./formRegistrarEncomenda";
 
 interface PorteiroDashboardProps {
   encomendasPendentes: (Encomenda & {

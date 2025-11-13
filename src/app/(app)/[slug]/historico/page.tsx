@@ -4,14 +4,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { db } from "@/lib/prisma";
 import { SimpleSidebar } from "../components/sidebar";
-import { StatusEncomenda } from "@prisma/client";
+import { PerfilUsuario, Prisma, StatusEncomenda } from "@prisma/client";
 import { HistoricoPageSassContent } from "../pages/historicoPageSaas";
 
 interface SlugPageProps {
   params: { slug: string };
   searchParams: {
     user?: string;
-    perfil?: string;
+    perfil?: PerfilUsuario;
   };
 }
 
@@ -26,17 +26,24 @@ export default async function HistoricoPage({
   const userName = data.user.nome_completo || "Usuário";
   const condominioName = data.condominio.nome_condominio;
 
-  const unitIds = data.user.unidades_residenciais.map((u) => u.id_unidade);
+  let whereClause: Prisma.EncomendaWhereInput = {
+    unidade: {
+      id_condominio: slug,
+    },
+    status: {
+      in: [StatusEncomenda.ENTREGUE, StatusEncomenda.CANCELADA],
+    },
+  };
+
+  if (perfil === PerfilUsuario.MORADOR) {
+    const unitIds = data.user.unidades_residenciais.map((u) => u.id_unidade);
+    whereClause.id_unidade = {
+      in: unitIds,
+    };
+  }
 
   const encomendasDoHistorico = await db.encomenda.findMany({
-    where: {
-      id_unidade: {
-        in: unitIds,
-      },
-      status: {
-        in: [StatusEncomenda.ENTREGUE, StatusEncomenda.CANCELADA],
-      },
-    },
+    where: whereClause,
     include: {
       unidade: {
         select: {
@@ -62,7 +69,9 @@ export default async function HistoricoPage({
       },
     },
     orderBy: {
-      data_recebimento: { sort: "desc", nulls: "first" },
+      retirada: {
+        data_retirada: "desc",
+      },
     },
   });
 

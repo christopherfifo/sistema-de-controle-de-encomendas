@@ -106,3 +106,49 @@ A senha padrão para todos é **`Casa#2459`**.
 | Porteiro | porteiro2@seed.com | 11111111102 | N/A           |
 
 ---
+
+## 🧪 6. Testes Automatizados
+
+O projeto utiliza Jest e React Testing Library para testes de integração. Os testes focam nos fluxos críticos da aplicação, simulando a interação do usuário e "mockando" as chamadas ao banco de dados (Server Actions) e componentes de UI complexos (Radix UI).
+
+### 6.1. Rodando os Testes
+Para executar toda a suíte de testes:
+```bash
+npm test
+```
+Para rodar os testes em modo "watch" (re-executa ao salvar arquivos):
+```bash
+npm run test:watch
+```
+Para rodar um arquivo de teste específico (ex: porteiro):
+```bash
+npm test porteiro
+```
+### 6.2. Cobertura dos Testes
+Atualmente, os seguintes fluxos estão cobertos:
+
+* ✅ Fluxo do Porteiro (porteiro.test.tsx)
+
+    * Preenchimento e validação do formulário de registro de encomendas.
+
+    * Visualização da lista de encomendas pendentes.
+
+    * Fluxo completo de registro de retirada (abertura do modal, seleção de morador e confirmação).
+
+* ✅ Fluxo do Morador (morador.test.tsx)
+
+    * Renderização do dashboard e visualização das encomendas pendentes.
+
+    * Preenchimento e envio do formulário de pré-cadastro de encomenda.
+
+* ✅ Autenticação (login.test.tsx)
+
+    * Validação de campos obrigatórios (Zod).
+
+    * Funcionalidade de "Mostrar/Esconder" senha.
+
+    * Simulação de login com sucesso (redirecionamento).
+
+    * Tratamento de erro com credenciais inválidas.
+
+---

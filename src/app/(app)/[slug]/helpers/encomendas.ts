@@ -3,16 +3,19 @@
 import { db } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { MoradoresUnidades, StatusEncomenda } from "@prisma/client";
-import { 
-  registroEncomendaSchema, 
-  RegistroEncomendaFormData 
+import {
+  registroEncomendaSchema,
+  RegistroEncomendaFormData,
 } from "../schemas/schemaRegistroPorteiro";
 
 import {
   cadastroEncomendaSchema,
   CadastroEncomendaFormData,
 } from "../schemas/schemaCadastroEncomendas";
-import { RetiradaEncomendaFormData, retiradaEncomendaSchema } from "../schemas/schemaRetiradaPorteiro";
+import {
+  RetiradaEncomendaFormData,
+  retiradaEncomendaSchema,
+} from "../schemas/schemaRetiradaPorteiro";
 
 export async function cancelarEncomendaMorador(
   encomendaId: string,
@@ -135,19 +138,18 @@ export async function registrarEncomendaPorteiro(
       data: {
         ...encomendaData,
         id_unidade: id_unidade,
-        
+
         id_porteiro_recebimento: porteiroId,
         data_recebimento: new Date(),
 
-        status: StatusEncomenda.PENDENTE, 
+        status: StatusEncomenda.PENDENTE,
         id_usuario_cadastro: null,
       },
     });
 
     revalidatePath(`/(app)/[slug]`, "page");
-    
-    return { success: true, message: "Encomenda registrada com sucesso!" };
 
+    return { success: true, message: "Encomenda registrada com sucesso!" };
   } catch (error) {
     console.error("Erro ao registrar encomenda:", error);
     throw new Error("Não foi possível registrar a encomenda. Tente novamente.");
@@ -156,7 +158,7 @@ export async function registrarEncomendaPorteiro(
 
 export async function getMoradoresDaUnidade(
   unidadeId: string,
-  condominioId: string
+  condominioId: string,
 ) {
   if (!unidadeId || !condominioId) {
     throw new Error("ID da unidade ou condomínio não fornecido.");
@@ -170,7 +172,9 @@ export async function getMoradoresDaUnidade(
   });
 
   if (!unidade) {
-    throw new Error("Unidade não encontrada ou não pertence a este condomínio.");
+    throw new Error(
+      "Unidade não encontrada ou não pertence a este condomínio.",
+    );
   }
 
   const moradores = await db.moradoresUnidades.findMany({
@@ -193,7 +197,7 @@ export async function getMoradoresDaUnidade(
 export async function registrarRetiradaEncomenda(
   data: RetiradaEncomendaFormData,
   encomendaId: string,
-  porteiroId: string
+  porteiroId: string,
 ) {
   const validatedData = retiradaEncomendaSchema.safeParse(data);
   if (!validatedData.success) {
@@ -232,11 +236,10 @@ export async function registrarRetiradaEncomenda(
         },
       }),
     ]);
-    
-    revalidatePath(`/(app)/[slug]`, "page");
-    
-    return { success: true, message: "Retirada registrada com sucesso!" };
 
+    revalidatePath(`/(app)/[slug]`, "page");
+
+    return { success: true, message: "Retirada registrada com sucesso!" };
   } catch (error) {
     console.error("Erro na transação de retirada:", error);
     throw new Error("Não foi possível registrar a retirada. Tente novamente.");

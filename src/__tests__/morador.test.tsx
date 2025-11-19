@@ -1,4 +1,3 @@
-
 import React from "react";
 import "@testing-library/jest-dom";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
@@ -18,17 +17,24 @@ window.alert = jest.fn();
 
 jest.mock("@/components/ui/select", () => {
   const React = require("react");
-  const MockSelectContext = React.createContext({ onValueChange: (val: string) => { } });
+  const MockSelectContext = React.createContext({
+    onValueChange: (val: string) => {},
+  });
 
   return {
     Select: ({ onValueChange, children, value }: any) => (
       <MockSelectContext.Provider value={{ onValueChange }}>
-        <input type="hidden" value={value || ""} onChange={() => { }} />
+        <input type="hidden" value={value || ""} onChange={() => {}} />
         {children}
       </MockSelectContext.Provider>
     ),
     SelectTrigger: ({ children, id }: any) => (
-      <button role="combobox" id={id} data-testid="select-trigger" type="button">
+      <button
+        role="combobox"
+        id={id}
+        data-testid="select-trigger"
+        type="button"
+      >
         {children}
       </button>
     ),
@@ -108,7 +114,7 @@ describe("Fluxo do Morador", () => {
           informationsOfUserAndCondominio={mockInfoCondominio}
           encomendasPendentes={mockEncomendasPendentes}
           userId="user-123"
-        />
+        />,
       );
 
       expect(screen.getByText("Painel de Encomendas")).toBeInTheDocument();
@@ -126,7 +132,7 @@ describe("Fluxo do Morador", () => {
           unidadesDoMorador={mockUnidadesDoMorador}
           userId="user-123"
           condominioSlug="cond-slug"
-        />
+        />,
       );
 
       const selectTrigger = screen.getByText("Selecione a unidade...");
@@ -134,11 +140,15 @@ describe("Fluxo do Morador", () => {
       const opcaoUnidade = await screen.findByText(/101/);
       fireEvent.click(opcaoUnidade);
 
-      const inputTipo = screen.getByPlaceholderText("Ex: Pacote, Caixa, Envelope");
+      const inputTipo = screen.getByPlaceholderText(
+        "Ex: Pacote, Caixa, Envelope",
+      );
       await user.clear(inputTipo);
       await user.type(inputTipo, "Notebook Dell");
 
-      const inputEntregador = screen.getByPlaceholderText("Ex: Correios, Amazon, ML");
+      const inputEntregador = screen.getByPlaceholderText(
+        "Ex: Correios, Amazon, ML",
+      );
       await user.clear(inputEntregador);
       await user.type(inputEntregador, "DHL Express");
 
@@ -147,7 +157,9 @@ describe("Fluxo do Morador", () => {
       const opcaoGrande = await screen.findByText("Grande");
       fireEvent.click(opcaoGrande);
 
-      const btnSalvar = screen.getByRole("button", { name: /cadastrar encomenda/i });
+      const btnSalvar = screen.getByRole("button", {
+        name: /cadastrar encomenda/i,
+      });
       await user.click(btnSalvar);
 
       await waitFor(() => {
@@ -158,8 +170,8 @@ describe("Fluxo do Morador", () => {
           expect.objectContaining({
             tipo_encomenda: "Notebook Dell",
             forma_entrega: "DHL Express",
-            tamanho: "Grande"
-          })
+            tamanho: "Grande",
+          }),
         );
       });
     });

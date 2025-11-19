@@ -63,7 +63,9 @@ export function ModalRegistrarRetirada({
 }: ModalRegistrarRetiradaProps) {
   const [isPending, startTransition] = useTransition();
   const [isFetchingMoradores, setIsFetchingMoradores] = useState(false);
-  const [moradores, setMoradores] = useState<Pick<Usuario, "id_usuario" | "nome_completo">[]>([]);
+  const [moradores, setMoradores] = useState<
+    Pick<Usuario, "id_usuario" | "nome_completo">[]
+  >([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const form = useForm<RetiradaEncomendaFormData>({
@@ -81,7 +83,7 @@ export function ModalRegistrarRetirada({
       setErrorMessage(null);
       setMoradores([]);
       form.reset();
-      
+
       const fetchMoradores = async () => {
         setIsFetchingMoradores(true);
         try {
@@ -91,20 +93,21 @@ export function ModalRegistrarRetirada({
           );
           setMoradores(moradoresDaUnidade);
         } catch (error) {
-          const msg = error instanceof Error ? error.message : "Erro desconhecido";
+          const msg =
+            error instanceof Error ? error.message : "Erro desconhecido";
           setErrorMessage(`Erro ao buscar moradores: ${msg}`);
         } finally {
           setIsFetchingMoradores(false);
         }
       };
-      
+
       fetchMoradores();
     }
   }, [isOpen, encomenda, condominioId, form]);
 
   const onSubmit = (data: RetiradaEncomendaFormData) => {
     if (!encomenda) return;
-    
+
     setErrorMessage(null);
 
     startTransition(async () => {
@@ -120,7 +123,8 @@ export function ModalRegistrarRetirada({
           onRetiradaSuccess();
         }
       } catch (error) {
-        const msg = error instanceof Error ? error.message : "Erro desconhecido";
+        const msg =
+          error instanceof Error ? error.message : "Erro desconhecido";
         setErrorMessage(msg);
       }
     });
@@ -138,15 +142,18 @@ export function ModalRegistrarRetirada({
           <DialogDescription>
             Confirme quem está retirando a encomenda para a unidade{" "}
             <strong>
-              {encomenda?.unidade.bloco_torre} - {encomenda?.unidade.numero_unidade}
+              {encomenda?.unidade.bloco_torre} -{" "}
+              {encomenda?.unidade.numero_unidade}
             </strong>
             .
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-            
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 pt-4"
+          >
             <FormField
               control={form.control}
               name="id_usuario_retirada"
@@ -160,11 +167,13 @@ export function ModalRegistrarRetirada({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={
-                          isFetchingMoradores 
-                            ? "Carregando moradores..." 
-                            : "Selecione o morador..."
-                        } />
+                        <SelectValue
+                          placeholder={
+                            isFetchingMoradores
+                              ? "Carregando moradores..."
+                              : "Selecione o morador..."
+                          }
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -206,18 +215,18 @@ export function ModalRegistrarRetirada({
                 </FormItem>
               )}
             />
-            
+
             {errorMessage && (
-                <p className="text-sm font-medium text-destructive">
-                  {errorMessage}
-                </p>
+              <p className="text-sm font-medium text-destructive">
+                {errorMessage}
+              </p>
             )}
 
             <DialogFooter className="pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleClose} 
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
                 disabled={isPending}
               >
                 Cancelar

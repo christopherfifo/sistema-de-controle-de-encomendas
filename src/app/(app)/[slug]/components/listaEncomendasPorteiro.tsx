@@ -87,15 +87,16 @@ export function ListaEncomendasPorteiro({
                   <li>
                     <span className="font-medium">Recebido em:</span>{" "}
                     {encomenda.data_recebimento
-                      ? new Date(
-                          encomenda.data_recebimento,
-                        ).toLocaleString("pt-BR", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                      ? new Date(encomenda.data_recebimento).toLocaleString(
+                          "pt-BR",
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )
                       : "N/A"}
                   </li>
                   <li>

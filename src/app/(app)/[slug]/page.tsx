@@ -82,10 +82,7 @@ async function getPorteiroData(condominioId: string) {
       bloco_torre: true,
       numero_unidade: true,
     },
-    orderBy: [
-      { bloco_torre: "asc" },
-      { numero_unidade: "asc" }
-    ],
+    orderBy: [{ bloco_torre: "asc" }, { numero_unidade: "asc" }],
   });
 
   return { encomendasPendentes, todasUnidades };
@@ -130,7 +127,8 @@ export default async function SlugPage({
       break;
 
     case PerfilUsuario.PORTEIRO:
-      const { encomendasPendentes: pEncomendas, todasUnidades } = await getPorteiroData(slug);
+      const { encomendasPendentes: pEncomendas, todasUnidades } =
+        await getPorteiroData(slug);
       pageContent = (
         <PorteiroDashboard
           encomendasPendentes={pEncomendas}
@@ -172,9 +170,7 @@ export default async function SlugPage({
           <h2 className="text-lg font-semibold ml-4">{pageTitle}</h2>
         </header>
 
-        <div className="p-4 md:p-8 pt-6">
-          {pageContent}
-        </div>
+        <div className="p-4 md:p-8 pt-6">{pageContent}</div>
       </main>
     </div>
   );

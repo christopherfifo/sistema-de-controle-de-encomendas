@@ -112,43 +112,48 @@ A senha padrão para todos é **`Casa#2459`**.
 O projeto utiliza Jest e React Testing Library para testes de integração. Os testes focam nos fluxos críticos da aplicação, simulando a interação do usuário e "mockando" as chamadas ao banco de dados (Server Actions) e componentes de UI complexos (Radix UI).
 
 ### 6.1. Rodando os Testes
+
 Para executar toda a suíte de testes:
+
 ```bash
 npm test
 ```
+
 Para rodar os testes em modo "watch" (re-executa ao salvar arquivos):
+
 ```bash
 npm run test:watch
 ```
+
 Para rodar um arquivo de teste específico (ex: porteiro):
+
 ```bash
 npm test porteiro
 ```
+
 ### 6.2. Cobertura dos Testes
+
 Atualmente, os seguintes fluxos estão cobertos:
 
-* ✅ Fluxo do Porteiro (porteiro.test.tsx)
+- ✅ Fluxo do Porteiro (porteiro.test.tsx)
+  - Preenchimento e validação do formulário de registro de encomendas.
 
-    * Preenchimento e validação do formulário de registro de encomendas.
+  - Visualização da lista de encomendas pendentes.
 
-    * Visualização da lista de encomendas pendentes.
+  - Fluxo completo de registro de retirada (abertura do modal, seleção de morador e confirmação).
 
-    * Fluxo completo de registro de retirada (abertura do modal, seleção de morador e confirmação).
+- ✅ Fluxo do Morador (morador.test.tsx)
+  - Renderização do dashboard e visualização das encomendas pendentes.
 
-* ✅ Fluxo do Morador (morador.test.tsx)
+  - Preenchimento e envio do formulário de pré-cadastro de encomenda.
 
-    * Renderização do dashboard e visualização das encomendas pendentes.
+- ✅ Autenticação (login.test.tsx)
+  - Validação de campos obrigatórios (Zod).
 
-    * Preenchimento e envio do formulário de pré-cadastro de encomenda.
+  - Funcionalidade de "Mostrar/Esconder" senha.
 
-* ✅ Autenticação (login.test.tsx)
+  - Simulação de login com sucesso (redirecionamento).
 
-    * Validação de campos obrigatórios (Zod).
-
-    * Funcionalidade de "Mostrar/Esconder" senha.
-
-    * Simulação de login com sucesso (redirecionamento).
-
-    * Tratamento de erro com credenciais inválidas.
+  - Tratamento de erro com credenciais inválidas.
 
 ---

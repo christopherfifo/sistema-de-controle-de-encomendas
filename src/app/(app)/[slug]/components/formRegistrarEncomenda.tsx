@@ -67,14 +67,16 @@ export function FormRegistrarEncomenda({
           condominioId,
           data,
         );
-        
+
         if (result.success) {
           alert(result.message);
           form.reset();
         }
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : "Ocorreu um erro desconhecido";
+          error instanceof Error
+            ? error.message
+            : "Ocorreu um erro desconhecido";
         alert(`Erro: ${errorMessage}`);
       }
     });
@@ -88,7 +90,6 @@ export function FormRegistrarEncomenda({
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            
             <FormField
               control={form.control}
               name="id_unidade"

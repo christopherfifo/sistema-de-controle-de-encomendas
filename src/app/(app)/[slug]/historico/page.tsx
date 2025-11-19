@@ -26,7 +26,7 @@ export default async function HistoricoPage({
   const userName = data.user.nome_completo || "Usuário";
   const condominioName = data.condominio.nome_condominio;
 
-  let whereClause: Prisma.EncomendaWhereInput = {
+  const whereClause: Prisma.EncomendaWhereInput = {
     unidade: {
       id_condominio: slug,
     },

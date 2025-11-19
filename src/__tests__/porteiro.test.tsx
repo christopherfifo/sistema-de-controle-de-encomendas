@@ -16,7 +16,9 @@ window.alert = jest.fn();
 
 jest.mock("@/components/ui/select", () => {
   const React = require("react");
-  const MockSelectContext = React.createContext({ onValueChange: (val: string) => { } });
+  const MockSelectContext = React.createContext({
+    onValueChange: (val: string) => {},
+  });
 
   return {
     Select: ({ onValueChange, children, value }: any) => (
@@ -113,7 +115,7 @@ describe("Fluxo do Porteiro", () => {
           unidades={mockUnidades}
           porteiroId="porteiro-123"
           condominioId="cond-abc"
-        />
+        />,
       );
 
       const triggerUnidade = screen.getByText("Selecione a unidade...");
@@ -132,7 +134,9 @@ describe("Fluxo do Porteiro", () => {
 
       await user.type(screen.getByLabelText(/transportadora/i), "Amazon");
 
-      const btnSalvar = screen.getByRole("button", { name: /registrar encomenda/i });
+      const btnSalvar = screen.getByRole("button", {
+        name: /registrar encomenda/i,
+      });
       await user.click(btnSalvar);
 
       await waitFor(() => {
@@ -144,8 +148,8 @@ describe("Fluxo do Porteiro", () => {
             id_unidade: UUID_UNIDADE,
             tipo_encomenda: "Caixa Misteriosa",
             forma_entrega: "Amazon",
-            tamanho: "Médio"
-          })
+            tamanho: "Médio",
+          }),
         );
       });
     });
@@ -164,17 +168,22 @@ describe("Fluxo do Porteiro", () => {
           encomendasIniciais={[mockEncomenda as any]}
           porteiroId="porteiro-123"
           condominioId="cond-abc"
-        />
+        />,
       );
 
       const accordionTrigger = screen.getByText(/Caixa Grande/i);
       await user.click(accordionTrigger);
 
-      const btnRetirada = await screen.findByRole("button", { name: /registrar retirada/i });
+      const btnRetirada = await screen.findByRole("button", {
+        name: /registrar retirada/i,
+      });
       await user.click(btnRetirada);
 
       await waitFor(() => {
-        expect(getMoradoresDaUnidade).toHaveBeenCalledWith(UUID_UNIDADE, "cond-abc");
+        expect(getMoradoresDaUnidade).toHaveBeenCalledWith(
+          UUID_UNIDADE,
+          "cond-abc",
+        );
       });
 
       const triggerMorador = await screen.findByText("Selecione o morador...");
@@ -185,7 +194,9 @@ describe("Fluxo do Porteiro", () => {
 
       await user.type(screen.getByLabelText(/documento/i), "123456");
 
-      const btnConfirmar = screen.getByRole("button", { name: /confirmar retirada/i });
+      const btnConfirmar = screen.getByRole("button", {
+        name: /confirmar retirada/i,
+      });
       await user.click(btnConfirmar);
 
       await waitFor(() => {
@@ -195,7 +206,7 @@ describe("Fluxo do Porteiro", () => {
             documento_retirante: "123456",
           }),
           "enc-1",
-          "porteiro-123"
+          "porteiro-123",
         );
       });
     });

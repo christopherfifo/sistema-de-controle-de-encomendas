@@ -33,7 +33,7 @@ async function main() {
 
   const unidadeDaYaya = vinculoMorador.unidade;
   console.log(
-    `Unidade encontrada: ${unidadeDaYaya.bloco_torre}-${unidadeDaYaya.numero_unidade} (ID: ${unidadeDaYaya.id_unidade})`, 
+    `Unidade encontrada: ${unidadeDaYaya.bloco_torre}-${unidadeDaYaya.numero_unidade} (ID: ${unidadeDaYaya.id_unidade})`,
   );
 
   await db.encomenda.deleteMany({

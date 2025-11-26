@@ -90,6 +90,12 @@ export function SimpleSidebar({
         icon: Package,
         pathCheck: `/${condominioId}`,
       },
+      {
+        label: "Histórico",
+        href: createHref("/historicoPorteiro"),
+        icon: History,
+        pathCheck: `/${condominioId}/historicoPorteiro`,
+      },
     ];
   } else if (perfil === PerfilUsuario.SINDICO) {
     navItems = [

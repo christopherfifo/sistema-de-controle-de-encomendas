@@ -94,8 +94,8 @@ export default async function SlugPage({
   params,
   searchParams = {},
 }: SlugPageProps) {
-  const { slug } = params;
-  const { user: userId, perfil } = searchParams;
+  const { slug } = await params;
+  const { user: userId, perfil } = await searchParams;
 
   const data = await validateAndGetCondominioData(slug, userId);
   const userName = data.user.nome_completo || "Usuário";

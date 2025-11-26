@@ -20,14 +20,7 @@ interface SlugPageProps {
   };
 }
 
-async function getMoradorData(userIds: string[], slug: string) {
-  const unitIds = (
-    await db.moradoresUnidades.findMany({
-      where: { id_usuario: { in: userIds } },
-      select: { id_unidade: true },
-    })
-  ).map((u) => u.id_unidade);
-
+async function getMoradorData(unitIds: string[], slug: string) {
   if (unitIds.length === 0) {
     return { encomendasPendentes: [] };
   }
@@ -111,10 +104,12 @@ export default async function SlugPage({
       const userUnitIds = data.user.unidades_residenciais.map(
         (u) => u.unidade.id_unidade,
       );
+
       const { encomendasPendentes: mEncomendas } = await getMoradorData(
-        [data.user.id_usuario],
+        userUnitIds,
         slug,
       );
+
       pageContent = (
         <HomePageSaasContent
           informationsOfUserAndCondominio={data}

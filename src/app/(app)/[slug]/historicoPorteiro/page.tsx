@@ -32,7 +32,6 @@ async function getHistoricoPorteiro(
   slug: string,
   userId: string,
 ): Promise<EncomendaComDetalhes[]> {
-
   const encomendas = await db.encomenda.findMany({
     where: {
       unidade: {
@@ -66,12 +65,11 @@ async function getHistoricoPorteiro(
         },
       },
     },
- 
+
     orderBy: {
-      data_recebimento: "desc", 
+      data_recebimento: "desc",
     },
   });
-
 
   return encomendas as EncomendaComDetalhes[];
 }
@@ -83,14 +81,11 @@ export default async function HistoricoPorteiroPage({
   const { slug } = params;
   const { user, perfil } = searchParams;
 
-
   const data = await validateAndGetCondominioData(slug, user);
   const userName = data.user.nome_completo || "Usuário";
   const condominioName = data.condominio.nome_condominio;
 
-
   if (data.user.perfil !== PerfilUsuario.PORTEIRO) {
-
     redirect(`/${slug}?user=${user}&perfil=${data.user.perfil}`);
   }
 

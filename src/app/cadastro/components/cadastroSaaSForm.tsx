@@ -69,9 +69,7 @@ export function CadastroSaaSForm() {
         setSuccess("Cadastro realizado com sucesso! Redirecionando...");
         form.reset();
         setTimeout(() => {
-          router.push(
-            `/${String(result.condominioId)}?user=${String(result.userId)}&perfil=${String(result.perfil)}`,
-          );
+          router.push(`/`);
         }, 2000);
       }
     });

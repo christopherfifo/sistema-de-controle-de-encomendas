@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Package, History, Menu, User, PackagePlus, Settings, LucideIcon } from "lucide-react";
+import { Package, History, Menu, User, PackagePlus, Settings, LogOut, LucideIcon } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
 interface NavItem {
@@ -37,6 +37,7 @@ export function SimpleSidebar({
   condominioName,
 }: SimpleSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -91,6 +92,10 @@ export function SimpleSidebar({
       },
     ];
   }
+
+  const handleLogout = () => {
+    router.replace('/');
+  };
 
 
   return (
@@ -158,19 +163,45 @@ export function SimpleSidebar({
 
         <div
           className={cn(
-            "p-4 border-t flex items-center",
-            !isOpen && "justify-center",
+            "p-2 border-t flex items-center justify-between",
+            !isOpen && "justify-center flex-col space-y-2",
           )}
         >
-          <User className={cn("h-5 w-5 shrink-0", isOpen && "mr-2")} />
-          <span
-            className={cn(
-              "font-medium whitespace-nowrap transition-opacity duration-300",
-              !isOpen && "sr-only",
+          {isOpen ? (
+            <div className="flex items-center">
+              <User className="h-5 w-5 mr-2 shrink-0" />
+              <span className="font-medium whitespace-nowrap overflow-hidden text-sm">
+                {userName}
+              </span>
+            </div>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <User className="h-5 w-5 shrink-0" />
+              </TooltipTrigger>
+              <TooltipContent side="right">{userName}</TooltipContent>
+            </Tooltip>
+          )}
+
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size={isOpen ? "sm" : "icon"}
+                className={cn(
+                  "hover:bg-destructive/10 hover:text-destructive",
+                  !isOpen && "w-10 h-10",
+                )}
+                onClick={handleLogout}
+              >
+                <LogOut className={cn("h-4 w-4", isOpen && "mr-1")} />
+                <span className={cn(!isOpen && "sr-only")}>Sair</span>
+              </Button>
+            </TooltipTrigger>
+            {!isOpen && (
+              <TooltipContent side="right">Sair</TooltipContent>
             )}
-          >
-            {userName}
-          </span>
+          </Tooltip>
         </div>
       </aside>
     </TooltipProvider>

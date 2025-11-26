@@ -5,7 +5,7 @@ export const registroUnidadeSchema = z.object({
     .string()
     .min(1, { message: "O Bloco/Torre é obrigatório." })
     .max(50, { message: "Máximo de 50 caracteres." }),
-  
+
   numero_unidade: z
     .string()
     .min(1, { message: "O Número da Unidade é obrigatório." })

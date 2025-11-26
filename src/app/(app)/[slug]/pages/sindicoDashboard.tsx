@@ -35,7 +35,6 @@ type CondominioData = Awaited<ReturnType<typeof getSindicoData>>;
 interface SindicoDashboardProps {
   condominioData: CondominioData & { id_condominio: string };
   sindicoId: string;
-
 }
 
 export function SindicoDashboard({
@@ -82,7 +81,8 @@ export function SindicoDashboard({
             Configuração do Condomínio
           </h2>
           <p className="text-muted-foreground">
-            Gerencie unidades, blocos e limites de {condominioData.nome_condominio}
+            Gerencie unidades, blocos e limites de{" "}
+            {condominioData.nome_condominio}
           </p>
         </div>
       </div>
@@ -120,7 +120,10 @@ export function SindicoDashboard({
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="bloco_torre"
@@ -131,7 +134,11 @@ export function SindicoDashboard({
                         <Input
                           placeholder="Ex: Bloco A, Torre 1"
                           {...field}
-                          disabled={isPending || unidadesRestantes <= 0 || limiteMaximo === 0}
+                          disabled={
+                            isPending ||
+                            unidadesRestantes <= 0 ||
+                            limiteMaximo === 0
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -149,7 +156,11 @@ export function SindicoDashboard({
                         <Input
                           placeholder="Ex: 101, 204"
                           {...field}
-                          disabled={isPending || unidadesRestantes <= 0 || limiteMaximo === 0}
+                          disabled={
+                            isPending ||
+                            unidadesRestantes <= 0 ||
+                            limiteMaximo === 0
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -160,14 +171,18 @@ export function SindicoDashboard({
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isPending || unidadesRestantes <= 0 || limiteMaximo === 0}
+                  disabled={
+                    isPending || unidadesRestantes <= 0 || limiteMaximo === 0
+                  }
                 >
-                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   {limiteMaximo === 0
                     ? "Plano Inválido"
                     : unidadesRestantes <= 0
-                    ? "Limite Atingido"
-                    : "Cadastrar Unidade"}
+                      ? "Limite Atingido"
+                      : "Cadastrar Unidade"}
                 </Button>
               </form>
             </Form>

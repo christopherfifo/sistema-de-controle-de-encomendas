@@ -11,13 +11,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Package, History, Menu, User, PackagePlus, Settings, LogOut, LucideIcon } from "lucide-react";
+import {
+  Package,
+  History,
+  Menu,
+  User,
+  PackagePlus,
+  Settings,
+  LogOut,
+  LucideIcon,
+} from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
 interface NavItem {
   label: string;
   href: string;
-  icon: LucideIcon; 
+  icon: LucideIcon;
   pathCheck: string;
 }
 
@@ -86,7 +95,7 @@ export function SimpleSidebar({
     navItems = [
       {
         label: "Configurações",
-        href: createHref("/"), 
+        href: createHref("/"),
         icon: Settings,
         pathCheck: `/${condominioId}`,
       },
@@ -94,9 +103,8 @@ export function SimpleSidebar({
   }
 
   const handleLogout = () => {
-    router.replace('/');
+    router.replace("/");
   };
-
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -198,9 +206,7 @@ export function SimpleSidebar({
                 <span className={cn(!isOpen && "sr-only")}>Sair</span>
               </Button>
             </TooltipTrigger>
-            {!isOpen && (
-              <TooltipContent side="right">Sair</TooltipContent>
-            )}
+            {!isOpen && <TooltipContent side="right">Sair</TooltipContent>}
           </Tooltip>
         </div>
       </aside>

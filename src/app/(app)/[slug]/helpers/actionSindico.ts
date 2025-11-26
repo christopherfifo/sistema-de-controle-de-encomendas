@@ -18,7 +18,6 @@ export async function adicionarUnidade(
   condominioId: string,
   sindicoId: string,
 ): Promise<ActionResponse> {
-
   const validatedData = registroUnidadeSchema.safeParse(data);
   if (!validatedData.success) {
     return { success: false, message: validatedData.error.issues[0].message };
@@ -38,7 +37,8 @@ export async function adicionarUnidade(
   ) {
     return {
       success: false,
-      message: "Acesso negado. Apenas o Síndico deste condomínio pode adicionar unidades.",
+      message:
+        "Acesso negado. Apenas o Síndico deste condomínio pode adicionar unidades.",
     };
   }
 
@@ -81,7 +81,6 @@ export async function adicionarUnidade(
 
   try {
     await db.$transaction(async (prisma) => {
-
       await prisma.unidade.create({
         data: {
           id_condominio: condominioId,
@@ -100,7 +99,6 @@ export async function adicionarUnidade(
       });
     });
 
-
     revalidatePath(`/(app)/[slug]`, "page");
 
     return {
@@ -112,7 +110,6 @@ export async function adicionarUnidade(
     return { success: false, message: "Erro interno ao cadastrar unidade." };
   }
 }
-
 
 export async function getSindicoData(condominioId: string) {
   const condominio = await db.condominio.findUnique({
@@ -133,10 +130,7 @@ export async function getSindicoData(condominioId: string) {
           bloco_torre: true,
           numero_unidade: true,
         },
-        orderBy: [
-          { bloco_torre: "asc" },
-          { numero_unidade: "asc" },
-        ]
+        orderBy: [{ bloco_torre: "asc" }, { numero_unidade: "asc" }],
       },
     },
   });

@@ -6,8 +6,11 @@ import { Menu } from "lucide-react";
 import { SimpleSidebar } from "./components/sidebar";
 import { db } from "@/lib/prisma";
 import { HomePageSaasContent } from "./pages/homePageSaas";
-import { PerfilUsuario, StatusEncomenda } from "@prisma/client";
+import { PerfilUsuario, Prisma, StatusEncomenda } from "@prisma/client";
 import { PorteiroDashboard } from "./components/porteiroDashboard";
+
+import { getSindicoData } from "./helpers/actionSindico";
+import { SindicoDashboard } from "./pages/sindicoDashboard";
 
 interface SlugPageProps {
   params: { slug: string };
@@ -46,19 +49,20 @@ async function getMoradorData(userIds: string[], slug: string) {
       },
     },
     orderBy: {
-      id_encomenda: "desc",
+      data_recebimento: "desc",
     },
   });
+
   return { encomendasPendentes };
 }
 
-async function getPorteiroData(condominioId: string) {
+async function getPorteiroData(slug: string) {
   const encomendasPendentes = await db.encomenda.findMany({
     where: {
-      status: StatusEncomenda.PENDENTE,
       unidade: {
-        id_condominio: condominioId,
+        id_condominio: slug,
       },
+      status: StatusEncomenda.PENDENTE,
     },
     include: {
       unidade: {
@@ -69,14 +73,12 @@ async function getPorteiroData(condominioId: string) {
       },
     },
     orderBy: {
-      id_encomenda: "desc",
+      data_recebimento: "desc",
     },
   });
 
   const todasUnidades = await db.unidade.findMany({
-    where: {
-      id_condominio: condominioId,
-    },
+    where: { id_condominio: slug },
     select: {
       id_unidade: true,
       bloco_torre: true,
@@ -99,27 +101,27 @@ export default async function SlugPage({
   const userName = data.user.nome_completo || "Usuário";
   const condominioName = data.condominio.nome_condominio;
 
-  const sidebarProps = {
-    condominioId: slug,
-    userId: userId,
-    perfil: perfil,
-    userName: userName,
-    condominioName: condominioName,
-  };
-
-  let pageContent = null;
-  let pageTitle = "Dashboard";
+  let pageContent: React.ReactNode = (
+    <p>Bem-vindo ao Painel. Selecione uma opção no menu.</p>
+  );
+  let pageTitle = "Painel";
 
   switch (perfil) {
     case PerfilUsuario.MORADOR:
-      const { encomendasPendentes } = await getMoradorData([userId!], slug);
+      const userUnitIds = data.user.unidades_residenciais.map(
+        (u) => u.unidade.id_unidade,
+      );
+      const { encomendasPendentes: mEncomendas } = await getMoradorData(
+        [data.user.id_usuario],
+        slug,
+      );
       pageContent = (
         <HomePageSaasContent
           informationsOfUserAndCondominio={data}
           slug={slug}
           user={userId}
           perfil={perfil}
-          encomendasPendentes={encomendasPendentes}
+          encomendasPendentes={mEncomendas}
           userId={userId}
         />
       );
@@ -141,12 +143,27 @@ export default async function SlugPage({
       break;
 
     case PerfilUsuario.SINDICO:
-      pageTitle = "Painel do Síndico";
+      const sindicoData = await getSindicoData(slug);
+      pageContent = (
+        <SindicoDashboard
+          condominioData={{ ...sindicoData, id_condominio: slug }}
+          sindicoId={userId!}
+        />
+      );
+      pageTitle = "Configuração do Condomínio";
       break;
 
     default:
       pageContent = <p>Perfil de usuário não reconhecido.</p>;
   }
+
+  const sidebarProps = {
+    condominioId: slug,
+    userId: userId,
+    perfil: perfil,
+    userName: userName,
+    condominioName: condominioName,
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -170,7 +187,7 @@ export default async function SlugPage({
           <h2 className="text-lg font-semibold ml-4">{pageTitle}</h2>
         </header>
 
-        <div className="p-4 md:p-8 pt-6">{pageContent}</div>
+        <section className="p-4 md:p-6 space-y-6">{pageContent}</section>
       </main>
     </div>
   );

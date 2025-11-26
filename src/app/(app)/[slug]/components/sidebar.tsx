@@ -11,13 +11,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Package, History, Menu, User, PackagePlus } from "lucide-react";
+import { Package, History, Menu, User, PackagePlus, Settings, LucideIcon } from "lucide-react";
+import { PerfilUsuario } from "@prisma/client";
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: LucideIcon; 
+  pathCheck: string;
+}
 
 interface SimpleSidebarProps {
   userName: string;
   condominioId: string;
   userId?: string;
-  perfil?: string;
+  perfil?: PerfilUsuario;
   condominioName: string;
 }
 
@@ -34,32 +42,56 @@ export function SimpleSidebar({
 
   const createHref = (path: string) => {
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
+
     if (path === "/") {
       return `/${condominioId}?user=${userId}&perfil=${perfil}`;
     }
     return `/${condominioId}${cleanPath}?user=${userId}&perfil=${perfil}`;
   };
 
-  const navItems = [
-    {
-      label: "Encomendas",
-      href: createHref("/"),
-      icon: Package,
-      pathCheck: `/${condominioId}`,
-    },
-    {
-      label: "Histórico",
-      href: createHref("/historico"),
-      icon: History,
-      pathCheck: `/${condominioId}/historico`,
-    },
-    {
-      label: "cadastro de Encomendas",
-      href: createHref("/cadastroEncomendas"),
-      icon: PackagePlus,
-      pathCheck: `/${condominioId}/historico`,
-    },
-  ];
+  let navItems: NavItem[] = [];
+
+  if (perfil === PerfilUsuario.MORADOR) {
+    navItems = [
+      {
+        label: "Encomendas",
+        href: createHref("/"),
+        icon: Package,
+        pathCheck: `/${condominioId}`,
+      },
+      {
+        label: "Histórico",
+        href: createHref("/historico"),
+        icon: History,
+        pathCheck: `/${condominioId}/historico`,
+      },
+      {
+        label: "Pré-cadastro",
+        href: createHref("/cadastroEncomendas"),
+        icon: PackagePlus,
+        pathCheck: `/${condominioId}/cadastroEncomendas`,
+      },
+    ];
+  } else if (perfil === PerfilUsuario.PORTEIRO) {
+    navItems = [
+      {
+        label: "Painel da Portaria",
+        href: createHref("/"),
+        icon: Package,
+        pathCheck: `/${condominioId}`,
+      },
+    ];
+  } else if (perfil === PerfilUsuario.SINDICO) {
+    navItems = [
+      {
+        label: "Configurações",
+        href: createHref("/"), 
+        icon: Settings,
+        pathCheck: `/${condominioId}`,
+      },
+    ];
+  }
+
 
   return (
     <TooltipProvider delayDuration={0}>

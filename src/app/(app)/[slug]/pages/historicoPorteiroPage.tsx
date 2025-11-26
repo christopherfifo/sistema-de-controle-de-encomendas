@@ -39,7 +39,6 @@ interface HistoricoPorteiroPageProps {
   porteiroId: string;
 }
 
-
 type StatusFilterType = "ENTREGUE" | "CANCELADA" | "ALL";
 
 export function HistoricoPorteiroPageContent({
@@ -60,7 +59,6 @@ export function HistoricoPorteiroPageContent({
         return true;
       })
       .filter((e) => {
-
         if (statusFilter === "ALL") {
           return true;
         }
@@ -95,7 +93,6 @@ export function HistoricoPorteiroPageContent({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-        
           <div className="space-y-2">
             <Label className="flex items-center gap-2 font-medium">
               <User className="h-4 w-4" />
@@ -118,7 +115,6 @@ export function HistoricoPorteiroPageContent({
             </ToggleGroup>
           </div>
 
-   
           <div className="space-y-2">
             <Label className="flex items-center gap-2 font-medium">
               <Package className="h-4 w-4" />
@@ -126,7 +122,6 @@ export function HistoricoPorteiroPageContent({
             </Label>
             <ToggleGroup
               type="single"
-              
               onValueChange={(val: StatusFilterType) => {
                 if (val) setStatusFilter(val);
               }}
@@ -153,7 +148,6 @@ export function HistoricoPorteiroPageContent({
           </div>
         </CardContent>
       </Card>
-
 
       <Card>
         <CardHeader>

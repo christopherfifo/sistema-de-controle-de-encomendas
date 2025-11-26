@@ -102,8 +102,8 @@ A senha padrão para todos é **`Casa#2459`**.
 | -------- | ------------------ | ----------- | ------------- |
 | Morador  | yaya@gmail.com     | 05955422048 | Bloco A - 101 |
 | Síndico  | sindico@gmail.com  | 68282302058 | N/A           |
-| Porteiro | porteiro1@seed.com | 11111111101 | N/A           |
-| Porteiro | porteiro2@seed.com | 11111111102 | N/A           |
+| Porteiro | porteiro1@seed.com | 55563157873 | N/A           |
+| Porteiro | porteiro2@seed.com | 34090527805 | N/A           |
 
 ---
 

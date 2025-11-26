@@ -83,7 +83,7 @@ async function main() {
     data: {
       nome_completo: "Carlos (Porteiro 1)",
       email: "porteiro1@seed.com",
-      cpf: "11111111101",
+      cpf: "55563157873",
       telefone: "11911110001",
       senha_hash: senhaHash,
       perfil: PerfilUsuario.PORTEIRO,
@@ -95,7 +95,7 @@ async function main() {
     data: {
       nome_completo: "Roberto (Porteiro 2)",
       email: "porteiro2@seed.com",
-      cpf: "11111111102",
+      cpf: "34090527805",
       telefone: "11911110002",
       senha_hash: senhaHash,
       perfil: PerfilUsuario.PORTEIRO,

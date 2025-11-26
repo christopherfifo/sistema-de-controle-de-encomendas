@@ -2,8 +2,10 @@ import { validateAndGetCondominioData } from "@/data/get-data-by-slug";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-
 import { redirect } from "next/navigation";
+
+import { PerfilUsuario } from "@prisma/client";
+
 import { SimpleSidebar } from "../components/sidebar";
 import { CadastroEncomendaPageContent } from "../pages/cadastroEncomendaPage";
 
@@ -11,7 +13,7 @@ interface SlugPageProps {
   params: { slug: string };
   searchParams: {
     user?: string;
-    perfil?: string;
+    perfil?: PerfilUsuario | string;
   };
 }
 
@@ -26,16 +28,20 @@ export default async function CadastrarPage({
   const userName = data.user.nome_completo || "Usuário";
   const condominioName = data.condominio.nome_condominio;
 
+  const userPerfil = data.user.perfil;
+
   const unidadesDoMorador = data.user.unidades_residenciais;
 
   if (!unidadesDoMorador || unidadesDoMorador.length === 0) {
-    redirect(`/${slug}?user=${user}&perfil=${perfil}`);
+    redirect(`/${slug}?user=${user}&perfil=${userPerfil}`);
   }
+
+  console.log("User perfil:", perfil);
 
   const sidebarProps = {
     condominioId: slug,
     userId: user,
-    perfil: perfil,
+    perfil: userPerfil,
     userName: userName,
     condominioName: condominioName,
   };

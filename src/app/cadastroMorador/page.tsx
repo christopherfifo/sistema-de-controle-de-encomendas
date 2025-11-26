@@ -29,6 +29,9 @@ export default function CadastroPage() {
           <Button variant="outline" className="w-full" asChild>
             <Link href="/login">Já tem uma conta? Faça Login</Link>
           </Button>
+          <Button variant="link" className="w-full text-sm" asChild>
+            <Link href="/">Voltar para a Home</Link>
+          </Button>
         </CardFooter>
       </Card>
     </main>

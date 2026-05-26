@@ -99,6 +99,7 @@ model Usuario {
   notificacoes_recebidas Notificacao[]
 
   encomendas_cadastradas Encomenda[] @relation("MoradorCadastrou")
+  token_acesso           String?     @unique
 }
 
 model Unidade {

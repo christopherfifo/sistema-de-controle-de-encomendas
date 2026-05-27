@@ -18,3 +18,7 @@
 - [ ] criar a pagina de contratação do sistema
 - [ ] criar o sistema de cadastro e validação dos cartoes
 - [ ] sistema de pagamento
+
+# melhorias
+
+- [ ] permitir enviar link de cadastro com código de acesso pré-preenchido via URL

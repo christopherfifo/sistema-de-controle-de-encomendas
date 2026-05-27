@@ -2,13 +2,13 @@
 
 ## gabriel
 
-- [ ] Criar a função que crie o token para cada usuário quando ele fizer o cadastro (interessante essa função ser separada)
+- [X] Criar a função que crie o token para cada usuário quando ele fizer o cadastro (interessante essa função ser separada)
 - [X] arrumar a logica dos formulários de cadastro e login para usar a api e redirecionar se estiver certo 
 - [ ] criar a aba onde exibi o token do usuário 
 
 ## chris
 
-- [ ] criar a aba de adm para cadastrar ponteiros e tirar
+- [X] criar a aba de adm para cadastrar ponteiros e tirar
 - [ ] api do telegram para noticiar o usuário 
 - [ ] campo para p usuário colocar o id do telegram
 

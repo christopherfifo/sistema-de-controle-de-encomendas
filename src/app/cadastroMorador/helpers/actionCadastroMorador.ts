@@ -5,6 +5,7 @@ import { cadastroSchema } from "./schemaCadastroMorador";
 import { db } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { isValideCPF } from "@/helpers/cpf";
+import { getOrCreateUserToken } from "@/app/(app)/[slug]/helpers/token";
 
 type CadastroResult = {
   success?: boolean;
@@ -13,18 +14,23 @@ type CadastroResult = {
   userId?: string;
   perfil?: string;
   condominioId?: string;
+  token?: string;
 };
 
 export async function registerMorador(
   values: z.infer<typeof cadastroSchema>,
 ): Promise<CadastroResult> {
-const validatedFields = await cadastroSchema.safeParseAsync(values);
+  const validatedFields = await cadastroSchema.safeParseAsync(values);
+
   if (!validatedFields.success) {
     console.error(
       "[ZOD_VALIDATION_ERROR]",
       validatedFields.error.flatten().fieldErrors,
     );
-    return { error: "Dados inválidos. Verifique os campos e tente novamente." };
+
+    return {
+      error: "Dados inválidos. Verifique os campos e tente novamente.",
+    };
   }
 
   const {
@@ -38,36 +44,38 @@ const validatedFields = await cadastroSchema.safeParseAsync(values);
     apartamento,
   } = validatedFields.data;
 
-  // Verificação real na API externa (A matemática local já foi feita no Zod)
   const isCpfReal = await isValideCPF(cpf);
   if (!isCpfReal) {
-    return { error: "O CPF informado não é válido na Receita Federal.", field: "cpf" };
+    return {
+      error: "O CPF informado não é válido na Receita Federal.",
+      field: "cpf",
+    };
   }
 
   try {
     const existingUser = await db.usuario.findFirst({
       where: {
-        OR: [{ email: email }, { cpf: cpf }],
+        OR: [{ email }, { cpf }],
       },
     });
 
     if (existingUser) {
-      return { 
-        error: "Email ou CPF já cadastrados.", 
-        field: existingUser.email === email ? "email" : "cpf" 
+      return {
+        error: "Email ou CPF já cadastrados.",
+        field: existingUser.email === email ? "email" : "cpf",
       };
     }
 
     const condominio = await db.condominio.findUnique({
       where: {
-        codigo_acesso: codigo_acesso,
+        codigo_acesso,
       },
     });
 
     if (!condominio) {
-      return { 
-        error: "Código de acesso inválido. Condomínio não encontrado.",
-        field: "codigo_acesso" 
+      return {
+        error: "Código de acesso inválido.",
+        field: "codigo_acesso",
       };
     }
 
@@ -84,7 +92,7 @@ const validatedFields = await cadastroSchema.safeParseAsync(values);
     if (!unidade) {
       return {
         error:
-          "Unidade não encontrada. Verifique o bloco e o número do apartamento.",
+          "Unidade não encontrada. Verifique bloco e apartamento.",
       };
     }
 
@@ -103,13 +111,19 @@ const validatedFields = await cadastroSchema.safeParseAsync(values);
       const usuario = await tx.usuario.create({
         data: {
           nome_completo: nomeCompleto,
-          email: email,
-          cpf: cpf,
+          email,
+          cpf,
           senha_hash: hashedPassword,
-          telefone: telefone,
+          telefone,
           perfil: "MORADOR",
           id_condominio: condominio.id_condominio,
         },
+      });
+
+      const token = await getOrCreateUserToken({
+        userId: usuario.id_usuario,
+        prisma: tx,
+        formatted: true,
       });
 
       await tx.moradoresUnidades.create({
@@ -120,17 +134,24 @@ const validatedFields = await cadastroSchema.safeParseAsync(values);
         },
       });
 
-      return usuario;
+      return {
+        usuario,
+        token,
+      };
     });
 
     return {
       success: true,
-      userId: newMorador.id_usuario,
-      perfil: newMorador.perfil,
+      token: newMorador.token,
+      userId: newMorador.usuario.id_usuario,
+      perfil: newMorador.usuario.perfil,
       condominioId: condominio.id_condominio,
     };
   } catch (error) {
     console.error("[REGISTER_MORADOR_ERROR]", error);
-    return { error: "Ocorreu um erro no cadastro. Tente novamente." };
+
+    return {
+      error: "Ocorreu um erro no cadastro. Tente novamente.",
+    };
   }
 }

@@ -89,8 +89,14 @@ export function GerenciarFuncionariosContent({
 
     startTransition(async () => {
       const res = await adicionarPorteiro(dadosTratados, condominioId, sindicoId);
-      alert(res.message);
-      if (res.success) { formCadastro.reset(); setActiveTab("lista"); }
+      
+      if (res.success) {
+        alert(`🎉 Funcionário Cadastrado com Sucesso!\n\nTOKEN DE ACESSO: ${res.token_acesso}\n\nCopie e repasse este Token e a Senha definida ao porteiro para o primeiro login.`);
+        formCadastro.reset(); 
+        setActiveTab("lista"); 
+      } else {
+        alert(res.message);
+      }
     });
   };
 
@@ -111,7 +117,12 @@ export function GerenciarFuncionariosContent({
     if (confirm(`Confirmar a contratação de "${nome}" como Porteiro do sistema? Ele manterá os dados de moradia originais.`)) {
       startTransition(async () => {
         const res = await transformarMoradorEmPorteiro(moradorId, condominioId, sindicoId);
-        alert(res.message);
+        
+        if (res.success) {
+          alert(`🎉 Morador Promovido com Sucesso!\n\nTOKEN DE ACESSO PORTARIA: ${res.token_acesso}\n\nInforme este token para que ele consiga se autenticar nos terminais da portaria.`);
+        } else {
+          alert(res.message);
+        }
       });
     }
   };

@@ -35,6 +35,8 @@ export async function adicionarPorteiro(
 
     const hashedPassword = await bcrypt.hash(senha, 10);
 
+    const tokenGerado = Math.random().toString(36).substring(2, 8).toUpperCase();
+
     await db.$transaction(async (tx) => {
       const usuario = await tx.usuario.create({
         data: {
@@ -45,6 +47,7 @@ export async function adicionarPorteiro(
           telefone,
           perfil: PerfilUsuario.PORTEIRO,
           id_condominio: condominioId,
+          token_acesso: tokenGerado, 
         }
       });
 
@@ -56,7 +59,12 @@ export async function adicionarPorteiro(
     });
 
     revalidatePath(`/(app)/[slug]/gerenciarFuncionarios`, "page");
-    return { success: true, message: "Porteiro cadastrado com sucesso!" };
+    
+    return { 
+      success: true, 
+      message: "Porteiro cadastrado com sucesso!", 
+      token_acesso: tokenGerado 
+    };
   } catch (error: any) {
     return { success: false, message: error.message || "Erro ao cadastrar porteiro." };
   }
@@ -103,13 +111,22 @@ export async function transformarMoradorEmPorteiro(moradorId: string, condominio
   try {
     await verificarPermissaoSindico(sindicoId, condominioId);
 
+    const tokenGerado = Math.random().toString(36).substring(2, 8).toUpperCase();
+
     await db.usuario.update({
       where: { id_usuario: moradorId, id_condominio: condominioId },
-      data: { perfil: PerfilUsuario.PORTEIRO } 
+      data: { 
+        perfil: PerfilUsuario.PORTEIRO,
+        token_acesso: tokenGerado 
+      } 
     });
 
     revalidatePath(`/(app)/[slug]/gerenciarFuncionarios`, "page");
-    return { success: true, message: "Morador promovido a Porteiro com sucesso! Ele agora tem acesso à portaria." };
+    return { 
+      success: true, 
+      message: "Morador promovido a Porteiro com sucesso! Ele agora tem acesso à portaria.",
+      token_acesso: tokenGerado 
+    };
   } catch (error: any) {
     return { success: false, message: error.message || "Erro ao alterar perfil do morador." };
   }

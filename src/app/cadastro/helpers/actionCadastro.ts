@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import axios from "axios";
 import { cadastroSchema } from "./schemaCadastro";
 import { db } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
@@ -17,7 +16,7 @@ type CadastroResult = {
 export async function registerCondominioAndAdmin(
   values: z.infer<typeof cadastroSchema>,
 ): Promise<CadastroResult> {
-const validatedFields = await cadastroSchema.safeParseAsync(values);
+  const validatedFields = await cadastroSchema.safeParseAsync(values);
   if (!validatedFields.success) {
     console.error(
       "[ZOD_VALIDATION_ERROR]",

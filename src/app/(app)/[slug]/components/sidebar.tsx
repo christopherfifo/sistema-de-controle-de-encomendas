@@ -20,6 +20,7 @@ import {
   Settings,
   LogOut,
   LucideIcon,
+  SquareChartGantt,
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
@@ -104,6 +105,12 @@ export function SimpleSidebar({
         href: createHref("/"),
         icon: Settings,
         pathCheck: `/${condominioId}`,
+      },
+      {
+        label: "Gerenciar Funcionários",
+        href: createHref("/gerenciarFuncionarios"),
+        icon: SquareChartGantt,
+        pathCheck: `/${condominioId}/gerenciarFuncionarios`,
       },
     ];
   }

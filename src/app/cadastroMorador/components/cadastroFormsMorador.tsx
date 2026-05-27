@@ -98,7 +98,7 @@ export function CadastroFormsMorador() {
         )}
         <fieldset className="space-y-4 rounded-lg border p-4">
           <legend className="-ml-1 px-1 text-sm font-medium">
-            Dados do Responsável (Síndico)
+            Dados Pessoais
           </legend>
 
           <FormField

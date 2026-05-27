@@ -19,8 +19,11 @@
 - [ ] criar a pagina de contratação do sistema
 - [ ] criar o sistema de cadastro e validação dos cartoes
 - [ ] sistema de pagamento
+- [ ] permitir cadastro de síndico na tela administrativa (após contratação do sistema)
 - [ ] na hora inserir o codigo do condominio, selecionar automaticamente os blocos e apartamentos disponiveis
 - [X] mostrar mensagens de erro da API no cadastro de morador
+- [X] api externa de validação de cpf
+- [X] api externa de pagamento
 
 # melhorias
 

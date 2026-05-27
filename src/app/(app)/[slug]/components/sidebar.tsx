@@ -21,6 +21,7 @@ import {
   LogOut,
   LucideIcon,
   SquareChartGantt,
+  ShieldAlert,
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
@@ -82,6 +83,12 @@ export function SimpleSidebar({
         icon: PackagePlus,
         pathCheck: `/${condominioId}/cadastroEncomendas`,
       },
+      {
+        label: "Token de Acesso",
+        href: createHref("/meuToken"),
+        icon: ShieldAlert,
+        pathCheck: `/${condominioId}/meuToken`,
+      },
     ];
   } else if (perfil === PerfilUsuario.PORTEIRO) {
     navItems = [
@@ -97,6 +104,12 @@ export function SimpleSidebar({
         icon: History,
         pathCheck: `/${condominioId}/historicoPorteiro`,
       },
+      {
+        label: "Token de Acesso",
+        href: createHref("/meuToken"),
+        icon: ShieldAlert,
+        pathCheck: `/${condominioId}/meuToken`,
+      },
     ];
   } else if (perfil === PerfilUsuario.SINDICO) {
     navItems = [
@@ -111,6 +124,12 @@ export function SimpleSidebar({
         href: createHref("/gerenciarFuncionarios"),
         icon: SquareChartGantt,
         pathCheck: `/${condominioId}/gerenciarFuncionarios`,
+      },
+      {
+        label: "Token de Acesso",
+        href: createHref("/meuToken"),
+        icon: ShieldAlert,
+        pathCheck: `/${condominioId}/meuToken`,
       },
     ];
   }

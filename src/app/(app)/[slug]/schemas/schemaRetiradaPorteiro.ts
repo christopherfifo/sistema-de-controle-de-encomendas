@@ -1,13 +1,10 @@
 import { z } from "zod";
 
 export const retiradaEncomendaSchema = z.object({
-  id_usuario_retirada: z
+  token_retirante: z
     .string()
-    .uuid({ message: "Selecione um morador válido." }),
-
-  documento_retirante: z
-    .string()
-    .min(5, { message: "Documento é obrigatório (mín. 5 caracteres)." }),
+    .length(6, { message: "O token deve ter exatamente 6 dígitos." })
+    .regex(/^\d+$/, { message: "O token deve conter apenas números." }),
 });
 
 export type RetiradaEncomendaFormData = z.infer<typeof retiradaEncomendaSchema>;

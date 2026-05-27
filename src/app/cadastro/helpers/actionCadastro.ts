@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import axios from "axios";
 import { cadastroSchema } from "./schemaCadastro";
 import { db } from "@/lib/prisma";
 import bcrypt from "bcryptjs";

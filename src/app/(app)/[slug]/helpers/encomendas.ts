@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
+import axios from "axios";
 import { revalidatePath } from "next/cache";
 import { MoradoresUnidades, StatusEncomenda } from "@prisma/client";
 import {
@@ -134,25 +135,25 @@ export async function registrarEncomendaPorteiro(
   }
 
   try {
-    await db.encomenda.create({
+    const novaEncomenda = await db.encomenda.create({
       data: {
         ...encomendaData,
         id_unidade: id_unidade,
-
         id_porteiro_recebimento: porteiroId,
         data_recebimento: new Date(),
-
         status: StatusEncomenda.PENDENTE,
         id_usuario_cadastro: null,
       },
     });
 
-    revalidatePath(`/(app)/[slug]`, "page");
 
+    await enviarNotificacaoTelegram(id_unidade, encomendaData.tipo_encomenda, encomendaData.forma_entrega);
+
+    revalidatePath(`/(app)/[slug]`, "page");
     return { success: true, message: "Encomenda registrada com sucesso!" };
   } catch (error) {
-    console.error("Erro ao registrar encomenda:", error);
-    throw new Error("Não foi possível registrar a encomenda. Tente novamente.");
+    console.error(error);
+    throw new Error("Erro ao registrar a encomenda.");
   }
 }
 
@@ -204,7 +205,7 @@ export async function registrarRetiradaEncomenda(
     throw new Error(validatedData.error.issues[0].message);
   }
 
-  const { id_usuario_retirada, documento_retirante } = validatedData.data;
+  const { token_retirante } = validatedData.data;
 
   const encomenda = await db.encomenda.findUnique({
     where: { id_encomenda: encomendaId },
@@ -217,8 +218,16 @@ export async function registrarRetiradaEncomenda(
     throw new Error("Esta encomenda não está mais pendente de retirada.");
   }
 
+  const morador = await db.usuario.findUnique({
+    where: { token_acesso: token_retirante },
+  });
+
+  if (!morador) {
+    throw new Error("Token inválido ou expirado. Verifique o código com o morador.");
+  }
+
   try {
-    const [_, retirada] = await db.$transaction([
+    await db.$transaction([
       db.encomenda.update({
         where: { id_encomenda: encomendaId },
         data: {
@@ -229,19 +238,68 @@ export async function registrarRetiradaEncomenda(
       db.retirada.create({
         data: {
           id_encomenda: encomendaId,
-          id_usuario_retirada: id_usuario_retirada,
+          id_usuario_retirada: morador.id_usuario,
           data_retirada: new Date(),
-          forma_confirmacao: "DOCUMENTO",
-          comprovante: documento_retirante,
+          forma_confirmacao: "TOKEN",
+          comprovante: `Validado via Token de Segurança`,
         },
       }),
+
+      db.usuario.update({
+        where: { id_usuario: morador.id_usuario },
+        data: { token_acesso: null }
+      })
     ]);
 
     revalidatePath(`/(app)/[slug]`, "page");
 
-    return { success: true, message: "Retirada registrada com sucesso!" };
+    return { success: true, message: "Retirada por Token registada com sucesso!" };
   } catch (error) {
     console.error("Erro na transação de retirada:", error);
-    throw new Error("Não foi possível registrar a retirada. Tente novamente.");
+    throw new Error("Não foi possível registar a retirada. Tente novamente.");
+  }
+}
+
+export async function gerarNovoTokenRetirada(userId: string) {
+  const novoToken = Math.floor(100000 + Math.random() * 900000).toString();
+
+  await db.usuario.update({
+    where: { id_usuario: userId },
+    data: { token_acesso: novoToken },
+  });
+
+  revalidatePath("/");
+  return { success: true, token: novoToken };
+}
+
+async function enviarNotificacaoTelegram(unidadeId: string, tipo: string, origem: string) {
+  try {
+    const moradoresDaUnidade = await db.moradoresUnidades.findMany({
+      where: { id_unidade: unidadeId },
+      include: {
+        usuario: {
+          select: { telegram_chat_id: true }
+        }
+      }
+    });
+
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+
+    if (!BOT_TOKEN) return;
+
+    for (const vinculo of moradoresDaUnidade) {
+      const chatId = vinculo.usuario.telegram_chat_id;
+      if (chatId) {
+        const texto = `📦 *SysCondomínio — Nova Encomenda!*\n\nOlá! Um pacote do tipo *${tipo}* (${origem}) acabou de chegar na portaria.\n\nGere o seu *Token de 6 dígitos* no painel para efetuar a retirada em segurança!`;
+        
+        await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          chat_id: chatId,
+          text: texto,
+          parse_mode: "Markdown"
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Falha silenciosa no envio do Telegram:", err);
   }
 }

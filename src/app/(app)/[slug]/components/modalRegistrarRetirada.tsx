@@ -3,17 +3,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition, useEffect } from "react";
-import { Encomenda, Unidade, Usuario } from "@prisma/client";
+import { Encomenda, Unidade } from "@prisma/client";
 import { Loader2 } from "lucide-react";
 
 import {
   retiradaEncomendaSchema,
   RetiradaEncomendaFormData,
 } from "../schemas/schemaRetiradaPorteiro";
-import {
-  getMoradoresDaUnidade,
-  registrarRetiradaEncomenda,
-} from "../helpers/encomendas";
+import { registrarRetiradaEncomenda } from "../helpers/encomendas";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,15 +20,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -48,7 +39,7 @@ type EncomendaParaRetirada = Encomenda & {
 interface ModalRegistrarRetiradaProps {
   encomenda: EncomendaParaRetirada | null;
   porteiroId: string;
-  condominioId: string;
+  condominioId: string; 
   onOpenChange: (open: boolean) => void;
   onRetiradaSuccess: () => void;
 }
@@ -56,22 +47,16 @@ interface ModalRegistrarRetiradaProps {
 export function ModalRegistrarRetirada({
   encomenda,
   porteiroId,
-  condominioId,
   onOpenChange,
   onRetiradaSuccess,
 }: ModalRegistrarRetiradaProps) {
   const [isPending, startTransition] = useTransition();
-  const [isFetchingMoradores, setIsFetchingMoradores] = useState(false);
-  const [moradores, setMoradores] = useState<
-    Pick<Usuario, "id_usuario" | "nome_completo">[]
-  >([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const form = useForm<RetiradaEncomendaFormData>({
     resolver: zodResolver(retiradaEncomendaSchema),
     defaultValues: {
-      id_usuario_retirada: undefined,
-      documento_retirante: "",
+      token_retirante: "",
     },
   });
 
@@ -80,29 +65,9 @@ export function ModalRegistrarRetirada({
   useEffect(() => {
     if (isOpen && encomenda) {
       setErrorMessage(null);
-      setMoradores([]);
-      form.reset();
-
-      const fetchMoradores = async () => {
-        setIsFetchingMoradores(true);
-        try {
-          const moradoresDaUnidade = await getMoradoresDaUnidade(
-            encomenda.id_unidade,
-            condominioId,
-          );
-          setMoradores(moradoresDaUnidade);
-        } catch (error) {
-          const msg =
-            error instanceof Error ? error.message : "Erro desconhecido";
-          setErrorMessage(`Erro ao buscar moradores: ${msg}`);
-        } finally {
-          setIsFetchingMoradores(false);
-        }
-      };
-
-      fetchMoradores();
+      form.reset({ token_retirante: "" });
     }
-  }, [isOpen, encomenda, condominioId, form]);
+  }, [isOpen, encomenda, form]);
 
   const onSubmit = (data: RetiradaEncomendaFormData) => {
     if (!encomenda) return;
@@ -139,10 +104,9 @@ export function ModalRegistrarRetirada({
         <DialogHeader>
           <DialogTitle>Registrar Retirada</DialogTitle>
           <DialogDescription>
-            Confirme quem está retirando a encomenda para a unidade{" "}
+            Solicite o token de segurança para liberar a encomenda da unidade{" "}
             <strong>
-              {encomenda?.unidade.bloco_torre} -{" "}
-              {encomenda?.unidade.numero_unidade}
+              {encomenda?.unidade.bloco_torre} - {encomenda?.unidade.numero_unidade}
             </strong>
             .
           </DialogDescription>
@@ -155,61 +119,22 @@ export function ModalRegistrarRetirada({
           >
             <FormField
               control={form.control}
-              name="id_usuario_retirada"
+              name="token_retirante"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Morador *</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isPending || isFetchingMoradores}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={
-                            isFetchingMoradores
-                              ? "Carregando moradores..."
-                              : "Selecione o morador..."
-                          }
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {moradores.length > 0 ? (
-                        moradores.map((morador) => (
-                          <SelectItem
-                            key={morador.id_usuario}
-                            value={morador.id_usuario}
-                          >
-                            {morador.nome_completo}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="null" disabled>
-                          Nenhum morador encontrado
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="documento_retirante"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Documento (RG/CPF) *</FormLabel>
+                  <FormLabel>Token do Morador *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Somente números"
+                      placeholder="Ex: 123456"
+                      maxLength={6}
                       {...field}
                       disabled={isPending}
+                      className="text-center text-lg font-bold tracking-widest"
                     />
                   </FormControl>
+                  <FormDescription>
+                    Peça ao morador o código de 6 dígitos gerado no aplicativo dele.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -230,9 +155,9 @@ export function ModalRegistrarRetirada({
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isPending || isFetchingMoradores}>
+              <Button type="submit" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Confirmar Retirada
+                Validar e Entregar
               </Button>
             </DialogFooter>
           </form>

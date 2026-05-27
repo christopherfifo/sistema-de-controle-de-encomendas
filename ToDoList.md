@@ -11,6 +11,7 @@
 - [X] criar a aba de adm para cadastrar ponteiros e tirar
 - [ ] api do telegram para noticiar o usuário 
 - [ ] campo para p usuário colocar o id do telegram
+- [ ] validação do token na hora da encomenda com acesso a camera para ler o token
 
 # tarefas secundarias
 
@@ -18,6 +19,7 @@
 - [ ] criar a pagina de contratação do sistema
 - [ ] criar o sistema de cadastro e validação dos cartoes
 - [ ] sistema de pagamento
+- [ ] na hora inserir o codigo do condominio, selecionar automaticamente os blocos e apartamentos disponiveis
 - [X] mostrar mensagens de erro da API no cadastro de morador
 
 # melhorias

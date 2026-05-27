@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isValideCPF, removeCpfPunctuation } from "@/helpers/cpf";
+import { removeCpfPunctuation, validarCpfLocalmente } from "@/helpers/cpf";
 import { isValidCNPJ, removeCnpjPunctuation } from "@/helpers/cnpj";
 
 export const cadastroSchema = z.object({
@@ -12,7 +12,7 @@ export const cadastroSchema = z.object({
       z
         .string()
         .length(11, { message: "CPF deve ter exatamente 11 dígitos." })
-        .refine(isValideCPF, {
+        .refine(validarCpfLocalmente, {
           message: "Este CPF não é válido.",
         }),
     ),
@@ -31,14 +31,7 @@ export const cadastroSchema = z.object({
         .length(14, { message: "CNPJ deve ter exatamente 14 dígitos." })
         .refine(isValidCNPJ, { message: "CNPJ inválido." }),
     ),
-  telefone: z
-    .string()
-    .transform((val) => val.replace(/\D/g, ""))
-    .pipe(
-      z.string().refine((v) => v.length === 10 || v.length === 11, {
-        message: "Telefone deve ter 10 ou 11 dígitos (DDD + número).",
-      }),
-    ),
+  telefone: z.string().min(1, { message: "Telefone é obrigatório." }),
 });
 
 export type CadastroFormValues = z.infer<typeof cadastroSchema>;

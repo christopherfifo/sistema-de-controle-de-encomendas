@@ -17,8 +17,7 @@ type CadastroResult = {
 export async function registerCondominioAndAdmin(
   values: z.infer<typeof cadastroSchema>,
 ): Promise<CadastroResult> {
-  const validatedFields = cadastroSchema.safeParse(values);
-
+const validatedFields = await cadastroSchema.safeParseAsync(values);
   if (!validatedFields.success) {
     console.error(
       "[ZOD_VALIDATION_ERROR]",

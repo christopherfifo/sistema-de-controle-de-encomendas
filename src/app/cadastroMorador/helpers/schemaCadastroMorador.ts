@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { isValideCPF, removeCpfPunctuation } from "@/helpers/cpf";
+import { removeCpfPunctuation, validarCpfLocalmente } from "@/helpers/cpf";
 
 export const cadastroSchema = z.object({
   nomeCompleto: z.string().min(3, { message: "Nome é obrigatório." }),
@@ -11,7 +11,7 @@ export const cadastroSchema = z.object({
       z
         .string()
         .length(11, { message: "CPF deve ter exatamente 11 dígitos." })
-        .refine(isValideCPF, {
+        .refine(validarCpfLocalmente, {
           message: "Este CPF não é válido.",
         }),
     ),
@@ -28,7 +28,7 @@ export const cadastroSchema = z.object({
     ),
   codigo_acesso: z.string().min(1, "O código de acesso é obrigatório"),
   bloco: z.string().min(1, "O bloco é obrigatório"),
-  apartamento: z.string().min(1, "O número do apartamento é obrigatório"),
+  apartamento: z.string().min(1, "O apartamento é obrigatório"),
 });
 
 export type CadastroFormValues = z.infer<typeof cadastroSchema>;

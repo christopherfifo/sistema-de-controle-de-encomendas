@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const removeCpfPunctuation = (cpf: string) => {
   return cpf.replace(/[\.\-]/g, "");
 };
@@ -12,11 +14,11 @@ export const maskCPF = (value: string) => {
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 };
 
-export const isValideCPF = (cpf: string): boolean => {
+// Validação matemática local (Fallback)
+export const validarCpfLocalmente = (cpf: string): boolean => {
   cpf = cpf.replace(/\D/g, "");
 
   if (cpf.length !== 11) return false;
-
   if (/^(\d)\1+$/.test(cpf)) return false;
 
   let sum = 0;
@@ -34,4 +36,21 @@ export const isValideCPF = (cpf: string): boolean => {
   secondVerifier = secondVerifier === 10 ? 0 : secondVerifier;
 
   return secondVerifier === parseInt(cpf.charAt(10));
+};
+
+// ✅ Função assíncrona integrada à API externa
+export const isValideCPF = async (cpf: string): Promise<boolean> => {
+  const cleaned = removeCpfPunctuation(cpf);
+  if (cleaned.length !== 11) return false;
+
+  try {
+    // Timeout de 4 segundos para a API não travar o fluxo caso a Vercel demore
+    const response = await axios.get(`https://valida-cpf-rgtcnrkac-gabriel-vitor-ifsp.vercel.app/api/validar/${cleaned}`, {
+      timeout: 4000
+    });
+    return !!response.data?.valido;
+  } catch (error) {
+    console.warn("[CPF_API_WARNING] Falha na API de CPF, usando validação local de fallback:", error);
+    return validarCpfLocalmente(cleaned);
+  }
 };

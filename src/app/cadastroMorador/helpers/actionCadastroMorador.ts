@@ -4,10 +4,12 @@ import { z } from "zod";
 import { cadastroSchema } from "./schemaCadastroMorador";
 import { db } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { isValideCPF } from "@/helpers/cpf";
 
 type CadastroResult = {
   success?: boolean;
   error?: string;
+  field?: string;
   userId?: string;
   perfil?: string;
   condominioId?: string;
@@ -36,6 +38,12 @@ const validatedFields = await cadastroSchema.safeParseAsync(values);
     apartamento,
   } = validatedFields.data;
 
+  // Verificação real na API externa (A matemática local já foi feita no Zod)
+  const isCpfReal = await isValideCPF(cpf);
+  if (!isCpfReal) {
+    return { error: "O CPF informado não é válido na Receita Federal.", field: "cpf" };
+  }
+
   try {
     const existingUser = await db.usuario.findFirst({
       where: {
@@ -44,7 +52,10 @@ const validatedFields = await cadastroSchema.safeParseAsync(values);
     });
 
     if (existingUser) {
-      return { error: "Email ou CPF já cadastrados." };
+      return { 
+        error: "Email ou CPF já cadastrados.", 
+        field: existingUser.email === email ? "email" : "cpf" 
+      };
     }
 
     const condominio = await db.condominio.findUnique({
@@ -54,7 +65,10 @@ const validatedFields = await cadastroSchema.safeParseAsync(values);
     });
 
     if (!condominio) {
-      return { error: "Código de acesso inválido. Condomínio não encontrado." };
+      return { 
+        error: "Código de acesso inválido. Condomínio não encontrado.",
+        field: "codigo_acesso" 
+      };
     }
 
     const unidade = await db.unidade.findUnique({

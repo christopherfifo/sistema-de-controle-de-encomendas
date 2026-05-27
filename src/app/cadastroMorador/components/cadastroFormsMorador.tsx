@@ -66,24 +66,36 @@ export function CadastroFormsMorador() {
       const result = await registerMorador(values);
 
       if (result.error) {
-        setError(result.error);
-        console.log("Erro no cadastro:", error);
+        if (result.field) {
+          form.setError(result.field as any, { message: result.error });
+        } else {
+          setError(result.error);
+        }
+        console.log("Erro no cadastro:", result.error);
       } else if (result.success) {
         setSuccess("Cadastro realizado com sucesso! Redirecionando...");
-        console.log("Cadastro bem-sucedido:", success);
+        console.log("Cadastro bem-sucedido:", result.success);
         form.reset();
 
-        setTimeout(() => {
-          router.push(
-            `/${String(result.condominioId)}?user=${String(result.userId)}&perfil=${String(result.perfil)}`,
-          );
-        }, 2000);
+        router.push(
+          `/${String(result.condominioId)}?user=${String(result.userId)}&perfil=${String(result.perfil)}`,
+        );
       }
     });
   }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {error && (
+          <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="rounded-md bg-green-50 p-3 text-sm text-green-600">
+            {success}
+          </div>
+        )}
         <fieldset className="space-y-4 rounded-lg border p-4">
           <legend className="-ml-1 px-1 text-sm font-medium">
             Dados do Responsável (Síndico)

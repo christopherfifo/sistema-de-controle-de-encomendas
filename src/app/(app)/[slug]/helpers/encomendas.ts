@@ -3,7 +3,9 @@
 import { db } from "@/lib/prisma";
 import axios from "axios";
 import { revalidatePath } from "next/cache";
-import { MoradoresUnidades, StatusEncomenda } from "@prisma/client";
+import { StatusEncomenda } from "@prisma/client";
+import { enviarNotificacaoRetiradaTelegram } from "@/lib/telegramService";
+
 import {
   registroEncomendaSchema,
   RegistroEncomendaFormData,
@@ -13,6 +15,7 @@ import {
   cadastroEncomendaSchema,
   CadastroEncomendaFormData,
 } from "../schemas/schemaCadastroEncomendas";
+
 import {
   RetiradaEncomendaFormData,
   retiradaEncomendaSchema,
@@ -135,7 +138,7 @@ export async function registrarEncomendaPorteiro(
   }
 
   try {
-    const novaEncomenda = await db.encomenda.create({
+    await db.encomenda.create({
       data: {
         ...encomendaData,
         id_unidade: id_unidade,
@@ -145,7 +148,6 @@ export async function registrarEncomendaPorteiro(
         id_usuario_cadastro: null,
       },
     });
-
 
     await enviarNotificacaoTelegram(id_unidade, encomendaData.tipo_encomenda, encomendaData.forma_entrega);
 
@@ -209,6 +211,7 @@ export async function registrarRetiradaEncomenda(
 
   const encomenda = await db.encomenda.findUnique({
     where: { id_encomenda: encomendaId },
+    include: { unidade: true },
   });
 
   if (!encomenda) {
@@ -251,12 +254,29 @@ export async function registrarRetiradaEncomenda(
       })
     ]);
 
+    if (morador.telegram_chat_id) {
+      enviarNotificacaoRetiradaTelegram({
+        chatId: morador.telegram_chat_id,
+        moradorNome: morador.nome_completo,
+        bloco: encomenda?.unidade.bloco_torre || encomenda.unidade.bloco_torre,
+        apartamento: encomenda.unidade.numero_unidade,
+        tipoEncomenda: encomenda.tipo_encomenda,
+        formaEntrega: encomenda.forma_entrega,
+        codigoRastreio: encomenda.codigo_rastreio,
+        dataRetirada: new Date(),
+        quemRetirouNome: morador.nome_completo,
+        urlFotoProduto: encomenda.url_foto_pacote
+      }).catch((err) => {
+        console.error("[TELEGRAM_BG_ERROR] Falha ao notificar saída:", err);
+      });
+    }
+
     revalidatePath(`/(app)/[slug]`, "page");
 
-    return { success: true, message: "Retirada por Token registada com sucesso!" };
+    return { success: true, message: "Retirada por Token registrada com sucesso!" };
   } catch (error) {
     console.error("Erro na transação de retirada:", error);
-    throw new Error("Não foi possível registar a retirada. Tente novamente.");
+    throw new Error("Não foi possível registrar a retirada. Tente novamente.");
   }
 }
 

@@ -35,4 +35,4 @@
 # melhorias
 
 - [X] permitir enviar link de cadastro com código de acesso pré-preenchido via URL
-- [ ] arrumar botão de logoff (só aparecendo quando a barra lateral está aberta, e meio quebrado com o layout)
+- [X] arrumar botão de logoff (só aparecendo quando a barra lateral está aberta, e meio quebrado com o layout)

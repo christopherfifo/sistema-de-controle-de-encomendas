@@ -236,14 +236,14 @@ export function SimpleSidebar({
 
         <div
           className={cn(
-            "p-2 border-t flex items-center justify-between",
+            "p-2 border-t flex items-center justify-between overflow-hidden",
             !isOpen && "justify-center flex-col space-y-2",
           )}
         >
           {isOpen ? (
-            <div className="flex items-center">
+            <div className="flex items-center min-w-0 pr-2">
               <User className="h-5 w-5 mr-2 shrink-0" />
-              <span className="font-medium whitespace-nowrap overflow-hidden text-sm">
+              <span className="font-medium whitespace-nowrap overflow-hidden text-ellipsis text-sm block">
                 {userName}
               </span>
             </div>
@@ -262,12 +262,12 @@ export function SimpleSidebar({
                 variant="ghost"
                 size={isOpen ? "sm" : "icon"}
                 className={cn(
-                  "hover:bg-destructive/10 hover:text-destructive",
+                  "hover:bg-destructive/10 hover:text-destructive shrink-0",
                   !isOpen && "w-10 h-10",
                 )}
                 onClick={handleLogout}
               >
-                <LogOut className={cn("h-4 w-4", isOpen && "mr-1")} />
+                <LogOut className={cn("h-4 w-4 shrink-0", isOpen && "mr-1")} />
                 <span className={cn(!isOpen && "sr-only")}>Sair</span>
               </Button>
             </TooltipTrigger>

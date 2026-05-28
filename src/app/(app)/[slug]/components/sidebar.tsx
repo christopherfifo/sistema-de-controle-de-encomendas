@@ -24,6 +24,7 @@ import {
   ShieldAlert,
   ExternalLink,
   FolderKanban,
+  IdCardLanyard,
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
@@ -91,6 +92,12 @@ export function SimpleSidebar({
         icon: ShieldAlert,
         pathCheck: `/${condominioId}/meuToken`,
       },
+      {
+        label: "vincular Telegram",
+        href: createHref("/telegramLink"),
+        icon: IdCardLanyard,
+        pathCheck: `/${condominioId}/telegramLink`,
+      },
     ];
   } else if (perfil === PerfilUsuario.PORTEIRO) {
     navItems = [
@@ -111,6 +118,12 @@ export function SimpleSidebar({
         href: createHref("/meuToken"),
         icon: ShieldAlert,
         pathCheck: `/${condominioId}/meuToken`,
+      },
+      {
+        label: "vincular Telegram",
+        href: createHref("/telegramLink"),
+        icon: IdCardLanyard,
+        pathCheck: `/${condominioId}/telegramLink`,
       },
     ];
   } else if (perfil === PerfilUsuario.SINDICO) {
@@ -144,6 +157,12 @@ export function SimpleSidebar({
         href: createHref("/gerenciarMoradores"),
         icon: FolderKanban,
         pathCheck: `/${condominioId}/gerenciarMoradores`,
+      },
+      {
+        label: "vincular Telegram",
+        href: createHref("/telegramLink"),
+        icon: IdCardLanyard,
+        pathCheck: `/${condominioId}/telegramLink`,
       },
     ];
   }

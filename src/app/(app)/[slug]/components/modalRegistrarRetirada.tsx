@@ -193,7 +193,7 @@ export function ModalRegistrarRetirada({
                   name="token_retirante"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Código do Morador (6 dígitos)</FormLabel>
+                      <FormLabel>Código do Morador (8 dígitos)</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Ex: 12345678"

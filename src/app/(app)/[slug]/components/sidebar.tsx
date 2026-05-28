@@ -120,7 +120,7 @@ export function SimpleSidebar({
         pathCheck: `/${condominioId}/meuToken`,
       },
       {
-        label: "vincular Telegram",
+        label: "Vincular Telegram",
         href: createHref("/telegramLink"),
         icon: IdCardLanyard,
         pathCheck: `/${condominioId}/telegramLink`,
@@ -159,7 +159,7 @@ export function SimpleSidebar({
         pathCheck: `/${condominioId}/gerenciarMoradores`,
       },
       {
-        label: "vincular Telegram",
+        label: "Vincular Telegram",
         href: createHref("/telegramLink"),
         icon: IdCardLanyard,
         pathCheck: `/${condominioId}/telegramLink`,

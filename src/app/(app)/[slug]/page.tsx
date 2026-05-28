@@ -6,21 +6,21 @@ import { Menu } from "lucide-react";
 import { SimpleSidebar } from "./components/sidebar";
 import { db } from "@/lib/prisma";
 import { HomePageSaasContent } from "./pages/homePageSaas";
-import { PerfilUsuario, Prisma, StatusEncomenda } from "@prisma/client";
+import { PerfilUsuario, StatusEncomenda } from "@prisma/client";
 import { PorteiroDashboard } from "./components/porteiroDashboard";
 
 import { getSindicoData } from "./helpers/actionSindico";
 import { SindicoDashboard } from "./pages/sindicoDashboard";
 
 interface SlugPageProps {
-  params: { slug: string };
-  searchParams: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{
     user?: string;
     perfil?: PerfilUsuario;
-  };
+  }>;
 }
 
-async function getMoradorData(unitIds: string[], slug: string) {
+async function getMoradorData(unitIds: string[], idCondominio: string) {
   if (unitIds.length === 0) {
     return { encomendasPendentes: [] };
   }
@@ -30,7 +30,7 @@ async function getMoradorData(unitIds: string[], slug: string) {
       id_unidade: { in: unitIds },
       status: StatusEncomenda.PENDENTE,
       unidade: {
-        id_condominio: slug,
+        id_condominio: idCondominio,
       },
     },
     include: {
@@ -49,13 +49,13 @@ async function getMoradorData(unitIds: string[], slug: string) {
   return { encomendasPendentes };
 }
 
-async function getPorteiroData(slug: string) {
+async function getPorteiroData(idCondominio: string) {
   const encomendasPendentes = await db.encomenda.findMany({
     where: {
-      unidade: {
-        id_condominio: slug,
-      },
       status: StatusEncomenda.PENDENTE,
+      unidade: {
+        id_condominio: idCondominio, 
+      },
     },
     include: {
       unidade: {
@@ -66,7 +66,7 @@ async function getPorteiroData(slug: string) {
             include: {
               usuario: {
                 select: {
-                  id_usuario: true, 
+                  id_usuario: true,
                   nome_completo: true, 
                 },
               },
@@ -76,12 +76,14 @@ async function getPorteiroData(slug: string) {
       },
     },
     orderBy: {
-      data_recebimento: "desc",
+      id_encomenda: "desc",
     },
   });
 
   const todasUnidades = await db.unidade.findMany({
-    where: { id_condominio: slug },
+    where: { 
+      id_condominio: idCondominio 
+    },
     select: {
       id_unidade: true,
       bloco_torre: true,
@@ -95,7 +97,7 @@ async function getPorteiroData(slug: string) {
 
 export default async function SlugPage({
   params,
-  searchParams = {},
+  searchParams,
 }: SlugPageProps) {
   const { slug } = await params;
   const { user: userId, perfil } = await searchParams;
@@ -103,6 +105,7 @@ export default async function SlugPage({
   const data = await validateAndGetCondominioData(slug, userId);
   const userName = data.user.nome_completo || "Usuário";
   const condominioName = data.condominio.nome_condominio;
+  const idCondominioReal = data.condominio.id_condominio; 
 
   let pageContent: React.ReactNode = (
     <p>Bem-vindo ao Painel. Selecione uma opção no menu.</p>
@@ -117,7 +120,7 @@ export default async function SlugPage({
 
       const { encomendasPendentes: mEncomendas } = await getMoradorData(
         userUnitIds,
-        slug,
+        idCondominioReal,
       );
 
       pageContent = (
@@ -135,7 +138,8 @@ export default async function SlugPage({
 
     case PerfilUsuario.PORTEIRO:
       const { encomendasPendentes: pEncomendas, todasUnidades } =
-        await getPorteiroData(slug);
+        await getPorteiroData(idCondominioReal);
+        
       pageContent = (
         <PorteiroDashboard
           encomendasPendentes={pEncomendas}
@@ -148,10 +152,10 @@ export default async function SlugPage({
       break;
 
     case PerfilUsuario.SINDICO:
-      const sindicoData = await getSindicoData(slug);
+      const sindicoData = await getSindicoData(idCondominioReal);
       pageContent = (
         <SindicoDashboard
-          condominioData={{ ...sindicoData, id_condominio: slug }}
+          condominioData={{ ...sindicoData, id_condominio: idCondominioReal }}
           sindicoId={userId!}
         />
       );

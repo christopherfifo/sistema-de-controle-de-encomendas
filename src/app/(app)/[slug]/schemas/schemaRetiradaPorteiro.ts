@@ -2,7 +2,12 @@ import { z } from "zod";
 
 export const retiradaEncomendaSchema = z.object({
   tipo_confirmacao: z.enum(["TOKEN", "MANUAL"]),
-  token_retirante: z.string().optional().nullable(),
+  token_retirante: z
+    .string()
+    .min(1, { message: "O token não pode estar vazio." })
+    .max(10, { message: "O token é muito longo." }) 
+    .optional()
+    .nullable(),
   id_usuario_retirada: z.string().optional().nullable(),
   cpf_retirante: z.string().optional().nullable(),
 });

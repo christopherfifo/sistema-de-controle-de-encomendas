@@ -196,8 +196,8 @@ export function ModalRegistrarRetirada({
                       <FormLabel>Código do Morador (6 dígitos)</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Ex: 123456"
-                          maxLength={6}
+                          placeholder="Ex: 12345678"
+                          maxLength={8}
                           {...field}
                           value={field.value || ""}
                           disabled={isPending}

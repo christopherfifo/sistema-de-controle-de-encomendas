@@ -39,9 +39,6 @@ export function VincularTelegramContent({ userId, slug }: VincularTelegramConten
         setStatus({ type: "success", message: resultado.message });
         setChatId("");
         
-        setTimeout(() => {
-          router.push(`/${slug}?user=${userId}`);
-        }, 2000);
       } else {
         setStatus({ type: "error", message: resultado.message });
       }

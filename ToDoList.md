@@ -10,9 +10,9 @@
 ## chris
 
 - [X] criar a aba de adm para cadastrar ponteiros e tirar
-- [ ] api do telegram para noticiar o usuário 
-- [ ] campo para p usuário colocar o id do telegram
-- [ ] validação do token na hora da encomenda com acesso a camera para ler o token
+- [X] api do telegram para noticiar o usuário 
+- [X] campo para p usuário colocar o id do telegram
+- [X] validação do token na hora da encomenda com acesso a camera para ler o token
 
 # tarefas secundarias
 

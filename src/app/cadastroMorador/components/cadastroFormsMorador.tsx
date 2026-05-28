@@ -2,8 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useState, useTransition, useEffect } from "react";
+import { Eye, EyeOff, Loader2, Check, ChevronsUpDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
@@ -14,6 +14,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +34,8 @@ import {
   cadastroSchema,
 } from "../helpers/schemaCadastroMorador";
 import { maskCPF } from "@/helpers/cpf";
-import { registerMorador } from "../helpers/actionCadastroMorador";
+import { registerMorador, getUnidadesByCodigoAcesso } from "../helpers/actionCadastroMorador";
+import { cn } from "@/lib/utils";
 
 export function CadastroFormsMorador() {
   const router = useRouter();
@@ -33,6 +47,11 @@ export function CadastroFormsMorador() {
   const [success, setSuccess] = useState<string | undefined>();
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const [unidadesData, setUnidadesData] = useState<{blocos: string[], unidadesPorBloco: Record<string, string[]>} | null>(null);
+  const [isFetchingUnidades, setIsFetchingUnidades] = useState(false);
+  const [blocoOpen, setBlocoOpen] = useState(false);
+  const [apartamentoOpen, setApartamentoOpen] = useState(false);
 
   function maskPhone(value: string) {
     const digits = (value || "").replace(/\D/g, "");
@@ -60,6 +79,29 @@ export function CadastroFormsMorador() {
       apartamento: "",
     },
   });
+
+  const codigoAcessoWatch = form.watch("codigo_acesso");
+  const blocoWatch = form.watch("bloco");
+
+  useEffect(() => {
+    const fetchUnidades = async () => {
+      if (codigoAcessoWatch && codigoAcessoWatch.length >= 5) {
+        setIsFetchingUnidades(true);
+        const data = await getUnidadesByCodigoAcesso(codigoAcessoWatch);
+        setUnidadesData(data);
+        setIsFetchingUnidades(false);
+      } else {
+        setUnidadesData(null);
+        setIsFetchingUnidades(false);
+      }
+    };
+
+    if (codigoAcessoWatch && codigoAcessoWatch.length >= 5) {
+      setIsFetchingUnidades(true);
+    }
+    const timeoutId = setTimeout(fetchUnidades, 500);
+    return () => clearTimeout(timeoutId);
+  }, [codigoAcessoWatch]);
 
   async function onSubmit(values: CadastroFormValues) {
     setError(undefined);
@@ -99,6 +141,31 @@ export function CadastroFormsMorador() {
             {success}
           </div>
         )}
+
+        {!codigoFromUrl && (
+          <fieldset className="space-y-4 rounded-lg border p-4">
+            <legend className="-ml-1 px-1 text-sm font-medium">
+              Dados do Condomínio
+            </legend>
+            <FormField
+              control={form.control}
+              name="codigo_acesso"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Código de Acesso</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Insira o código do seu condomínio"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </fieldset>
+        )}
+
         <fieldset className="space-y-4 rounded-lg border p-4">
           <legend className="-ml-1 px-1 text-sm font-medium">
             Dados Pessoais
@@ -118,34 +185,80 @@ export function CadastroFormsMorador() {
             )}
           />
 
-          {!codigoFromUrl && (
-            <FormField
-              control={form.control}
-              name="codigo_acesso"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Código de Acesso</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Insira o código do seu condomínio"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="bloco"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col pt-2">
                   <FormLabel>Bloco</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Bloco A" {...field} />
-                  </FormControl>
+                  {isFetchingUnidades ? (
+                    <FormControl>
+                      <Button variant="outline" disabled className="w-full justify-between font-normal text-muted-foreground">
+                        Buscando blocos...
+                        <Loader2 className="ml-2 h-4 w-4 animate-spin shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  ) : !codigoAcessoWatch || codigoAcessoWatch.length < 5 ? (
+                    <FormControl>
+                      <Input placeholder="Aguardando código..." disabled {...field} />
+                    </FormControl>
+                  ) : unidadesData && unidadesData.blocos.length > 0 ? (
+                    <Popover open={blocoOpen} onOpenChange={setBlocoOpen} modal={true}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? field.value
+                              : "Selecione o bloco"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Pesquisar bloco..." />
+                          <CommandList>
+                            <CommandEmpty>Nenhum bloco encontrado.</CommandEmpty>
+                            <CommandGroup>
+                              {unidadesData.blocos.map((bloco) => (
+                                <CommandItem
+                                  value={bloco}
+                                  key={bloco}
+                                  onSelect={(value) => {
+                                    form.setValue("bloco", value);
+                                    form.setValue("apartamento", "");
+                                    setBlocoOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      bloco === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {bloco}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    <FormControl>
+                      <Input placeholder="Ex: Bloco A" {...field} />
+                    </FormControl>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -153,15 +266,82 @@ export function CadastroFormsMorador() {
             <FormField
               control={form.control}
               name="apartamento"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Apartamento</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: 101" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const apartamentos = blocoWatch && unidadesData ? unidadesData.unidadesPorBloco[blocoWatch] || [] : [];
+                return (
+                  <FormItem className="flex flex-col pt-2">
+                    <FormLabel>Apartamento</FormLabel>
+                    {isFetchingUnidades ? (
+                      <FormControl>
+                        <Button variant="outline" disabled className="w-full justify-between font-normal text-muted-foreground">
+                          Buscando...
+                          <Loader2 className="ml-2 h-4 w-4 animate-spin shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    ) : !codigoAcessoWatch || codigoAcessoWatch.length < 5 ? (
+                      <FormControl>
+                        <Input placeholder="Aguardando código..." disabled {...field} />
+                      </FormControl>
+                    ) : unidadesData && apartamentos.length > 0 ? (
+                      <Popover open={apartamentoOpen} onOpenChange={setApartamentoOpen} modal={true}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              disabled={!blocoWatch}
+                              className={cn(
+                                "w-full justify-between font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? field.value
+                                : "Selecione o apartamento"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Pesquisar apartamento..." />
+                            <CommandList>
+                              <CommandEmpty>Nenhum apartamento encontrado.</CommandEmpty>
+                              <CommandGroup>
+                                {apartamentos.map((apt) => (
+                                  <CommandItem
+                                    value={apt}
+                                    key={apt}
+                                    onSelect={(value) => {
+                                      form.setValue("apartamento", value);
+                                      setApartamentoOpen(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        apt === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    {apt}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    ) : (
+                      <FormControl>
+                        <Input placeholder="Ex: 101" disabled={!blocoWatch && (unidadesData?.blocos?.length ?? 0) > 0} {...field} />
+                      </FormControl>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

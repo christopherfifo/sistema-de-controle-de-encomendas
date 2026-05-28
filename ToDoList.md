@@ -24,6 +24,7 @@
 - [X] mostrar mensagens de erro da API no cadastro de morador
 - [X] api externa de validação de cpf
 - [X] api externa de pagamento
+- [X] api externa de envio de emails
 
 # melhorias
 

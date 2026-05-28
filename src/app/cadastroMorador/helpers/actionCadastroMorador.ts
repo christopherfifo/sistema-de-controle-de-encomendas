@@ -155,3 +155,45 @@ export async function registerMorador(
     };
   }
 }
+
+export async function getUnidadesByCodigoAcesso(codigo_acesso: string) {
+  if (!codigo_acesso) return null;
+
+  try {
+    const condominio = await db.condominio.findUnique({
+      where: { codigo_acesso },
+      select: {
+        id_condominio: true,
+        unidades: {
+          select: {
+            bloco_torre: true,
+            numero_unidade: true,
+          },
+          orderBy: [
+            { bloco_torre: 'asc' },
+            { numero_unidade: 'asc' }
+          ]
+        }
+      }
+    });
+
+    if (!condominio) return null;
+
+    // Agrupar unidades por bloco
+    const blocosMap = new Map<string, string[]>();
+    for (const unidade of condominio.unidades) {
+      if (!blocosMap.has(unidade.bloco_torre)) {
+        blocosMap.set(unidade.bloco_torre, []);
+      }
+      blocosMap.get(unidade.bloco_torre)!.push(unidade.numero_unidade);
+    }
+
+    const blocos = Array.from(blocosMap.keys());
+    const unidadesPorBloco = Object.fromEntries(blocosMap);
+
+    return { blocos, unidadesPorBloco };
+  } catch (error) {
+    console.error("[GET_UNIDADES_ERROR]", error);
+    return null;
+  }
+}

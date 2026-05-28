@@ -31,6 +31,7 @@ export default async function GerenciarFuncionariosPage({
       cpf: true,
       telefone: true,
       ativo: true,
+      token_acesso: true, 
       unidades_residenciais: { include: { unidade: true } }
     },
     orderBy: { nome_completo: "asc" },

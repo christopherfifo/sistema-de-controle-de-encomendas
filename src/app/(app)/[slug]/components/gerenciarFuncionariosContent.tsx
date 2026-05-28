@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useForm, Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, ShieldAlert, UserX, UserCheck, Trash2, Edit2, UserPlus, CheckCircle } from "lucide-react";
+import { Loader2, ShieldAlert, UserX, UserCheck, Trash2, Edit2, UserPlus, CheckCircle, KeyRound, Copy, Check } from "lucide-react";
 
 import { registroPorteiroSchema, edicaoPorteiroSchema, RegistroPorteiroFormData, EdicaoPorteiroFormData } from "../schemas/schemaPorteiro";
 import { adicionarPorteiro, atualizarPorteiro, transformarMoradorEmPorteiro, alternarStatusPorteiro, excluirPorteiro } from "../helpers/actionPorteiro";
@@ -26,6 +26,17 @@ interface GerenciarFuncionariosContentProps {
   nomeCondominio: string;
 }
 
+function formatarTokenVisual(token: string): string {
+  if (!token) return "---";
+  if (token.length === 6) {
+    return `${token.slice(0, 3)}-${token.slice(3, 6)}`;
+  }
+  if (token.length === 8) {
+    return `${token.slice(0, 4)}-${token.slice(4, 8)}`;
+  }
+  return token;
+}
+
 export function GerenciarFuncionariosContent({
   porteiros,
   moradores,
@@ -37,6 +48,8 @@ export function GerenciarFuncionariosContent({
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState("lista");
   const [editandoPorteiroId, setEditandoPorteiroId] = useState<string | null>(null);
+  const [tokenPorteiroEdicao, setTokenPorteiroEdicao] = useState<string>("");
+  const [copiadoId, setCopiadoId] = useState<string | null>(null);
 
   const formCadastro = useForm<RegistroPorteiroFormData>({
     resolver: zodResolver(registroPorteiroSchema),
@@ -66,8 +79,16 @@ export function GerenciarFuncionariosContent({
   const watchMoraCadastro = formCadastro.watch("moraNoCondominio");
   const watchMoraEdicao = formEdicao.watch("moraNoCondominio");
 
+  const handleCopiarToken = (token: string, idContexto: string) => {
+    if (!token || token === "---") return;
+    navigator.clipboard.writeText(token);
+    setCopiadoId(idContexto);
+    setTimeout(() => setCopiadoId(null), 2000);
+  };
+
   const handleEntrarModoEdicao = (porteiro: any) => {
     setEditandoPorteiroId(porteiro.id_usuario);
+    setTokenPorteiroEdicao(porteiro.token_acesso || "");
     const primeiraUnidade = porteiro.unidades_residenciais?.[0]?.id_unidade || "";
     
     formEdicao.reset({
@@ -91,7 +112,7 @@ export function GerenciarFuncionariosContent({
       const res = await adicionarPorteiro(dadosTratados, condominioId, sindicoId);
       
       if (res.success) {
-        alert(`🎉 Funcionário Cadastrado com Sucesso!\n\nTOKEN DE ACESSO: ${res.token_acesso}\n\nCopie e repasse este Token e a Senha definida ao porteiro para o primeiro login.`);
+        alert("Ok");
         formCadastro.reset(); 
         setActiveTab("lista"); 
       } else {
@@ -109,7 +130,7 @@ export function GerenciarFuncionariosContent({
     startTransition(async () => {
       const res = await atualizarPorteiro(dadosTratados, condominioId, sindicoId);
       alert(res.message);
-      if (res.success) { setEditandoPorteiroId(null); formEdicao.reset(); setActiveTab("lista"); }
+      if (res.success) { setEditandoPorteiroId(null); setTokenPorteiroEdicao(""); formEdicao.reset(); setActiveTab("lista"); }
     });
   };
 
@@ -119,7 +140,8 @@ export function GerenciarFuncionariosContent({
         const res = await transformarMoradorEmPorteiro(moradorId, condominioId, sindicoId);
         
         if (res.success) {
-          alert(`🎉 Morador Promovido com Sucesso!\n\nTOKEN DE ACESSO PORTARIA: ${res.token_acesso}\n\nInforme este token para que ele consiga se autenticar nos terminais da portaria.`);
+          alert("Ok");
+          setActiveTab("lista");
         } else {
           alert(res.message);
         }
@@ -164,21 +186,38 @@ export function GerenciarFuncionariosContent({
             <CardContent className="space-y-4">
               {porteiros.map((p) => {
                 const mora = p.unidades_residenciais?.length > 0;
+                const estaCopiado = copiadoId === p.id_usuario;
+                
                 return (
                   <div key={p.id_usuario} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/40 border rounded-xl gap-4">
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="font-bold text-lg">{p.nome_completo}</span>
                         <span className={`text-[10px] px-2 py-0.5 font-bold rounded-full ${p.ativo ? "bg-green-100 text-green-700" : "bg-destructive/10 text-destructive"}`}>
                           {p.ativo ? "Ativo" : "Bloqueado"}
                         </span>
+                        
+                        <div className="text-[10px] pl-2 pr-1 py-0.5 font-mono font-bold bg-amber-100 text-amber-800 rounded-full flex items-center gap-1.5 border border-amber-200">
+                          <KeyRound className="h-3 w-3" /> Token: {formatarTokenVisual(p.token_acesso)}
+                          {p.token_acesso && (
+                            <button
+                              type="button"
+                              onClick={() => handleCopiarToken(p.token_acesso, p.id_usuario)}
+                              className="p-0.5 hover:bg-amber-200 rounded transition-colors text-amber-900"
+                              title="Copiar token bruto"
+                            >
+                              {estaCopiado ? <Check className="h-3 w-3 text-green-600" /> : <Copy className="h-3 w-3" />}
+                            </button>
+                          )}
+                        </div>
+
                         {mora && (
                           <span className="text-[10px] px-2 py-0.5 font-bold bg-blue-100 text-blue-700 rounded-full">
                             Mora no local ({p.unidades_residenciais[0].unidade.bloco_torre} - Apt {p.unidades_residenciais[0].unidade.numero_unidade})
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground">CPF: {maskCPF(p.cpf)} • Email: {p.email} • Tel: {p.telefone}</p>
+                      <p className="text-xs text-muted-foreground mt-1">CPF: {maskCPF(p.cpf)} • Email: {p.email} • Tel: {p.telefone}</p>
                     </div>
 
                     <div className="flex items-center gap-2 self-end sm:self-center">
@@ -205,13 +244,34 @@ export function GerenciarFuncionariosContent({
             <CardHeader>
               <CardTitle>{editandoPorteiroId ? "Alterar Dados Básicos e Moradia" : "Cadastrar Novo Porteiro Profissional"}</CardTitle>
               <CardDescription>
-                {editandoPorteiroId ? "CPFs e senhas são criptografados e não podem ser alterados pelo administrador." : "Crie uma conta nova de funcionário com senha provisória de acesso."}
+                {editandoPorteiroId ? "CPFs, senhas e tokens de portaria são protegidos e não podem ser alterados pelo administrador." : "Crie uma conta nova de funcionário com senha provisória de acesso."}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {editandoPorteiroId ? (
                 <Form {...formEdicao}>
                   <form onSubmit={formEdicao.handleSubmit(onEditarSubmit)} className="space-y-4">
+                    
+                    
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                        <KeyRound className="h-4 w-4" /> Token de Acesso à Portaria (Imutável)
+                      </label>
+                      <div className="flex gap-2">
+                        <Input value={formatarTokenVisual(tokenPorteiroEdicao)} disabled className="bg-amber-50/50 dark:bg-amber-950/20 font-mono font-bold text-amber-700 border-amber-200" />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="border-amber-200 text-amber-800 hover:bg-amber-50"
+                          onClick={() => handleCopiarToken(tokenPorteiroEdicao, "form-edicao")}
+                          title="Copiar token original"
+                        >
+                          {copiadoId === "form-edicao" ? <Check className="h-4 w-4 text-green-600 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+                          {copiadoId === "form-edicao" ? "Copiado!" : "Copiar"}
+                        </Button>
+                      </div>
+                    </div>
+
                     <FormField control={formEdicao.control as Control<any>} name="nomeCompleto" render={({ field }) => (
                       <FormItem><FormLabel>Nome Completo</FormLabel><FormControl><Input {...field} disabled={isPending} /></FormControl><FormMessage /></FormItem>
                     )} />
@@ -260,7 +320,7 @@ export function GerenciarFuncionariosContent({
 
                     <div className="flex gap-2 pt-2">
                       <Button type="submit" className="flex-1" disabled={isPending}>{isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar Alterações</Button>
-                      <Button type="button" variant="outline" onClick={() => { setEditandoPorteiroId(null); formEdicao.reset(); setActiveTab("lista"); }}>Cancelar</Button>
+                      <Button type="button" variant="outline" onClick={() => { setEditandoPorteiroId(null); setTokenPorteiroEdicao(""); formEdicao.reset(); setActiveTab("lista"); }}>Cancelar</Button>
                     </div>
                   </form>
                 </Form>

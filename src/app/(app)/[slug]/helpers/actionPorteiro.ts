@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { registroPorteiroSchema, edicaoPorteiroSchema } from "../schemas/schemaPorteiro";
 import { isValideCPF } from "@/helpers/cpf";
 import { PerfilUsuario } from "@prisma/client";
+import { getOrCreateUserToken } from "./token"; 
 
 async function verificarPermissaoSindico(sindicoId: string, condominioId: string) {
   const sindico = await db.usuario.findFirst({
@@ -35,7 +36,7 @@ export async function adicionarPorteiro(
 
     const hashedPassword = await bcrypt.hash(senha, 10);
 
-    const tokenGerado = Math.random().toString(36).substring(2, 8).toUpperCase();
+    let tokenFinal = "";
 
     await db.$transaction(async (tx) => {
       const usuario = await tx.usuario.create({
@@ -47,8 +48,14 @@ export async function adicionarPorteiro(
           telefone,
           perfil: PerfilUsuario.PORTEIRO,
           id_condominio: condominioId,
-          token_acesso: tokenGerado, 
         }
+      });
+
+      tokenFinal = await getOrCreateUserToken({
+        userId: usuario.id_usuario,
+        length: 6,
+        formatted: false, 
+        prisma: tx, 
       });
 
       if (moraNoCondominio && id_unidade) {
@@ -63,7 +70,7 @@ export async function adicionarPorteiro(
     return { 
       success: true, 
       message: "Porteiro cadastrado com sucesso!", 
-      token_acesso: tokenGerado 
+      token_acesso: tokenFinal 
     };
   } catch (error: any) {
     return { success: false, message: error.message || "Erro ao cadastrar porteiro." };
@@ -101,7 +108,7 @@ export async function atualizarPorteiro(
     });
 
     revalidatePath(`/(app)/[slug]/gerenciarFuncionarios`, "page");
-    return { success: true, message: "Dados do funcionário atualizados com sucesso!" };
+    return { success: true, message: "Dados do funcionário updated com sucesso!" };
   } catch (error: any) {
     return { success: false, message: error.message || "Erro ao atualizar dados." };
   }
@@ -111,21 +118,22 @@ export async function transformarMoradorEmPorteiro(moradorId: string, condominio
   try {
     await verificarPermissaoSindico(sindicoId, condominioId);
 
-    const tokenGerado = Math.random().toString(36).substring(2, 8).toUpperCase();
-
     await db.usuario.update({
       where: { id_usuario: moradorId, id_condominio: condominioId },
-      data: { 
-        perfil: PerfilUsuario.PORTEIRO,
-        token_acesso: tokenGerado 
-      } 
+      data: { perfil: PerfilUsuario.PORTEIRO } 
+    });
+
+    const tokenAcesso = await getOrCreateUserToken({
+      userId: moradorId,
+      length: 6,
+      formatted: false,
     });
 
     revalidatePath(`/(app)/[slug]/gerenciarFuncionarios`, "page");
     return { 
       success: true, 
       message: "Morador promovido a Porteiro com sucesso! Ele agora tem acesso à portaria.",
-      token_acesso: tokenGerado 
+      token_acesso: tokenAcesso
     };
   } catch (error: any) {
     return { success: false, message: error.message || "Erro ao alterar perfil do morador." };

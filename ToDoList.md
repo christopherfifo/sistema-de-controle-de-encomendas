@@ -15,7 +15,7 @@
 - [X] validação do token na hora da encomenda com acesso a camera para ler o token
   
 # essencial
-- [ ] verificar se a api de rastreio dos correios esta funcionando
+- [X] verificar se a api de rastreio dos correios esta funcionando
 - [X] deixar o formulario de cadasto de encomendas no mesmo formato que o do porteiro e usar a api do codigo de rastreio (mas sem o campo de foto e pesquisa por nome, mas ele deve pegar o bloco de apartamento sozinho)
 - [X] na aba de aviso dos moradores (encomendas pré cadastradas), ele so ta puxando uma pessoa (yasmin) ao invés de todos as pessoas
 

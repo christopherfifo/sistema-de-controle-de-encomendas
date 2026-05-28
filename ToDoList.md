@@ -27,4 +27,4 @@
 
 # melhorias
 
-- [ ] permitir enviar link de cadastro com código de acesso pré-preenchido via URL
+- [X] permitir enviar link de cadastro com código de acesso pré-preenchido via URL

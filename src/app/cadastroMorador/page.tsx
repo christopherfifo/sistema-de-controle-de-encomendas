@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CadastroFormsMorador } from "./components/cadastroFormsMorador";
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function CadastroPage() {
   return (
@@ -22,7 +24,9 @@ export default function CadastroPage() {
         </CardHeader>
 
         <CardContent>
-          <CadastroFormsMorador />
+          <Suspense fallback={<div className="flex justify-center p-4"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+            <CadastroFormsMorador />
+          </Suspense>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4">

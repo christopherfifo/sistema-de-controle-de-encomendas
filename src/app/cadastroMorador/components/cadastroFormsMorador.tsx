@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition } from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import {
   Form,
@@ -25,6 +25,9 @@ import { registerMorador } from "../helpers/actionCadastroMorador";
 
 export function CadastroFormsMorador() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const codigoFromUrl = searchParams.get("codigo_acesso") || searchParams.get("codigoAcesso") || searchParams.get("codigo");
+
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
@@ -52,7 +55,7 @@ export function CadastroFormsMorador() {
       cpf: "",
       senha: "",
       telefone: "",
-      codigo_acesso: "",
+      codigo_acesso: codigoFromUrl || "",
       bloco: "",
       apartamento: "",
     },
@@ -115,22 +118,24 @@ export function CadastroFormsMorador() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="codigo_acesso"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Código de Acesso</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Insira o código do seu condomínio"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!codigoFromUrl && (
+            <FormField
+              control={form.control}
+              name="codigo_acesso"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Código de Acesso</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Insira o código do seu condomínio"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               control={form.control}

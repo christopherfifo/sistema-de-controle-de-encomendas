@@ -26,7 +26,7 @@ import { registerMorador } from "../helpers/actionCadastroMorador";
 export function CadastroFormsMorador() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const codigoFromUrl = searchParams.get("codigo_acesso") || searchParams.get("codigoAcesso") || searchParams.get("codigo");
+  const codigoFromUrl = searchParams.get("codigo_acesso") || searchParams.get("codigoAcesso") || searchParams.get("codigo") || searchParams.get("condominio");
 
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();

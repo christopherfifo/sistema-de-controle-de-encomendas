@@ -66,6 +66,7 @@ async function getPorteiroData(slug: string) {
             include: {
               usuario: {
                 select: {
+                  id_usuario: true, 
                   nome_completo: true, 
                 },
               },

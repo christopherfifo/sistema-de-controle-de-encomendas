@@ -11,6 +11,7 @@ type EncomendaComUnidadeEMorador = Encomenda & {
   unidade: Pick<Unidade, "bloco_torre" | "numero_unidade"> & {
     moradores: {
       usuario: {
+        id_usuario: string;
         nome_completo: string;
       };
     }[];

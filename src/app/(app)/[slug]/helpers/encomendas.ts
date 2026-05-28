@@ -149,12 +149,11 @@ export async function registrarEncomendaPorteiro(
       },
     });
 
-    // CORREÇÃO AQUI: Passando o quarto parâmetro (condicao) para a função do Telegram
     await enviarNotificacaoTelegram(
       id_unidade, 
       encomendaData.tipo_encomenda, 
       encomendaData.forma_entrega,
-      encomendaData.condicao || "Nenhuma observação informada." // Garante que não vai null/undefined
+      encomendaData.condicao || "Nenhuma observação informada." 
     );
 
     revalidatePath(`/(app)/[slug]`, "page");
@@ -202,9 +201,12 @@ export async function getMoradoresDaUnidade(
 
   return moradores.map((morador) => morador.usuario);
 }
-
 export async function registrarRetiradaEncomenda(
-  data: RetiradaEncomendaFormData,
+  data: {
+    tipo_confirmacao: "TOKEN" | "MANUAL";
+    token_retirante?: string | null;
+    cpf_retirante?: string | null;
+  },
   encomendaId: string,
   porteiroId: string,
 ) {
@@ -213,7 +215,7 @@ export async function registrarRetiradaEncomenda(
     throw new Error(validatedData.error.issues[0].message);
   }
 
-  const { token_retirante } = validatedData.data;
+  const { tipo_confirmacao, token_retirante, cpf_retirante } = validatedData.data as any;
 
   const encomenda = await db.encomenda.findUnique({
     where: { id_encomenda: encomendaId },
@@ -227,12 +229,35 @@ export async function registrarRetiradaEncomenda(
     throw new Error("Esta encomenda não está mais pendente de retirada.");
   }
 
-  const morador = await db.usuario.findUnique({
-    where: { token_acesso: token_retirante },
-  });
+  let moradorAlvo;
 
-  if (!morador) {
-    throw new Error("Token inválido ou expirado. Verifique o código com o morador.");
+  if (tipo_confirmacao === "TOKEN") {
+    if (!token_retirante) throw new Error("Token é obrigatório para validação automática.");
+    
+    moradorAlvo = await db.usuario.findUnique({
+      where: { token_acesso: token_retirante },
+    });
+
+    if (!moradorAlvo) {
+      throw new Error("Token inválido ou expirado. Verifique com o morador.");
+    }
+  } else {
+    if (!cpf_retirante || cpf_retirante.trim() === "") {
+      throw new Error("O campo CPF é obrigatório para a baixa manual.");
+    }
+
+    const cpfLimpoInput = cpf_retirante.replace(/\D/g, "");
+
+    moradorAlvo = await db.usuario.findFirst({
+      where: { 
+        cpf: cpfLimpoInput,
+        id_condominio: encomenda.unidade.id_condominio 
+      },
+    });
+
+    if (!moradorAlvo) {
+      throw new Error("Nenhum morador encontrado com este CPF neste condomínio.");
+    }
   }
 
   try {
@@ -247,30 +272,34 @@ export async function registrarRetiradaEncomenda(
       db.retirada.create({
         data: {
           id_encomenda: encomendaId,
-          id_usuario_retirada: morador.id_usuario,
+          id_usuario_retirada: moradorAlvo.id_usuario,
           data_retirada: new Date(),
-          forma_confirmacao: "TOKEN",
-          comprovante: `Validado via Token de Segurança`,
+          forma_confirmacao: tipo_confirmacao,
+          comprovante: tipo_confirmacao === "TOKEN" 
+            ? `Validado via Token de Segurança`
+            : `Confirmado manualmente via checagem direta de CPF`,
         },
       }),
 
-      db.usuario.update({
-        where: { id_usuario: morador.id_usuario },
-        data: { token_acesso: null }
-      })
+      ...(tipo_confirmacao === "TOKEN" ? [
+        db.usuario.update({
+          where: { id_usuario: moradorAlvo.id_usuario },
+          data: { token_acesso: null }
+        })
+      ] : [])
     ]);
 
-    if (morador.telegram_chat_id) {
+    if (moradorAlvo.telegram_chat_id) {
       enviarNotificacaoRetiradaTelegram({
-        chatId: morador.telegram_chat_id,
-        moradorNome: morador.nome_completo,
-        bloco: encomenda?.unidade.bloco_torre || encomenda.unidade.bloco_torre,
+        chatId: moradorAlvo.telegram_chat_id,
+        moradorNome: moradorAlvo.nome_completo,
+        bloco: encomenda.unidade.bloco_torre,
         apartamento: encomenda.unidade.numero_unidade,
         tipoEncomenda: encomenda.tipo_encomenda,
         formaEntrega: encomenda.forma_entrega,
         codigoRastreio: encomenda.codigo_rastreio,
         dataRetirada: new Date(),
-        quemRetirouNome: morador.nome_completo,
+        quemRetirouNome: moradorAlvo.nome_completo,
         urlFotoProduto: encomenda.url_foto_pacote
       }).catch((err) => {
         console.error("[TELEGRAM_BG_ERROR] Falha ao notificar saída:", err);
@@ -279,13 +308,12 @@ export async function registrarRetiradaEncomenda(
 
     revalidatePath(`/(app)/[slug]`, "page");
 
-    return { success: true, message: "Retirada por Token registrada com sucesso!" };
+    return { success: true, message: `Retirada registrada com sucesso para ${moradorAlvo.nome_completo}!` };
   } catch (error) {
     console.error("Erro na transação de retirada:", error);
     throw new Error("Não foi possível registrar a retirada. Tente novamente.");
   }
 }
-
 export async function gerarNovoTokenRetirada(userId: string) {
   const novoToken = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -334,11 +362,10 @@ export async function confirmarChegadaEncomendaMorador(
         id_porteiro_recebimento: porteiroId,
         data_recebimento: new Date(),
         condicao: condicaoPorteiro,
-        url_foto_pacote: null, // Como combinado, a foto não vai para o BD
+        url_foto_pacote: null, 
       },
     });
 
-    // 2. Dispara o Telegram com o relatório completo (Nome, Apt, Bloco, Pedido e a Obs)
     await enviarNotificacaoTelegram(
       encomenda.id_unidade,
       encomenda.tipo_encomenda,
@@ -361,7 +388,6 @@ async function enviarNotificacaoTelegram(
   observacaoPorteiro: string
 ) {
   try {
-    // Busca os dados da Unidade trazendo todos os moradores vinculados e seus Chat IDs
     const unidade = await db.unidade.findUnique({
       where: { id_unidade: unidadeId },
       include: {
@@ -378,7 +404,6 @@ async function enviarNotificacaoTelegram(
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     if (!BOT_TOKEN) return;
 
-    // Varre e envia a notificação customizada para cada morador daquela unidade
     for (const vinculo of unidade.moradores) {
       const chatId = vinculo.usuario.telegram_chat_id;
       const nomeMorador = vinculo.usuario.nome_completo;

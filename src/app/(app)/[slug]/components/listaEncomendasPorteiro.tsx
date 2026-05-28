@@ -14,6 +14,9 @@ import { PackageCheck, PackageSearch, User } from "lucide-react";
 import { ModalRegistrarRetirada } from "./modalRegistrarRetirada";
 
 type EncomendaComUnidadeEMorador = Encomenda & {
+  usuario_cadastro?: {
+    nome_completo: string;
+  } | null;
   unidade: Pick<Unidade, "bloco_torre" | "numero_unidade"> & {
     moradores: {
       usuario: {
@@ -70,7 +73,9 @@ export function ListaEncomendasPorteiro({
     <>
       <Accordion type="multiple" className="w-full">
         {encomendasVisiveis.map((encomenda) => {
-          const nomeMorador = encomenda.unidade.moradores[0]?.usuario.nome_completo || "Morador não encontrado";
+          const nomeMorador = encomenda.usuario_cadastro?.nome_completo 
+            || encomenda.unidade.moradores.map(m => m.usuario.nome_completo).join(", ") 
+            || "Morador não encontrado";
 
           const dataRecebimentoTexto = encomenda.data_recebimento 
             ? new Date(encomenda.data_recebimento).toLocaleString("pt-BR", { 

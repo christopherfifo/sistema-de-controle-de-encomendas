@@ -58,6 +58,9 @@ async function getPorteiroData(idCondominio: string) {
       },
     },
     include: {
+      usuario_cadastro: {
+        select: { nome_completo: true },
+      },
       unidade: {
         select: {
           bloco_torre: true,

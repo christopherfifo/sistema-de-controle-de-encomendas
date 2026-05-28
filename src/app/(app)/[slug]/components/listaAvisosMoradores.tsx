@@ -14,6 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { ItemAvisoForm } from "./itemAvisoForm";
 
 type EncomendaComUnidadeEMorador = Encomenda & {
+  usuario_cadastro?: {
+    nome_completo: string;
+  } | null;
   unidade: Pick<Unidade, "bloco_torre" | "numero_unidade"> & {
     moradores: {
       usuario: {
@@ -50,7 +53,9 @@ export function ListaAvisosMoradores({ avisosIniciais, porteiroId }: ListaAvisos
   return (
     <Accordion type="multiple" className="w-full">
       {avisos.map((encomenda) => {
-        const nomeMorador = encomenda.unidade.moradores[0]?.usuario.nome_completo || "Morador não encontrado";
+        const nomeMorador = encomenda.usuario_cadastro?.nome_completo 
+          || encomenda.unidade.moradores.map(m => m.usuario.nome_completo).join(", ") 
+          || "Morador não encontrado";
 
         return (
           <AccordionItem key={encomenda.id_encomenda} value={encomenda.id_encomenda}>
@@ -75,7 +80,7 @@ export function ListaAvisosMoradores({ avisosIniciais, porteiroId }: ListaAvisos
               <div className="text-sm space-y-1.5">
                 <p><strong>Morador Responsável:</strong> {nomeMorador}</p>
                 <p><strong>Cód. Rastreio:</strong> <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{encomenda.codigo_rastreio || "Não informado"}</code></p>
-                <p><strong>Obs. Morador:</strong> <span className="italic text-muted-foreground">"{encomenda.condicao || "Nenhuma"}"</span></p>
+                <p><strong>Obs. Morador:</strong> <span className="italic text-muted-foreground">&quot;{encomenda.condicao || "Nenhuma"}&quot;</span></p>
               </div>
 
               <hr className="border-muted" />

@@ -8,6 +8,9 @@ import { ListaEncomendasPorteiro } from "./listaEncomendasPorteiro";
 import { ListaAvisosMoradores } from "./listaAvisosMoradores";
 
 type EncomendaComUnidadeEMorador = Encomenda & {
+  usuario_cadastro?: {
+    nome_completo: string;
+  } | null;
   unidade: Pick<Unidade, "bloco_torre" | "numero_unidade"> & {
     moradores: {
       usuario: {

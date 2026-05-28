@@ -5,6 +5,7 @@
 - [X] Criar a função que crie o token para cada usuário quando ele fizer o cadastro (interessante essa função ser separada)
 - [X] arrumar a logica dos formulários de cadastro e login para usar a api e redirecionar se estiver certo 
 - [X] criar a aba onde exibi o token do usuário 
+- [X] fluxo de recupeção de senha dos usuários com envio de email
 
 ## chris
 

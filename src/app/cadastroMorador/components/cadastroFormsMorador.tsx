@@ -453,7 +453,7 @@ export function CadastroFormsMorador() {
               Cadastrando...
             </>
           ) : (
-            "Criar Conta e Cadastrar Condomínio"
+            "Criar Conta"
           )}
         </Button>
       </form>

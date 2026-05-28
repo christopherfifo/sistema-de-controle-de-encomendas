@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { loginSchema, LoginFormValues } from "./helpers/schemaLogin";
 import { authenticate } from "./helpers/actionsLogin";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function LoginForm() {
   const router = useRouter();
@@ -83,7 +84,15 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Senha</FormLabel>
+              <div className="flex items-center justify-between">
+                <FormLabel>Senha</FormLabel>
+                <Link
+                  href="/recuperar-senha"
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Esqueci minha senha
+                </Link>
+              </div>
               <div className="relative">
                 <FormControl>
                   <Input

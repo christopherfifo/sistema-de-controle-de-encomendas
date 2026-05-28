@@ -149,7 +149,13 @@ export async function registrarEncomendaPorteiro(
       },
     });
 
-    await enviarNotificacaoTelegram(id_unidade, encomendaData.tipo_encomenda, encomendaData.forma_entrega);
+    // CORREÇÃO AQUI: Passando o quarto parâmetro (condicao) para a função do Telegram
+    await enviarNotificacaoTelegram(
+      id_unidade, 
+      encomendaData.tipo_encomenda, 
+      encomendaData.forma_entrega,
+      encomendaData.condicao || "Nenhuma observação informada." // Garante que não vai null/undefined
+    );
 
     revalidatePath(`/(app)/[slug]`, "page");
     return { success: true, message: "Encomenda registrada com sucesso!" };
@@ -292,25 +298,107 @@ export async function gerarNovoTokenRetirada(userId: string) {
   return { success: true, token: novoToken };
 }
 
-async function enviarNotificacaoTelegram(unidadeId: string, tipo: string, origem: string) {
+export async function confirmarChegadaEncomendaMorador(
+  encomendaId: string,
+  porteiroId: string,
+  formData: FormData
+) {
+  if (!encomendaId || !porteiroId) {
+    throw new Error("IDs de encomenda e porteiro são obrigatórios.");
+  }
+
+  const condicaoPorteiro = formData.get("condicaoPorteiro") as string;
+
+  if (!condicaoPorteiro || condicaoPorteiro.trim() === "") {
+    throw new Error("A condição/estado do pacote é obrigatória.");
+  }
+
+  const encomenda = await db.encomenda.findUnique({
+    where: { id_encomenda: encomendaId },
+    include: { unidade: true },
+  });
+
+  if (!encomenda) {
+    throw new Error("Encomenda não encontrada.");
+  }
+
+  if (encomenda.id_porteiro_recebimento) {
+    throw new Error("Esta encomenda já foi recebida por um porteiro.");
+  }
+
   try {
-    const moradoresDaUnidade = await db.moradoresUnidades.findMany({
+    // 1. Atualiza salvando o porteiro que recebeu fisicamente e a observação de entrada
+    await db.encomenda.update({
+      where: { id_encomenda: encomendaId },
+      data: {
+        id_porteiro_recebimento: porteiroId,
+        data_recebimento: new Date(),
+        condicao: condicaoPorteiro,
+        url_foto_pacote: null, // Como combinado, a foto não vai para o BD
+      },
+    });
+
+    // 2. Dispara o Telegram com o relatório completo (Nome, Apt, Bloco, Pedido e a Obs)
+    await enviarNotificacaoTelegram(
+      encomenda.id_unidade,
+      encomenda.tipo_encomenda,
+      encomenda.forma_entrega,
+      condicaoPorteiro
+    );
+
+    revalidatePath(`/(app)/[slug]`, "page");
+    return { success: true, message: "Chegada do pacote registrada e morador notificado!" };
+  } catch (error) {
+    console.error("Erro ao confirmar chegada da encomenda:", error);
+    throw new Error("Não foi possível registrar o recebimento da encomenda.");
+  }
+}
+
+async function enviarNotificacaoTelegram(
+  unidadeId: string,
+  tipo: string,
+  origem: string,
+  observacaoPorteiro: string
+) {
+  try {
+    // Busca os dados da Unidade trazendo todos os moradores vinculados e seus Chat IDs
+    const unidade = await db.unidade.findUnique({
       where: { id_unidade: unidadeId },
       include: {
-        usuario: {
-          select: { telegram_chat_id: true }
+        moradores: {
+          include: {
+            usuario: true
+          }
         }
       }
     });
 
-    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    if (!unidade) return;
 
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     if (!BOT_TOKEN) return;
 
-    for (const vinculo of moradoresDaUnidade) {
+    // Varre e envia a notificação customizada para cada morador daquela unidade
+    for (const vinculo of unidade.moradores) {
       const chatId = vinculo.usuario.telegram_chat_id;
+      const nomeMorador = vinculo.usuario.nome_completo;
+
       if (chatId) {
-        const texto = `📦 *SysCondomínio — Nova Encomenda!*\n\nOlá! Um pacote do tipo *${tipo}* (${origem}) acabou de chegar na portaria.\n\nGere o seu *Token de 6 dígitos* no painel para efetuar a retirada em segurança!`;
+        const texto = [
+          `📦 *SysCondomínio — Sua Encomenda Chegou!*`,
+          ``,
+          `Olá, *${nomeMorador}*! Informamos que seu pacote deu entrada física na portaria.`,
+          ``,
+          `🏢 *Dados da Unidade:*`,
+          `• *Bloco/Torre:* ${unidade.bloco_torre}`,
+          `• *Apartamento:* ${unidade.numero_unidade}`,
+          ``,
+          `📦 *Dados do Pedido:*`,
+          `• *Encomenda:* ${tipo} (${origem})`,
+          `• *Condição de Recebimento (Obs):* _${observacaoPorteiro}_`,
+          ``,
+          `🔑 Acesse seu painel para gerar seu *Token de Liberação* e retirar com o porteiro.`
+        ].join("\n");
         
         await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           chat_id: chatId,

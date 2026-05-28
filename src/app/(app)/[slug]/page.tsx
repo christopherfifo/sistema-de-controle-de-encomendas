@@ -62,6 +62,15 @@ async function getPorteiroData(slug: string) {
         select: {
           bloco_torre: true,
           numero_unidade: true,
+          moradores: { 
+            include: {
+              usuario: {
+                select: {
+                  nome_completo: true, 
+                },
+              },
+            },
+          },
         },
       },
     },

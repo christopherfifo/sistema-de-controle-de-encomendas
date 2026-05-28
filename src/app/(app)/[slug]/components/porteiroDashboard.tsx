@@ -2,14 +2,23 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Encomenda, Unidade } from "@prisma/client";
-import { PackagePlus, PackageSearch } from "lucide-react";
+import { PackagePlus, PackageSearch, ClipboardCheck } from "lucide-react";
 import { FormRegistrarEncomenda } from "./formRegistrarEncomenda";
 import { ListaEncomendasPorteiro } from "./listaEncomendasPorteiro";
+import { ListaAvisosMoradores } from "./listaAvisosMoradores";
+
+type EncomendaComUnidadeEMorador = Encomenda & {
+  unidade: Pick<Unidade, "bloco_torre" | "numero_unidade"> & {
+    moradores: {
+      usuario: {
+        nome_completo: string;
+      };
+    }[];
+  };
+};
 
 interface PorteiroDashboardProps {
-  encomendasPendentes: (Encomenda & {
-    unidade: Pick<Unidade, "bloco_torre" | "numero_unidade">;
-  })[];
+  encomendasPendentes: EncomendaComUnidadeEMorador[];
   unidadesDoCondominio: Pick<
     Unidade,
     "id_unidade" | "bloco_torre" | "numero_unidade"
@@ -19,23 +28,43 @@ interface PorteiroDashboardProps {
 }
 
 export function PorteiroDashboard({
-  encomendasPendentes,
+  encomendasPendentes = [],
   unidadesDoCondominio,
   porteiroId,
   condominioId,
 }: PorteiroDashboardProps) {
+  
+  const avisosMoradores = encomendasPendentes.filter(
+    (enc) => enc.id_usuario_cadastro !== null && enc.id_porteiro_recebimento === null
+  );
+
+  const pendentesRetirada = encomendasPendentes.filter(
+    (enc) => enc.id_porteiro_recebimento !== null
+  );
+
   return (
-    <Tabs defaultValue="registrar" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
+    <Tabs defaultValue="avisos" className="w-full">
+      <TabsList className="grid w-full grid-cols-3 md:w-[600px]">
+        <TabsTrigger value="avisos">
+          <ClipboardCheck className="h-4 w-4 mr-2" />
+          Avisos de Moradores ({avisosMoradores.length})
+        </TabsTrigger>
         <TabsTrigger value="registrar">
           <PackagePlus className="h-4 w-4 mr-2" />
-          Registrar Encomenda
+          Registrar Surpresa
         </TabsTrigger>
         <TabsTrigger value="pendentes">
           <PackageSearch className="h-4 w-4 mr-2" />
-          Pendentes de Retirada
+          Dar Retirada ({pendentesRetirada.length})
         </TabsTrigger>
       </TabsList>
+
+      <TabsContent value="avisos" className="mt-4">
+        <ListaAvisosMoradores
+          avisosIniciais={avisosMoradores}
+          porteiroId={porteiroId}
+        />
+      </TabsContent>
 
       <TabsContent value="registrar" className="mt-4">
         <FormRegistrarEncomenda
@@ -47,7 +76,7 @@ export function PorteiroDashboard({
 
       <TabsContent value="pendentes" className="mt-4">
         <ListaEncomendasPorteiro
-          encomendasIniciais={encomendasPendentes}
+          encomendasIniciais={pendentesRetirada}
           porteiroId={porteiroId}
           condominioId={condominioId}
         />

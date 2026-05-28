@@ -23,6 +23,7 @@ import {
   SquareChartGantt,
   ShieldAlert,
   ExternalLink,
+  FolderKanban,
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
@@ -132,11 +133,17 @@ export function SimpleSidebar({
         icon: ShieldAlert,
         pathCheck: `/${condominioId}/meuToken`,
       },
-            {
+      {
         label: "Gerenciar Links de Cadastro",
         href: createHref("/gerenciarLinksCadastro"),
         icon: ExternalLink,
         pathCheck: `/${condominioId}/gerenciarLinksCadastro`,
+      },
+      {
+        label: "Gerenciar Moradores",
+        href: createHref("/gerenciarMoradores"),
+        icon: FolderKanban,
+        pathCheck: `/${condominioId}/gerenciarMoradores`,
       },
     ];
   }

@@ -29,7 +29,7 @@ async function main() {
   // ==========================================
   const planoBasico = await db.plano.create({
     data: {
-      nome_plano: "Plano Básico",
+      nome_plano: "Plano Light",
       valor: 89.90,
       limite_unidades: 40,
       limite_condominios: 5,
@@ -147,6 +147,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       termo_aceite: true,
       ativo: true,
+      token_acesso: "00000000",
     },
   });
 
@@ -161,6 +162,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       ativo: true,
       termo_aceite: true,
+      token_acesso: "11111111",
     },
   });
 
@@ -175,6 +177,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       ativo: true,
       termo_aceite: true,
+      token_acesso: "22222222",
     },
   });
 
@@ -189,6 +192,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       ativo: true,
       termo_aceite: true,
+      token_acesso: "33333333",
     },
   });
 
@@ -203,6 +207,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       ativo: true,
       termo_aceite: true,
+      token_acesso: "44444444",
     },
   });
 

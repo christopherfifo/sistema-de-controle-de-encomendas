@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 import {
   CadastroFormValues,
   cadastroSchema,
@@ -77,6 +79,7 @@ export function CadastroFormsMorador() {
       codigo_acesso: codigoFromUrl || "",
       bloco: "",
       apartamento: "",
+      aceiteTermos: false,
     },
   });
 
@@ -445,6 +448,30 @@ export function CadastroFormsMorador() {
             />
           </div>
         </fieldset>
+
+        <FormField
+          control={form.control}
+          name="aceiteTermos"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel className="text-sm font-normal text-muted-foreground leading-relaxed">
+                  Li e aceito as condições contratuais do sistema, incluindo os{" "}
+                  <Link href="/termos" className="text-primary hover:underline">Termos de Uso</Link>, a{" "}
+                  <Link href="/privacidade" className="text-primary hover:underline">Política de Privacidade</Link> e o acordo de suporte{" "}
+                  <Link href="/sla" className="text-primary hover:underline">[SLA]</Link>.
+                </FormLabel>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" className="w-full" size="lg" disabled={isPending}>
           {isPending ? (

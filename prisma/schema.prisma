@@ -87,6 +87,7 @@ model Usuario {
   perfil        PerfilUsuario
   ativo         Boolean       @default(true)
   data_criacao  DateTime      @default(now())
+  termo_aceite  Boolean       @default(false)
 
   id_condominio String
   condominio    Condominio @relation(fields: [id_condominio], references: [id_condominio])

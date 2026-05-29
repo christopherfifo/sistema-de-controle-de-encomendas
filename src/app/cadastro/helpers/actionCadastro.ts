@@ -63,7 +63,8 @@ export async function registerCondominioAndAdmin(
           cpf: cpf,
           senha_hash: hashedPassword,
           telefone: telefone,
-          perfil: "SINDICO",
+          perfil: "ADMINISTRADOR",
+          termo_aceite: true,
           condominio: {
             connect: { id_condominio: newCondominio.id_condominio },
           },

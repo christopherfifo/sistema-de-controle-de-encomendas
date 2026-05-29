@@ -116,6 +116,7 @@ export async function registerMorador(
           senha_hash: hashedPassword,
           telefone,
           perfil: "MORADOR",
+          termo_aceite: true,
           id_condominio: condominio.id_condominio,
         },
       });

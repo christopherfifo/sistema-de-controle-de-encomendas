@@ -29,6 +29,9 @@ export const cadastroSchema = z.object({
   codigo_acesso: z.string().min(1, "O código de acesso é obrigatório"),
   bloco: z.string().min(1, "O bloco é obrigatório"),
   apartamento: z.string().min(1, "O apartamento é obrigatório"),
+  aceiteTermos: z.boolean().refine((val) => val === true, {
+    message: "Você deve aceitar as condições contratuais do sistema.",
+  }),
 });
 
 export type CadastroFormValues = z.infer<typeof cadastroSchema>;

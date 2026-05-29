@@ -22,6 +22,7 @@
 # tarefas secundarias
 
 - [ ] arrumar a tela de home do projeto
+- [ ] arrumar a aba de retirada de encomendas do porteiro, ta puxando varias pessoas para uma encomenda
 - [ ] criar a pagina de contratação do sistema
 - [ ] criar o sistema de cadastro e validação dos cartoes
 - [ ] sistema de pagamento

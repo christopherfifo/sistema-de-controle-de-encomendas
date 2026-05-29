@@ -37,8 +37,7 @@
 - [X] api externa de pagamento
 - [X] api externa de envio de emails
 - [X] melhorar o seed do projeto
-
-# melhorias
-
 - [X] permitir enviar link de cadastro com código de acesso pré-preenchido via URL
 - [X] arrumar botão de logoff (só aparecendo quando a barra lateral está aberta, e meio quebrado com o layout)
+- [X] adicionar identidade visual geral na aplicação
+- [X] adicionar favicon e ajustar nome da aba

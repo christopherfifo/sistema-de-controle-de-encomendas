@@ -27,7 +27,7 @@ export default async function GerenciarLinksCadastroPage({
     {
       id_condominio: data.condominio.id_condominio,
       nome_condominio: data.condominio.nome_condominio,
-      slug: slug,
+      codigo_acesso: data.condominio.codigo_acesso || "", 
     }
   ];
 

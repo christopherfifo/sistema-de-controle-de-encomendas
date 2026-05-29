@@ -1,6 +1,6 @@
 import { getPlanos } from "./actionPlanos";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Home, Building, Building2, Crown, Mail } from "lucide-react";
+import { CheckCircle2, Home, Building, Building2, Crown, Mail, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SyncPlanosClient } from "./SyncPlanosClient";
@@ -37,7 +37,16 @@ export default async function PlanosPage() {
   const maxUnits = planos.length > 0 ? Math.max(...planos.map(p => p.limite_unidades)) : 800;
 
   return (
-    <div className="container mx-auto py-16 px-4">
+    <div className="container mx-auto py-16 px-4 relative">
+      <div className="absolute top-6 left-4 lg:left-0">
+        <Button variant="ghost" asChild className="gap-2 hover:bg-primary/5 text-muted-foreground hover:text-primary transition-colors">
+          <Link href="/">
+            <ArrowLeft className="w-4 h-4" />
+            Voltar para Home
+          </Link>
+        </Button>
+      </div>
+      
       <SyncPlanosClient />
       <div className="text-center mb-16">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-6xl mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">

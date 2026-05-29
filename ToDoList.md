@@ -41,3 +41,4 @@
 - [X] arrumar botão de logoff (só aparecendo quando a barra lateral está aberta, e meio quebrado com o layout)
 - [X] adicionar identidade visual geral na aplicação
 - [X] adicionar favicon e ajustar nome da aba
+- [ ] enviar email ao morador ao chegar uma encomenda (além da notificação do telegram)

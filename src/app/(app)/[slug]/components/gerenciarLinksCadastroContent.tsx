@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { Copy, Check, Link2, Plus, Sparkles } from "lucide-react";
 interface CondominioData {
   id_condominio: string;
   nome_condominio: string;
-  slug: string;
+  codigo_acesso: string; 
 }
 
 interface GerenciarLinksCadastroContentProps {
@@ -20,12 +20,19 @@ interface GerenciarLinksCadastroContentProps {
 
 export function GerenciarLinksCadastroContent({ condominios }: GerenciarLinksCadastroContentProps) {
   const [copiadoUrl, setCopiadoUrl] = useState<string | null>(null);
-  
-  const [condominioSelecionado, setCondominioSelecionado] = useState(condominios[0]?.slug || "");
+  const [condominioSelecionado, setCondominioSelecionado] = useState("");
   const [origemLink, setOrigemLink] = useState(""); 
   const [linkGeradoNaHora, setLinkGeradoNaHora] = useState("");
 
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
+  // Obtém a URL base definida no arquivo .env
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
+  // Garante a sincronização do valor padrão do select assim que as propriedades carregarem
+  useEffect(() => {
+    if (condominios.length > 0 && !condominioSelecionado) {
+      setCondominioSelecionado(condominios[0].codigo_acesso);
+    }
+  }, [condominios, condominioSelecionado]);
 
   const handleCopiar = (url: string, id: string) => {
     navigator.clipboard.writeText(url);
@@ -69,7 +76,7 @@ export function GerenciarLinksCadastroContent({ condominios }: GerenciarLinksCad
           </CardHeader>
           <CardContent className="space-y-4">
             {condominios.map((condo) => {
-              const urlPermanente = `${baseUrl}/cadastroMorador?condominio=${condo.slug}`;
+              const urlPermanente = `${baseUrl}/cadastroMorador?condominio=${condo.codigo_acesso}`;
               const estáCopiado = copiadoUrl === condo.id_condominio;
 
               return (
@@ -77,7 +84,7 @@ export function GerenciarLinksCadastroContent({ condominios }: GerenciarLinksCad
                   <div className="flex items-center justify-between">
                     <span className="font-semibold text-sm text-card-foreground">{condo.nome_condominio}</span>
                     <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-mono">
-                      Ref: {condo.slug}
+                      Cód: {condo.codigo_acesso}
                     </span>
                   </div>
                   <div className="flex gap-2">
@@ -121,7 +128,7 @@ export function GerenciarLinksCadastroContent({ condominios }: GerenciarLinksCad
                   onChange={(e) => setCondominioSelecionado(e.target.value)}
                 >
                   {condominios.map((c) => (
-                    <option key={c.id_condominio} value={c.slug}>
+                    <option key={c.id_condominio} value={c.codigo_acesso}>
                       {c.nome_condominio}
                     </option>
                   ))}

@@ -26,6 +26,7 @@
 - [X] criar o sistema de cadastro e validação dos cartoes
 - [X] sistema de pagamento
 - [X] tela de planos com descrição para cada um
+- [ ] arrumar a aba de retirada de encomendas do porteiro, ta puxando varias pessoas para uma encomenda
 - [ ] permitir cadastro de síndico na tela administrativa (após contratação do sistema)
 - [ ] criar página de termos de uso (moradores/porteiro/síndico)
 - [ ] criar página de termos de uso (contratação)

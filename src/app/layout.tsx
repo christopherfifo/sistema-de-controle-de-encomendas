@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CondoDrop",
   description: "Gerenciamento inteligente de encomendas para o seu condomínio",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

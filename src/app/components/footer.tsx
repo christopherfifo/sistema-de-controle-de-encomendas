@@ -42,8 +42,8 @@ const Footer = () => {
             © {new Date().getFullYear()} CondoDrop. Todos os direitos reservados.
           </p>
           <div className="flex gap-6">
-            <Link href="#" className="hover:text-white transition-colors">Privacidade</Link>
-            <Link href="#" className="hover:text-white transition-colors">Termos de Uso</Link>
+            <Link href="/termos" className="hover:text-white transition-colors">Privacidade</Link>
+            <Link href="/privacidade" className="hover:text-white transition-colors">Termos de Uso</Link>
           </div>
         </div>
       </div>

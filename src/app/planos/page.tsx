@@ -83,7 +83,7 @@ export default async function PlanosPage() {
                   <li className="flex items-center gap-3">
                     <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
                     <span className="text-sm font-medium">
-                      Até {plano.limite_unidades} Unidades
+                      Até {plano.limite_unidades} Unidades (Aptos)
                     </span>
                   </li>
                   <li className="flex items-center gap-3">

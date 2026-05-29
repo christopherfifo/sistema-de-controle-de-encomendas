@@ -1,4 +1,4 @@
-# 📦 Documentação: Projeto de Controle de Encomendas
+# 📦 Documentação: Projeto CondoDrop
 
 Este documento descreve os passos necessários para configurar e rodar o ambiente de desenvolvimento local deste projeto.
 

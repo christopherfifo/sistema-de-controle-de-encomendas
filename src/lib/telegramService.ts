@@ -28,7 +28,7 @@ export async function enviarNotificacaoRetiradaTelegram(dados: DadosNotificacaoR
   const dataFormatada = dados.dataRetirada.toLocaleDateString("pt-BR");
 
   const textoMensagem = [
-    `✅ *SysCondomínio — Encomenda Retirada!*`,
+    `✅ *CondoDrop — Encomenda Retirada!*`,
     ``,
     `Olá, *${dados.moradorNome}*! Sua encomenda foi liberada na portaria.`,
     ``,

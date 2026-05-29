@@ -462,10 +462,11 @@ export function CadastroFormsMorador() {
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel className="text-sm font-normal text-muted-foreground leading-relaxed">
-                  Li e aceito as condições contratuais do sistema, incluindo os{" "}
-                  <Link href="/termos" className="text-primary hover:underline">Termos de Uso</Link>, a{" "}
-                  <Link href="/privacidade" className="text-primary hover:underline">Política de Privacidade</Link> e o acordo de suporte{" "}
-                  <Link href="/sla" className="text-primary hover:underline">[SLA]</Link>.
+                  <span>
+                    Li e aceito as condições do sistema, incluindo os{" "}
+                    <Link href="/termos" className="text-primary hover:underline">Termos de Uso</Link>, e a{" "}
+                    <Link href="/privacidade" className="text-primary hover:underline">Política de Privacidade</Link>
+                  </span>
                 </FormLabel>
                 <FormMessage />
               </div>

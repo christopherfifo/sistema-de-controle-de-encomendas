@@ -1,96 +1,100 @@
-import { PackageCheck, Menu, X } from "lucide-react";
+"use client";
+
+import { Package, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { RoleModal } from "./role-modal";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full border-b-8 border-black bg-black/90 backdrop-blur-sm">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-        <div className="flex items-center gap-3">
-          <PackageCheck className="h-6 w-6 text-white" />
-          <span className="text-lg font-semibold text-white">
-            SysCondomínio
+    <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
+      scrolled ? "bg-[#0A0A0A]/95 backdrop-blur-md border-b border-white/5 py-3 shadow-lg" : "bg-transparent py-5"
+    }`}>
+      <div className="container mx-auto px-6 max-w-7xl flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="bg-emerald-500 p-1.5 rounded-md group-hover:bg-emerald-600 transition-colors shadow-sm">
+            <Package className="h-5 w-5 text-black" />
+          </div>
+          <span className="text-xl font-bold text-white tracking-tight">
+            CondoDrop
           </span>
-        </div>
+        </Link>
 
-        <nav className="hidden md:flex items-center gap-4">
-          <Button
-            asChild
-            variant="outline"
-            className="bg-transparent text-white border-white hover:bg-white hover:text-black"
-          >
-            <Link href="/login">Login</Link>
-          </Button>
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
+          <Link href="#sobre" className="hover:text-white transition-colors">
+            Como Funciona
+          </Link>
+          
+          <div className="flex items-center gap-4 border-l border-white/10 pl-8">
+            <Button
+              asChild
+              variant="ghost"
+              className="text-white hover:bg-white/5 hover:text-white rounded-md"
+            >
+              <Link href="/login">Entrar</Link>
+            </Button>
 
-          <Button
-            asChild
-            variant="outline"
-            className="bg-transparent text-white border-white hover:bg-white hover:text-black"
-          >
-            <Link href="/cadastro">Cadastrar Condomínio</Link>
-          </Button>
-
-          <Button
-            asChild
-            variant="outline"
-            className="bg-transparent text-white border-white hover:bg-white hover:text-black"
-          >
-            <Link href="/cadastroMorador">Cadastrar Morador</Link>
-          </Button>
+            <RoleModal>
+              <Button
+                className="bg-emerald-500 text-black hover:bg-emerald-600 rounded-md font-semibold transition-colors"
+              >
+                Começar Agora
+              </Button>
+            </RoleModal>
+          </div>
         </nav>
 
         <div className="md:hidden">
           <button
-            aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
             onClick={() => setMobileOpen((s) => !s)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-white/5 text-white hover:bg-white/10"
+            className="p-2 text-gray-400 hover:text-white transition-colors"
           >
-            {mobileOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </div>
 
-      <div
-        className={`md:hidden origin-top-right transform transition-all duration-200 ease-in-out ${
-          mobileOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
-        } overflow-hidden`}
-      >
-        <div className="w-full border-t border-black bg-black/95 px-4 pb-4 pt-3">
-          <div className="flex flex-col gap-3">
+      {/* Mobile Menu */}
+      {mobileOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-[#0A0A0A] border-b border-white/5 shadow-2xl p-6 flex flex-col gap-4 animate-in slide-in-from-top-2">
+          <Link 
+            href="#sobre" 
+            className="text-gray-300 hover:text-white py-2 font-medium"
+            onClick={() => setMobileOpen(false)}
+          >
+            Como Funciona
+          </Link>
+          
+          <div className="h-px w-full bg-white/5 my-2"></div>
+
+          <Button
+            asChild
+            variant="ghost"
+            className="w-full justify-start text-white hover:bg-white/5 rounded-md h-12"
+            onClick={() => setMobileOpen(false)}
+          >
+            <Link href="/login">Entrar na Conta</Link>
+          </Button>
+          
+          <RoleModal>
             <Button
-              asChild
-              variant="ghost"
-              className="w-full justify-center bg-transparent text-white hover:bg-white/5"
-              onClick={() => setMobileOpen(false)}
+              className="w-full justify-center bg-emerald-500 text-black hover:bg-emerald-600 rounded-md h-12 font-semibold"
             >
-              <Link href="/login">Login</Link>
+              Começar Agora
             </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="w-full border-white bg-transparent text-white hover:bg-white hover:text-black"
-              onClick={() => setMobileOpen(false)}
-            >
-              <Link href="/cadastro">Cadastrar Condomínio</Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="w-full border-white bg-transparent text-white hover:bg-white hover:text-black"
-              onClick={() => setMobileOpen(false)}
-            >
-              <Link href="/cadastroMorador">Cadastrar Morador</Link>
-            </Button>
-          </div>
+          </RoleModal>
         </div>
-      </div>
+      )}
     </header>
   );
 };

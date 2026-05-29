@@ -68,7 +68,6 @@ model Plano {
   valor           Decimal @db.Decimal(10, 2)
   limite_unidades Int
 
-  limite_usuarios    Int
   limite_condominios Int
 
   data_inclusao DateTime @default(now())

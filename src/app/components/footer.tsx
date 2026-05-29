@@ -1,8 +1,52 @@
+import { Package } from "lucide-react";
+import Link from "next/link";
+
 const Footer = () => {
   return (
-    <footer className="border-t border-white/10 py-8 text-center text-sm text-gray-400">
-      © {new Date().getFullYear()} SysCondomínio — Gestão Inteligente de
-      Encomendas. Todos os direitos reservados.
+    <footer className="bg-[#050505] pt-16 pb-8">
+      <div className="container mx-auto px-6 max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+          <div className="md:col-span-2">
+            <Link href="/" className="flex items-center gap-2 mb-4">
+              <div className="bg-emerald-500 p-1.5 rounded-md">
+                <Package className="h-4 w-4 text-black" />
+              </div>
+              <span className="text-lg font-bold text-white tracking-tight">
+                CondoDrop
+              </span>
+            </Link>
+            <p className="text-gray-400 text-sm max-w-sm leading-relaxed">
+              O sistema definitivo para modernizar a portaria do seu condomínio, garantindo segurança e agilidade no controle de encomendas.
+            </p>
+          </div>
+          
+          <div>
+            <h4 className="text-white font-semibold mb-4">Produto</h4>
+            <div className="flex flex-col gap-3 text-sm text-gray-400">
+              <Link href="#sobre" className="hover:text-emerald-400 transition-colors">Funcionalidades</Link>
+              <Link href="/planos" className="hover:text-emerald-400 transition-colors">Planos</Link>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-white font-semibold mb-4">Acesso</h4>
+            <div className="flex flex-col gap-3 text-sm text-gray-400">
+              <Link href="/login" className="hover:text-emerald-400 transition-colors">Entrar</Link>
+              <Link href="/cadastroMorador" className="hover:text-emerald-400 transition-colors">Cadastro de Morador</Link>
+            </div>
+          </div>
+        </div>
+        
+        <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+          <p>
+            © {new Date().getFullYear()} CondoDrop. Todos os direitos reservados.
+          </p>
+          <div className="flex gap-6">
+            <Link href="#" className="hover:text-white transition-colors">Privacidade</Link>
+            <Link href="#" className="hover:text-white transition-colors">Termos de Uso</Link>
+          </div>
+        </div>
+      </div>
     </footer>
   );
 };

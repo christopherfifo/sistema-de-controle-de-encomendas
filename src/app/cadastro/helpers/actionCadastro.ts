@@ -25,7 +25,7 @@ export async function registerCondominioAndAdmin(
     return { error: "Dados inválidos. Verifique os campos e tente novamente." };
   }
 
-  const { nomeCompleto, email, cpf, senha, telefone, nomeCondominio, cnpj } =
+  const { nomeCompleto, email, cpf, senha, telefone, nomeCondominio, cnpj, planoId } =
     validatedFields.data;
 
   const hashedPassword = await bcrypt.hash(senha, 10);
@@ -53,6 +53,7 @@ export async function registerCondominioAndAdmin(
         data: {
           nome_condominio: nomeCondominio,
           cnpj: cnpj,
+          id_plano: planoId,
         },
       });
 
@@ -85,3 +86,57 @@ export async function registerCondominioAndAdmin(
     return { error: "Ocorreu um erro no cadastro. Tente novamente." };
   }
 }
+
+export async function consultarBandeiraCartao(bin: string) {
+  try {
+    const res = await fetch(`https://mock-pagamento-api.vercel.app/api/cartoes/bandeira/${bin}`);
+    if (res.ok) {
+      return await res.json();
+    }
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function validarEProcessarPagamento(validatePayload: Record<string, unknown>, valor: number, descricao: string) {
+  try {
+    const validateRes = await fetch("https://mock-pagamento-api.vercel.app/api/cartoes/validar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(validatePayload),
+    });
+
+    if (validateRes.ok) {
+      const validateData = await validateRes.json();
+      if (!validateData.numero_valido || !validateData.data_valida) {
+        return { error: validateData.mensagem_erro || "Dados do cartão inválidos." };
+      }
+    } else {
+      return { error: "Erro ao validar cartão." };
+    }
+
+    const paymentPayload = {
+      valor,
+      moeda: "BRL",
+      descricao,
+      cartao: validatePayload
+    };
+
+    const paymentRes = await fetch("https://mock-pagamento-api.vercel.app/api/pagamentos/processar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(paymentPayload),
+    });
+
+    if (!paymentRes.ok) {
+      const errorData = await paymentRes.json();
+      return { error: errorData.detail?.mensagem || "Erro ao processar pagamento." };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { error: "Ocorreu um erro de conexão ao processar. Tente novamente." };
+  }
+}
+

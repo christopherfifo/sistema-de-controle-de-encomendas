@@ -32,6 +32,7 @@ export const cadastroSchema = z.object({
         .refine(isValidCNPJ, { message: "CNPJ inválido." }),
     ),
   telefone: z.string().min(1, { message: "Telefone é obrigatório." }),
+  planoId: z.string().min(1, { message: "Selecione um plano." }),
   aceiteTermos: z.boolean().refine((val) => val === true, {
     message: "Você deve aceitar as condições contratuais do sistema.",
   }),

@@ -44,9 +44,9 @@ export const isValidCNPJ = async (cnpj: string): Promise<boolean> => {
       timeout: 4000
     });
     return response.status === 200;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Se a API retornar 404 é porque o CNPJ não existe (inválido)
-    if (error.response?.status === 404) {
+    if (typeof error === "object" && error !== null && "response" in error && (error as { response?: { status?: number } }).response?.status === 404) {
       return false;
     }
     console.warn("[CNPJ_API_WARNING] Erro na API pública, usando fallback matemático local:", error);

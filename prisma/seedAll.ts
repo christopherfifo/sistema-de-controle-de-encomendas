@@ -36,7 +36,7 @@ async function main() {
     },
   });
 
-  const planoProfissional = await db.plano.create({
+  await db.plano.create({
     data: {
       nome_plano: "Plano Profissional",
       valor: 149.90,
@@ -54,7 +54,7 @@ async function main() {
     },
   });
 
-  const planoEnterprise = await db.plano.create({
+  await db.plano.create({
     data: {
       nome_plano: "Plano Enterprise",
       valor: 599.90,
@@ -127,7 +127,7 @@ async function main() {
   });
 
   // 3. Condomínio Inativo
-  const condominioInativo = await db.condominio.create({
+  await db.condominio.create({
     data: {
       nome_condominio: "Residencial Fantasma",
       cnpj: "00000000000100",
@@ -140,7 +140,7 @@ async function main() {
   // ==========================================
   // USUÁRIOS
   // ==========================================
-  const admin = await db.usuario.create({
+  await db.usuario.create({
     data: {
       nome_completo: "Administrador do Sistema",
       email: "admin@gmail.com",

@@ -11,8 +11,33 @@ import { maskCPF } from "@/helpers/cpf";
 import { removerMoradorDoCondominio, reativarMoradorNoCondominio } from "../helpers/actionMorador";
 
 interface GerenciarMoradoresContentProps {
-  moradores: any[];
-  unidades: any[];
+  moradores: {
+    id_usuario: string;
+    nome_completo: string;
+    cpf: string;
+    email: string;
+    telefone: string;
+    ativo: boolean;
+    data_criacao: string | Date;
+    unidades_residenciais: {
+      principal: boolean;
+      unidade: {
+        id_unidade: string;
+        bloco_torre: string;
+        numero_unidade: string;
+        moradores: {
+          principal: boolean;
+          usuario: {
+            id_usuario: string;
+            nome_completo: string;
+            cpf: string;
+            telefone: string;
+          }
+        }[];
+      }
+    }[];
+  }[];
+  unidades: { id_unidade: string; bloco_torre: string; numero_unidade: string }[];
   condominioId: string;
   sindicoId: string;
 }
@@ -36,7 +61,7 @@ export function GerenciarMoradoresContent({ moradores, unidades, condominioId, s
   const blocosDisponiveis = Array.from(
     new Set(
       moradores.flatMap((m) =>
-        m.unidades_residenciais.map((ur: any) => ur.unidade.bloco_torre)
+        m.unidades_residenciais.map((ur) => ur.unidade.bloco_torre)
       )
     )
   ).sort() as string[];
@@ -54,11 +79,11 @@ export function GerenciarMoradoresContent({ moradores, unidades, condominioId, s
       m.cpf.includes(pesquisa);
 
     const correspondeBloco = blocoSelecionado
-      ? m.unidades_residenciais.some((ur: any) => ur.unidade.bloco_torre === blocoSelecionado)
+      ? m.unidades_residenciais.some((ur) => ur.unidade.bloco_torre === blocoSelecionado)
       : true;
 
     const correspondeUnidade = unidadeSelecionada
-      ? m.unidades_residenciais.some((ur: any) => ur.unidade.numero_unidade === unidadeSelecionada)
+      ? m.unidades_residenciais.some((ur) => ur.unidade.numero_unidade === unidadeSelecionada)
       : true;
 
     const correspondeStatus = 
@@ -198,7 +223,7 @@ export function GerenciarMoradoresContent({ moradores, unidades, condominioId, s
                         {m.ativo ? "Ativo" : "Bloqueado"}
                       </span>
 
-                      {m.unidades_residenciais.map((ur: any) => (
+                      {m.unidades_residenciais.map((ur) => (
                         <span key={ur.unidade.id_unidade} className="text-[10px] bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-semibold">
                           {ur.unidade.bloco_torre} - Apt {ur.unidade.numero_unidade} {ur.principal && "(Titular)"}
                         </span>
@@ -256,8 +281,8 @@ export function GerenciarMoradoresContent({ moradores, unidades, condominioId, s
                       <Building className="h-3.5 w-3.5" /> Moradores Coabitantes da Unidade
                     </p>
                     
-                    {m.unidades_residenciais.map((ur: any) => {
-                      const coabitantes = ur.unidade.moradores.filter((co: any) => co.usuario.id_usuario !== m.id_usuario);
+                    {m.unidades_residenciais.map((ur) => {
+                      const coabitantes = ur.unidade.moradores.filter((co) => co.usuario.id_usuario !== m.id_usuario);
 
                       return (
                         <div key={ur.unidade.id_unidade} className="bg-background border rounded-lg p-3 space-y-2">
@@ -267,7 +292,7 @@ export function GerenciarMoradoresContent({ moradores, unidades, condominioId, s
                             <p className="text-xs text-muted-foreground italic pl-2">Nenhum familiar ou coabitante registrado nesta unidade.</p>
                           ) : (
                             <div className="divide-y text-xs">
-                              {coabitantes.map((co: any) => (
+                              {coabitantes.map((co) => (
                                 <div key={co.usuario.id_usuario} className="flex justify-between items-center py-2 first:pt-0 last:pb-0">
                                   <div>
                                     <p className="font-semibold">{co.usuario.nome_completo} {co.principal && <span className="text-[9px] text-amber-600 bg-amber-50 border border-amber-200 px-1 rounded">(Responsável)</span>}</p>

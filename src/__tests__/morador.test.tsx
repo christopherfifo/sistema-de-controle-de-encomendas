@@ -16,21 +16,22 @@ beforeAll(() => {
 window.alert = jest.fn();
 
 jest.mock("@/components/ui/select", () => {
-  const React = require("react");
   const MockSelectContext = React.createContext({
-    onValueChange: (val: string) => {},
+    onValueChange: (_val: string) => {},
   });
 
   return {
-    Select: ({ onValueChange, children, value }: any) => (
+    Select: ({ onValueChange, children, value }: { onValueChange: (val: string) => void, children: React.ReactNode, value?: string }) => (
       <MockSelectContext.Provider value={{ onValueChange }}>
         <input type="hidden" value={value || ""} onChange={() => {}} />
         {children}
       </MockSelectContext.Provider>
     ),
-    SelectTrigger: ({ children, id }: any) => (
+    SelectTrigger: ({ children, id }: { children: React.ReactNode, id?: string }) => (
       <button
         role="combobox"
+        aria-controls="mock-controls"
+        aria-expanded={false}
         id={id}
         data-testid="select-trigger"
         type="button"
@@ -38,13 +39,14 @@ jest.mock("@/components/ui/select", () => {
         {children}
       </button>
     ),
-    SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
-    SelectContent: ({ children }: any) => <div>{children}</div>,
-    SelectItem: ({ value, children }: any) => {
+    SelectValue: ({ placeholder }: { placeholder: string }) => <span>{placeholder}</span>,
+    SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    SelectItem: ({ value, children }: { value: string, children: React.ReactNode }) => {
       const { onValueChange } = React.useContext(MockSelectContext);
       return (
         <div
           role="option"
+          aria-selected={false}
           className="mock-option"
           onClick={(e) => {
             e.stopPropagation();
@@ -72,18 +74,26 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
-const mockInfoCondominio: any = {
-  condominio: { nome_condominio: "Condomínio Teste" },
+const mockInfoCondominio = {
+  condominio: { nome_condominio: "Condomínio Teste", faturas: [] },
   user: { nome_completo: "Morador Teste" },
 };
 
-const mockEncomendasPendentes: any[] = [
+const mockEncomendasPendentes = [
   {
     id_encomenda: "enc-1",
     tipo_encomenda: "Pacote Amazon",
     status: "PENDENTE",
     unidade: { bloco_torre: "A", numero_unidade: "101" },
-    id_usuario_cadastro: "user-123",
+    id_usuario_cadastro: "port-1",
+    id_unidade: "u1",
+    id_porteiro_recebimento: null,
+    tamanho: "Pequeno",
+    forma_entrega: "Correios",
+    codigo_rastreio: null,
+    condicao: null,
+    data_recebimento: null,
+    url_foto_pacote: null
   },
 ];
 
@@ -111,8 +121,8 @@ describe("Fluxo do Morador", () => {
           slug="cond-slug"
           user="user-123"
           perfil="MORADOR"
-          informationsOfUserAndCondominio={mockInfoCondominio}
-          encomendasPendentes={mockEncomendasPendentes}
+          informationsOfUserAndCondominio={mockInfoCondominio as unknown as unknown}
+          encomendasPendentes={mockEncomendasPendentes as unknown as unknown}
           userId="user-123"
         />,
       );

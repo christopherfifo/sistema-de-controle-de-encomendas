@@ -115,7 +115,7 @@ export function CadastroFormsMorador() {
 
       if (result.error) {
         if (result.field) {
-          form.setError(result.field as any, { message: result.error });
+          form.setError(result.field as Parameters<typeof form.setError>[0], { message: result.error });
         } else {
           setError(result.error);
         }

@@ -17,16 +17,43 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { maskCPF } from "@/helpers/cpf";
 
+interface PorteiroInfo {
+  id_usuario: string;
+  nome_completo: string;
+  cpf: string;
+  email: string;
+  telefone: string;
+  ativo: boolean;
+  token_acesso: string | null;
+  unidades_residenciais: {
+    principal: boolean;
+    unidade: { id_unidade: string; bloco_torre: string; numero_unidade: string; }
+  }[];
+}
+
+interface MoradorInfo {
+  id_usuario: string;
+  nome_completo: string;
+  cpf: string;
+  email: string;
+}
+
+interface UnidadeInfo {
+  id_unidade: string;
+  bloco_torre: string;
+  numero_unidade: string;
+}
+
 interface GerenciarFuncionariosContentProps {
-  porteiros: any[];
-  moradores: any[];
-  unidades: any[];
+  porteiros: PorteiroInfo[];
+  moradores: MoradorInfo[];
+  unidades: UnidadeInfo[];
   condominioId: string;
   sindicoId: string;
   nomeCondominio: string;
 }
 
-function formatarTokenVisual(token: string): string {
+function formatarTokenVisual(token: string | null): string {
   if (!token) return "---";
   if (token.length === 6) {
     return `${token.slice(0, 3)}-${token.slice(3, 6)}`;
@@ -79,17 +106,17 @@ export function GerenciarFuncionariosContent({
   const watchMoraCadastro = formCadastro.watch("moraNoCondominio");
   const watchMoraEdicao = formEdicao.watch("moraNoCondominio");
 
-  const handleCopiarToken = (token: string, idContexto: string) => {
+  const handleCopiarToken = (token: string | null, idContexto: string) => {
     if (!token || token === "---") return;
     navigator.clipboard.writeText(token);
     setCopiadoId(idContexto);
     setTimeout(() => setCopiadoId(null), 2000);
   };
 
-  const handleEntrarModoEdicao = (porteiro: any) => {
+  const handleEntrarModoEdicao = (porteiro: PorteiroInfo) => {
     setEditandoPorteiroId(porteiro.id_usuario);
     setTokenPorteiroEdicao(porteiro.token_acesso || "");
-    const primeiraUnidade = porteiro.unidades_residenciais?.[0]?.id_unidade || "";
+    const primeiraUnidade = porteiro.unidades_residenciais?.[0]?.unidade?.id_unidade || "";
     
     formEdicao.reset({
       id_usuario: porteiro.id_usuario,
@@ -272,14 +299,14 @@ export function GerenciarFuncionariosContent({
                       </div>
                     </div>
 
-                    <FormField control={formEdicao.control as Control<any>} name="nomeCompleto" render={({ field }) => (
+                    <FormField control={formEdicao.control as Control<EdicaoPorteiroFormData>} name="nomeCompleto" render={({ field }) => (
                       <FormItem><FormLabel>Nome Completo</FormLabel><FormControl><Input {...field} disabled={isPending} /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <FormField control={formEdicao.control as Control<any>} name="email" render={({ field }) => (
+                    <FormField control={formEdicao.control as Control<EdicaoPorteiroFormData>} name="email" render={({ field }) => (
                       <FormItem><FormLabel>Email de Acesso</FormLabel><FormControl><Input type="email" {...field} disabled={isPending} /></FormControl><FormMessage /></FormItem>
                     )} />
                     
-                    <FormField control={formEdicao.control as Control<any>} name="telefone" render={({ field }) => (
+                    <FormField control={formEdicao.control as Control<EdicaoPorteiroFormData>} name="telefone" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Telefone</FormLabel>
                         <FormControl>
@@ -289,7 +316,7 @@ export function GerenciarFuncionariosContent({
                       </FormItem>
                     )} />
 
-                    <FormField control={formEdicao.control as Control<any>} name="moraNoCondominio" render={({ field }) => (
+                    <FormField control={formEdicao.control as Control<EdicaoPorteiroFormData>} name="moraNoCondominio" render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-muted/20">
                         <FormControl>
                           <Checkbox 
@@ -306,7 +333,7 @@ export function GerenciarFuncionariosContent({
                     )} />
 
                     {watchMoraEdicao && (
-                      <FormField control={formEdicao.control as Control<any>} name="id_unidade" render={({ field }) => (
+                      <FormField control={formEdicao.control as Control<EdicaoPorteiroFormData>} name="id_unidade" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Selecione a Unidade Habitacional</FormLabel>
                           <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" {...field} disabled={isPending}>
@@ -327,23 +354,23 @@ export function GerenciarFuncionariosContent({
               ) : (
                 <Form {...formCadastro}>
                   <form onSubmit={formCadastro.handleSubmit(onCadastrarSubmit)} className="space-y-3">
-                    <FormField control={formCadastro.control as Control<any>} name="nomeCompleto" render={({ field }) => (
+                    <FormField control={formCadastro.control as Control<RegistroPorteiroFormData>} name="nomeCompleto" render={({ field }) => (
                       <FormItem><FormLabel>Nome Completo</FormLabel><FormControl><Input placeholder="Nome do funcionário" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <FormField control={formCadastro.control as Control<any>} name="email" render={({ field }) => (
+                    <FormField control={formCadastro.control as Control<RegistroPorteiroFormData>} name="email" render={({ field }) => (
                       <FormItem><FormLabel>Email</FormLabel><FormControl><Input type="email" placeholder="email@provedor.com" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <FormField control={formCadastro.control as Control<any>} name="cpf" render={({ field }) => (
+                    <FormField control={formCadastro.control as Control<RegistroPorteiroFormData>} name="cpf" render={({ field }) => (
                       <FormItem><FormLabel>CPF</FormLabel><FormControl><Input placeholder="000.000.000-00" {...field} onChange={e => field.onChange(maskCPF(e.target.value))} /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <FormField control={formCadastro.control as Control<any>} name="telefone" render={({ field }) => (
+                    <FormField control={formCadastro.control as Control<RegistroPorteiroFormData>} name="telefone" render={({ field }) => (
                       <FormItem><FormLabel>Telefone</FormLabel><FormControl><Input placeholder="(11) 99999-0000" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
-                    <FormField control={formCadastro.control as Control<any>} name="senha" render={({ field }) => (
+                    <FormField control={formCadastro.control as Control<RegistroPorteiroFormData>} name="senha" render={({ field }) => (
                       <FormItem><FormLabel>Senha Provisória do Porteiro</FormLabel><FormControl><Input type="password" placeholder="Mínimo 6 caracteres" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
 
-                    <FormField control={formCadastro.control as Control<any>} name="moraNoCondominio" render={({ field }) => (
+                    <FormField control={formCadastro.control as Control<RegistroPorteiroFormData>} name="moraNoCondominio" render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-muted/20">
                         <FormControl>
                           <Checkbox 
@@ -359,7 +386,7 @@ export function GerenciarFuncionariosContent({
                     )} />
 
                     {watchMoraCadastro && (
-                      <FormField control={formCadastro.control as Control<any>} name="id_unidade" render={({ field }) => (
+                      <FormField control={formCadastro.control as Control<RegistroPorteiroFormData>} name="id_unidade" render={({ field }) => (
                         <FormItem>
                           <FormLabel>Selecione a Unidade Habitacional</FormLabel>
                           <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" {...field}>

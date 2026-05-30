@@ -9,13 +9,20 @@ import { registroEncomendaSchema } from "../schemas/schemaRegistroPorteiro";
 import { registrarEncomendaPorteiro, buscarMoradoresPorNome } from "../helpers/encomendas";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
+type MoradorBusca = {
+  id_usuario: string;
+  nome_completo: string;
+  bloco: string;
+  apartamento: string;
+};
+
 interface FormRegistrarEncomendaProps {
-  unidades: any[];
+  unidades: unknown[];
   porteiroId: string;
   condominioId: string;
 }
@@ -23,13 +30,13 @@ interface FormRegistrarEncomendaProps {
 export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistrarEncomendaProps) {
   const [isPending, startTransition] = useTransition();
   const [termoBusca, setTermoBusca] = useState("");
-  const [listaMoradores, setListaMoradores] = useState<any[]>([]);
+  const [listaMoradores, setListaMoradores] = useState<MoradorBusca[]>([]);
   const [previewFoto, setPreviewFoto] = useState<string | null>(null);
   const [modoManual, setModoManual] = useState(false);
   const [rastreioVerificado, setRastreioVerificado] = useState<boolean | null>(null);
   const [checandoRastreio, setChecandoRastreio] = useState(false);
 
-  const form = useForm<any>({
+  const form = useForm({
     resolver: zodResolver(registroEncomendaSchema),
     defaultValues: {
       id_usuario_morador: "",
@@ -74,14 +81,14 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
       } else {
         setRastreioVerificado(false);
       }
-    } catch (err) {
+    } catch {
       setRastreioVerificado(null);
     } finally {
       setChecandoRastreio(false);
     }
   };
 
-  const handleSelecionarMorador = (morador: any) => {
+  const handleSelecionarMorador = (morador: MoradorBusca) => {
     setModoManual(false);
     form.setValue("id_usuario_morador", morador.id_usuario);
     form.setValue("nome_manual_retirante", morador.nome_completo);
@@ -94,7 +101,7 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
   const ativarInsercaoManual = () => {
     setModoManual(true);
     setListaMoradores([]);
-    form.setValue("id_usuario_morador", null);
+    form.setValue("id_usuario_morador", null as unknown as string);
     form.setValue("bloco_manual", "");
     form.setValue("apartamento_manual", "");
   };
@@ -111,6 +118,7 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (data: any) => {
     startTransition(async () => {
       try {
@@ -123,8 +131,12 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
           setModoManual(false);
           setRastreioVerificado(null);
         }
-      } catch (err: any) {
-        alert(err.message || "Erro ao salvar");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          alert(err.message);
+        } else {
+          alert("Erro ao salvar");
+        }
       }
     });
   };
@@ -222,6 +234,7 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                       <Input 
                         placeholder="Ex: AA123456789BR" 
                         {...field} 
+                        value={field.value || ""}
                         disabled={isPending}
                         onBlur={(e) => {
                           field.onBlur();

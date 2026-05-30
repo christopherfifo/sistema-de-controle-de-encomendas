@@ -64,11 +64,12 @@ export async function enviarNotificacaoRetiradaTelegram(dados: DadosNotificacaoR
     }
 
     return true;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: unknown }, message?: string };
     console.error(
       "[TELEGRAM_API_ERROR] Falha ao enviar mensagem para o chat_id:",
       dados.chatId,
-      error?.response?.data || error.message
+      err?.response?.data || err.message
     );
     return false;
   }

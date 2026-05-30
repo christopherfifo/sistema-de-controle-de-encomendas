@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CadastroSaaSForm } from "./components/cadastroSaaSForm";
 
+import { Suspense } from "react";
+
 export default function CadastroPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-muted/40 p-4 py-8">
@@ -22,7 +24,9 @@ export default function CadastroPage() {
         </CardHeader>
 
         <CardContent>
-          <CadastroSaaSForm />
+          <Suspense fallback={<div className="flex items-center justify-center py-8">Carregando formulário...</div>}>
+            <CadastroSaaSForm />
+          </Suspense>
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4">

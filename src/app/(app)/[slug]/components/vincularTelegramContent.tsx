@@ -13,8 +13,7 @@ interface VincularTelegramContentProps {
   slug: string;
 }
 
-export function VincularTelegramContent({ userId, slug }: VincularTelegramContentProps) {
-  const router = useRouter();
+export function VincularTelegramContent({ userId }: Omit<VincularTelegramContentProps, "slug">) {
   const [chatId, setChatId] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{
@@ -42,7 +41,7 @@ export function VincularTelegramContent({ userId, slug }: VincularTelegramConten
       } else {
         setStatus({ type: "error", message: resultado.message });
       }
-    } catch (err) {
+    } catch {
       setStatus({ type: "error", message: "Erro inesperado ao salvar os dados." });
     } finally {
       setLoading(false);
@@ -75,7 +74,7 @@ export function VincularTelegramContent({ userId, slug }: VincularTelegramConten
               </a>
             </div>
           </li>
-          <li>No Telegram, clique em <strong>"Começar"</strong> (ou /start).</li>
+          <li>No Telegram, clique em <strong>&quot;Começar&quot;</strong> (ou /start).</li>
           <li>Copie a sequência numérica rotulada como <strong>Id</strong>.</li>
         </ol>
       </div>

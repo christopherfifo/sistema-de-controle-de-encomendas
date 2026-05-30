@@ -109,7 +109,7 @@ async function main() {
   });
 
   // 3. Condomínio Inativo
-  const condominioInativo = await db.condominio.create({
+  await db.condominio.create({
     data: {
       nome_condominio: "Residencial Fantasma",
       cnpj: "00000000000100",
@@ -122,7 +122,7 @@ async function main() {
   // ==========================================
   // USUÁRIOS
   // ==========================================
-  const admin = await db.usuario.create({
+  await db.usuario.create({
     data: {
       nome_completo: "Administrador do Sistema",
       email: "admin@gmail.com",

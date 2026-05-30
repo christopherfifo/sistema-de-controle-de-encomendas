@@ -7,7 +7,8 @@ import { Encomenda, Unidade } from "@prisma/client";
 import { Loader2, Camera, ScanQrCode, UserCheck } from "lucide-react";
 import { Html5Qrcode } from "html5-qrcode"; 
 
-import { RetiradaEncomendaFormData, retiradaEncomendaSchema } from "../schemas/schemaRetiradaPorteiro";
+import { retiradaEncomendaSchema } from "../schemas/schemaRetiradaPorteiro";
+import { z } from "zod";
 import { registrarRetiradaEncomenda } from "../helpers/encomendas";
 
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ export function ModalRegistrarRetirada({
   const [scannerAtivo, setScannerAtivo] = useState(false);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
 
-  const form = useForm<any>({
+  const form = useForm({
     resolver: zodResolver(retiradaEncomendaSchema),
     defaultValues: {
       tipo_confirmacao: "TOKEN",
@@ -66,7 +67,7 @@ export function ModalRegistrarRetirada({
     return () => {
       stopScanner();
     };
-  }, [isOpen, encomenda, abaAtiva]);
+  }, [isOpen, encomenda, abaAtiva, form]);
 
   const toggleScanner = async () => {
     if (scannerAtivo) {
@@ -99,7 +100,7 @@ export function ModalRegistrarRetirada({
             () => {
             }
           );
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.error("Erro ao acessar a câmera de vídeo:", err);
           setErrorMessage("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
           setScannerAtivo(false);
@@ -123,7 +124,7 @@ export function ModalRegistrarRetirada({
     setScannerAtivo(false);
   };
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: z.infer<typeof retiradaEncomendaSchema>) => {
     if (!encomenda) return;
     setErrorMessage(null);
     stopScanner();

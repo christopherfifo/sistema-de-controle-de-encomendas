@@ -12,12 +12,12 @@ beforeAll(() => {
 });
 
 jest.mock("@/app/(app)/[slug]/components/encomendasHistoricoList", () => ({
-    EncomendasHistoricoList: ({ encomendas }: any) => (
+    EncomendasHistoricoList: ({ encomendas }: { encomendas: Record<string, unknown>[] }) => (
         <div data-testid="lista-mock">
             {encomendas.length === 0 ? <p>Nenhuma encomenda</p> : null}
-            {encomendas.map((enc: any) => (
-                <div key={enc.id_encomenda} data-testid="item-encomenda">
-                    {enc.tipo_encomenda}
+            {encomendas.map((enc: Record<string, unknown>) => (
+                <div key={String(enc.id_encomenda)} data-testid="item-encomenda">
+                    {String(enc.tipo_encomenda)}
                 </div>
             ))}
         </div>
@@ -56,7 +56,7 @@ describe("Página de Histórico do Porteiro", () => {
     const renderPage = () =>
         render(
             <HistoricoPorteiroPageContent
-                encomendasDoHistorico={mockEncomendas as any}
+                encomendasDoHistorico={mockEncomendas as unknown as never[]}
                 condominioName="Condomínio Teste"
                 porteiroId={PORTEIRO_LOGADO_ID}
             />

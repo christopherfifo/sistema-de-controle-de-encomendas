@@ -72,8 +72,9 @@ export async function adicionarPorteiro(
       message: "Porteiro cadastrado com sucesso!", 
       token_acesso: tokenFinal 
     };
-  } catch (error: any) {
-    return { success: false, message: error.message || "Erro ao cadastrar porteiro." };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, message: err.message || "Erro." };
   }
 }
 
@@ -109,8 +110,9 @@ export async function atualizarPorteiro(
 
     revalidatePath(`/(app)/[slug]/gerenciarFuncionarios`, "page");
     return { success: true, message: "Dados do funcionário updated com sucesso!" };
-  } catch (error: any) {
-    return { success: false, message: error.message || "Erro ao atualizar dados." };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, message: err.message || "Erro." };
   }
 }
 
@@ -135,8 +137,9 @@ export async function transformarMoradorEmPorteiro(moradorId: string, condominio
       message: "Morador promovido a Porteiro com sucesso! Ele agora tem acesso à portaria.",
       token_acesso: tokenAcesso
     };
-  } catch (error: any) {
-    return { success: false, message: error.message || "Erro ao alterar perfil do morador." };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, message: err.message || "Erro." };
   }
 }
 
@@ -148,7 +151,7 @@ export async function alternarStatusPorteiro(porteiroId: string, atualStatus: bo
     });
     revalidatePath(`/(app)/[slug]/gerenciarFuncionarios`, "page");
     return { success: true, message: "Status alterado!" };
-  } catch (error) {
+  } catch {
     return { success: false, message: "Erro ao alterar status." };
   }
 }
@@ -158,7 +161,7 @@ export async function excluirPorteiro(porteiroId: string, condominioId: string) 
     await db.usuario.delete({ where: { id_usuario: porteiroId, id_condominio: condominioId } });
     revalidatePath(`/(app)/[slug]/gerenciarFuncionarios`, "page");
     return { success: true, message: "Removido do sistema." };
-  } catch (error) {
+  } catch {
     return { success: false, message: "Este usuário possui registros atrelados (ex: entregas), desative-o em vez de excluir." };
   }
 }

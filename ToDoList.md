@@ -42,3 +42,5 @@
 - [X] adicionar identidade visual geral na aplicação
 - [X] adicionar favicon e ajustar nome da aba
 - [ ] enviar email ao morador ao chegar uma encomenda (além da notificação do telegram)
+- [X] arrumar todos os erros de lint do projeto
+- [X] adicionar botão para trocar o tema da aplicação

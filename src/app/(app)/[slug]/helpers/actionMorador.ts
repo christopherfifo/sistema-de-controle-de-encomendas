@@ -61,8 +61,9 @@ export async function removerMoradorDoCondominio({
 
     revalidatePath(`/(app)/[slug]/gerenciarMoradores`, "page");
     return { success: true, message: "Morador desvinculado e bloqueado com sucesso!" };
-  } catch (error: any) {
-    return { success: false, message: error.message || "Erro ao remover morador." };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, message: err.message || "Erro." };
   }
 }
 
@@ -103,7 +104,8 @@ export async function reativarMoradorNoCondominio({
 
     revalidatePath(`/(app)/[slug]/gerenciarMoradores`, "page");
     return { success: true, message: "Morador reativado e vinculado com sucesso!" };
-  } catch (error: any) {
-    return { success: false, message: error.message || "Erro ao reativar morador." };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, message: err.message || "Erro." };
   }
 }

@@ -6,7 +6,6 @@ import { revalidatePath } from "next/cache";
 import { StatusEncomenda } from "@prisma/client";
 import { enviarNotificacaoRetiradaTelegram } from "@/lib/telegramService";
 
-import { RegistroEncomendaFormData } from "../schemas/schemaRegistroPorteiro";
 import {
   cadastroEncomendaSchema,
   CadastroEncomendaFormData,
@@ -103,10 +102,22 @@ export async function cadastrarEncomendaMorador(
   });
 }
 
+interface EncomendaData {
+  id_usuario_morador?: string;
+  bloco_manual?: string;
+  apartamento_manual?: string;
+  tipo_encomenda: string;
+  forma_entrega: string;
+  codigo_rastreio?: string;
+  condicao?: string;
+  foto_pacote?: string;
+  nome_manual_retirante?: string;
+}
+
 export async function registrarEncomendaPorteiro(
   porteiroId: string,
   condominioId: string,
-  data: any,
+  data: EncomendaData,
 ) {
   if (!porteiroId || !condominioId) {
     throw new Error("Usuário ou condomínio não identificado.");
@@ -126,8 +137,8 @@ export async function registrarEncomendaPorteiro(
     let unidadeExistente = await db.unidade.findFirst({
       where: {
         id_condominio: condominioId,
-        bloco_torre: data.bloco_manual,
-        numero_unidade: data.apartamento_manual
+        bloco_torre: data.bloco_manual || "",
+        numero_unidade: data.apartamento_manual || ""
       }
     });
 
@@ -135,8 +146,8 @@ export async function registrarEncomendaPorteiro(
       unidadeExistente = await db.unidade.create({
         data: {
           id_condominio: condominioId,
-          bloco_torre: data.bloco_manual,
-          numero_unidade: data.apartamento_manual
+          bloco_torre: data.bloco_manual || "",
+                  numero_unidade: data.apartamento_manual || ""
         }
       });
     }
@@ -226,7 +237,7 @@ export async function registrarRetiradaEncomenda(
     throw new Error(validatedData.error.issues[0].message);
   }
 
-  const { tipo_confirmacao, token_retirante, cpf_retirante } = validatedData.data as any;
+  const { tipo_confirmacao, token_retirante, cpf_retirante } = validatedData.data;
 
   const encomenda = await db.encomenda.findUnique({
     where: { id_encomenda: encomendaId },

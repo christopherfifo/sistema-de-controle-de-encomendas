@@ -22,10 +22,11 @@ const mockUnidadesExistentes = [
   { id_unidade: "u2", bloco_torre: "Bloco A", numero_unidade: "102" },
 ];
 
-const mockCondominioData: any = {
+const mockCondominioData = {
   id_condominio: "cond-123",
   nome_condominio: "Residencial Flores",
   qtd_unidades: 2,
+  qtd_blocos_torres: 1,
   plano: mockPlano,
   unidades: mockUnidadesExistentes,
 };

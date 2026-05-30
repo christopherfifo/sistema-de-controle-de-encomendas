@@ -1,4 +1,4 @@
-const { rastrearEncomendas } = require('correios-brasil');
+import { rastrearEncomendas } from 'correios-brasil';
 
 async function main() {
   const rastreio = await rastrearEncomendas(['AD466192491BR']);
@@ -6,3 +6,4 @@ async function main() {
 }
 
 main().catch(console.error);
+export {};

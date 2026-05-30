@@ -67,8 +67,7 @@ export default async function TelegramConfigPage({
           <hr className="hidden md:block border-muted" />
           
           <VincularTelegramContent
-            userId={user} 
-            slug={slug} 
+            userId={user as string}
           />
         </section>
       </main>

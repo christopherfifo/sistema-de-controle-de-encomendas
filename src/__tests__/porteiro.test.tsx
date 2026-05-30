@@ -15,29 +15,29 @@ beforeAll(() => {
 window.alert = jest.fn();
 
 jest.mock("@/components/ui/select", () => {
-  const React = require("react");
   const MockSelectContext = React.createContext({
-    onValueChange: (val: string) => {},
+    onValueChange: (_val: string) => {},
   });
 
   return {
-    Select: ({ onValueChange, children, value }: any) => (
+    Select: ({ onValueChange, children }: { onValueChange: (val: string) => void, children: React.ReactNode }) => (
       <MockSelectContext.Provider value={{ onValueChange }}>
         {children}
       </MockSelectContext.Provider>
     ),
-    SelectTrigger: ({ children }: any) => (
+    SelectTrigger: ({ children }: { children: React.ReactNode }) => (
       <div role="button" className="mock-trigger">
         {children}
       </div>
     ),
-    SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
-    SelectContent: ({ children }: any) => <div>{children}</div>,
-    SelectItem: ({ value, children }: any) => {
+    SelectValue: ({ placeholder }: { placeholder: string }) => <span>{placeholder}</span>,
+    SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    SelectItem: ({ value, children }: { value: string, children: React.ReactNode }) => {
       const { onValueChange } = React.useContext(MockSelectContext);
       return (
         <div
           role="option"
+          aria-selected={false}
           className="mock-option"
           onClick={(e) => {
             e.stopPropagation();
@@ -165,7 +165,7 @@ describe("Fluxo do Porteiro", () => {
 
       render(
         <ListaEncomendasPorteiro
-          encomendasIniciais={[mockEncomenda as any]}
+          encomendasIniciais={[mockEncomenda as never]}
           porteiroId="porteiro-123"
           condominioId="cond-abc"
         />,

@@ -27,7 +27,7 @@ async function main() {
   // ==========================================
   // PLANOS
   // ==========================================
-  const planoBasico = await db.plano.create({
+  const planoLight = await db.plano.create({
     data: {
       nome_plano: "Plano Light",
       valor: 89.90,
@@ -36,12 +36,30 @@ async function main() {
     },
   });
 
+  const planoProfissional = await db.plano.create({
+    data: {
+      nome_plano: "Plano Profissional",
+      valor: 149.90,
+      limite_unidades: 100,
+      limite_condominios: 9999,
+    },
+  });
+
   const planoPremium = await db.plano.create({
     data: {
       nome_plano: "Plano Premium",
-      valor: 199.90,
-      limite_unidades: 200,
-      limite_condominios: 15,
+      valor: 299.90,
+      limite_unidades: 300,
+      limite_condominios: 9999,
+    },
+  });
+
+  const planoEnterprise = await db.plano.create({
+    data: {
+      nome_plano: "Plano Enterprise",
+      valor: 599.90,
+      limite_unidades: 800,
+      limite_condominios: 9999,
     },
   });
   console.log(`Planos criados.`);
@@ -71,7 +89,7 @@ async function main() {
     data: {
       id_condominio: condominio.id_condominio,
       id_plano: planoPremium.id_plano,
-      valor_cobrado: 199.90,
+      valor_cobrado: 299.90,
       data_vencimento: new Date(new Date().setDate(new Date().getDate() + 10)),
       data_pagamento: new Date(),
       status_pagamento: StatusPagamento.PAGO,
@@ -91,7 +109,7 @@ async function main() {
       uf: "SP",
       qtd_unidades: 10,
       qtd_blocos_torres: 1,
-      id_plano: planoBasico.id_plano,
+      id_plano: planoLight.id_plano,
       ativo: true,
     },
   });
@@ -99,7 +117,7 @@ async function main() {
   await db.fatura.create({
     data: {
       id_condominio: condominioAtrasado.id_condominio,
-      id_plano: planoBasico.id_plano,
+      id_plano: planoLight.id_plano,
       valor_cobrado: 89.90,
       data_vencimento: new Date(new Date().setDate(new Date().getDate() - 15)), // Venceu 15 dias atrás
       status_pagamento: StatusPagamento.ATRASADO,
@@ -113,7 +131,7 @@ async function main() {
     data: {
       nome_condominio: "Residencial Fantasma",
       cnpj: "00000000000100",
-      id_plano: planoBasico.id_plano,
+      id_plano: planoLight.id_plano,
       ativo: false,
     },
   });

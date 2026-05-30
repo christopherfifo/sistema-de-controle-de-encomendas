@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
+import { ThemeToggle } from "@/components/theme-toggle";
+
 interface NavItem {
   label: string;
   href: string;
@@ -248,6 +250,19 @@ export function SimpleSidebar({
             </Tooltip>
           ))}
         </nav>
+
+        <div className={cn("px-2 pb-4 flex justify-center self-center", isOpen && "px-4 justify-start w-full")}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-full">
+                <ThemeToggle isOpen={isOpen} />
+              </div>
+            </TooltipTrigger>
+            {!isOpen && (
+              <TooltipContent side="right" className="font-semibold">Alternar Tema</TooltipContent>
+            )}
+          </Tooltip>
+        </div>
 
         <div
           className={cn(

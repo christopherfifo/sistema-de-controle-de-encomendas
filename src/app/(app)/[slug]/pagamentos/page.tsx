@@ -2,41 +2,34 @@ import { validateAndGetCondominioData } from "@/data/get-data-by-slug";
 import { PerfilUsuario } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { SimpleSidebar } from "../components/sidebar";
-import { GerenciarLinksCadastroContent } from "../components/gerenciarLinksCadastroContent";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import { PagamentosContent } from "../components/pagamentosContent";
 
-interface GerenciarLinksCadastroPageProps {
+interface PageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ user?: string }>;
+  searchParams: Promise<{ user?: string; perfil?: PerfilUsuario }>;
 }
 
-export default async function GerenciarLinksCadastroPage({
+export default async function PagamentosPage({
   params,
   searchParams,
-}: GerenciarLinksCadastroPageProps) {
+}: PageProps) {
   const { slug } = await params;
-  const { user: sindicoId } = await searchParams;
+  const { user, perfil } = await searchParams;
 
-  if (!sindicoId) redirect("/login");
+  if (!user) redirect("/login");
 
-  const data = await validateAndGetCondominioData(slug, sindicoId);
-  if (data.user.perfil !== PerfilUsuario.SINDICO && data.user.perfil !== PerfilUsuario.ADMINISTRADOR) {
-    redirect(`/${slug}?user=${sindicoId}&perfil=${data.user.perfil}`);
+  const data = await validateAndGetCondominioData(slug, user);
+
+  if (data.user.perfil !== PerfilUsuario.ADMINISTRADOR) {
+    redirect(`/${slug}?user=${user}&perfil=${data.user.perfil}`);
   }
-
-  const condominiosGerenciados = [
-    {
-      id_condominio: data.condominio.id_condominio,
-      nome_condominio: data.condominio.nome_condominio,
-      codigo_acesso: data.condominio.codigo_acesso || "",
-    },
-  ];
 
   const sidebarProps = {
     condominioId: slug,
-    userId: sindicoId,
+    userId: user,
     perfil: data.user.perfil,
     userName: data.user.nome_completo,
     condominioName: data.condominio.nome_condominio,
@@ -67,7 +60,7 @@ export default async function GerenciarLinksCadastroPage({
         </header>
 
         <div className="p-4 md:p-8">
-          <GerenciarLinksCadastroContent condominios={condominiosGerenciados} />
+            <PagamentosContent />
         </div>
       </main>
     </div>

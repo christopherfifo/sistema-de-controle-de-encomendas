@@ -11,6 +11,7 @@ import { PorteiroDashboard } from "./components/porteiroDashboard";
 
 import { getSindicoData } from "./helpers/actionSindico";
 import { SindicoDashboard } from "./pages/sindicoDashboard";
+import { AdminDashboard } from "./pages/adminDashboard";
 
 interface SlugPageProps {
   params: Promise<{ slug: string }>;
@@ -163,6 +164,73 @@ export default async function SlugPage({
         />
       );
       pageTitle = "Configuração do Condomínio";
+      break;
+
+    case PerfilUsuario.ADMINISTRADOR:
+      const adminData = await db.condominio.findUnique({
+        where: { id_condominio: idCondominioReal },
+        select: {
+          qtd_unidades: true,
+          qtd_blocos_torres: true,
+          unidades: {
+            include: {
+              moradores: {
+                select: { 
+                  usuario: {
+                    select: { nome_completo: true }
+                  }
+                }
+              }
+            }
+          },
+          usuarios: {
+            where: { perfil: PerfilUsuario.PORTEIRO },
+            select: { 
+              id_usuario: true,
+              nome_completo: true,
+              email: true,
+              telefone: true,
+              ativo: true
+            }
+          }
+        }
+      });
+
+      const encomendasPendentesAdmin = await db.encomenda.findMany({
+        where: {
+          status: StatusEncomenda.PENDENTE,
+          unidade: { id_condominio: idCondominioReal }
+        },
+        include: {
+          unidade: {
+            select: { bloco_torre: true, numero_unidade: true }
+          },
+          usuario_cadastro: {
+            select: { nome_completo: true }
+          }
+        },
+        orderBy: { data_recebimento: "desc" }
+      });
+
+      const totalEncomendasPendentes = encomendasPendentesAdmin.length;
+      const unidadesOcupadasCount = adminData?.unidades.filter(u => u.moradores.length > 0).length || 0;
+      const totalFuncionarios = adminData?.usuarios.length || 0;
+
+      pageContent = (
+        <AdminDashboard 
+          stats={{
+            totalUnidades: adminData?.qtd_unidades || 0,
+            unidadesOcupadas: unidadesOcupadasCount,
+            totalBlocos: adminData?.qtd_blocos_torres || 0,
+            totalFuncionarios,
+            totalEncomendasPendentes
+          }}
+          encomendasPendentes={encomendasPendentesAdmin}
+          funcionarios={adminData?.usuarios || []}
+          unidades={adminData?.unidades || []}
+        />
+      );
+      pageTitle = "Painel Administrativo";
       break;
 
     default:

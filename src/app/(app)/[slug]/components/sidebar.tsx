@@ -27,6 +27,12 @@ import {
   UserPen,
   UserCog,
   Users,
+  CreditCard,
+  ArrowUpCircle,
+  Wallet,
+  FileText,
+  Banknote,
+  UserPlus,
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
@@ -78,7 +84,88 @@ export function SimpleSidebar({
 
   let navItems: NavItem[] = [];
 
-  if (perfil === PerfilUsuario.MORADOR) {
+  if (perfil === PerfilUsuario.ADMINISTRADOR) {
+    navItems = [
+      {
+        label: "Dashboard Admin",
+        href: createHref("/"),
+        icon: Settings,
+        pathCheck: `/${condominioId}`,
+      },
+      {
+        label: "Encomendas Pendentes",
+        href: createHref("/"),
+        icon: Package,
+        pathCheck: `/${condominioId}`,
+      },
+      {
+        label: "Histórico Global",
+        href: createHref("/historico"),
+        icon: History,
+        pathCheck: `/${condominioId}/historico`,
+      },
+      {
+        label: "Histórico Portaria",
+        href: createHref("/historicoPorteiro"),
+        icon: History,
+        pathCheck: `/${condominioId}/historicoPorteiro`,
+      },
+      {
+        label: "Gerenciar Funcionários",
+        href: createHref("/gerenciarFuncionarios"),
+        icon: SquareChartGantt,
+        pathCheck: `/${condominioId}/gerenciarFuncionarios`,
+      },
+      {
+        label: "Gerenciar Links de Cadastro",
+        href: createHref("/gerenciarLinksCadastro"),
+        icon: ExternalLink,
+        pathCheck: `/${condominioId}/gerenciarLinksCadastro`,
+      },
+      {
+        label: "Gestão de Moradores",
+        href: createHref("/gerenciarCadastroMoradores"),
+        icon: Users,
+        pathCheck: `/${condominioId}/gerenciarCadastroMoradores`,
+      },
+      {
+        label: "Planos & Upgrade",
+        href: createHref("/planos"),
+        icon: CreditCard,
+        pathCheck: `/${condominioId}/planos`,
+      },
+      {
+        label: "Pagamentos",
+        href: createHref("/pagamentos"),
+        icon: Wallet,
+        pathCheck: `/${condominioId}/pagamentos`,
+      },
+      {
+        label: "Faturas",
+        href: createHref("/faturas"),
+        icon: FileText,
+        pathCheck: `/${condominioId}/faturas`,
+      },
+      {
+        label: "Formas de Pagamento",
+        href: createHref("/formasPagamento"),
+        icon: Banknote,
+        pathCheck: `/${condominioId}/formasPagamento`,
+      },
+      {
+        label: "Cadastro de Síndico",
+        href: createHref("/cadastroSindico"),
+        icon: UserPlus,
+        pathCheck: `/${condominioId}/cadastroSindico`,
+      },
+      {
+        label: "Perfil",
+        href: createHref("/meuPerfil"),
+        icon: UserPen,
+        pathCheck: `/${condominioId}/meuPerfil`,
+      },
+    ];
+  } else if (perfil === PerfilUsuario.MORADOR) {
     navItems = [
       {
         label: "Encomendas",

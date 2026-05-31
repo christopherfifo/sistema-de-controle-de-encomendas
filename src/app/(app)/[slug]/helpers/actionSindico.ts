@@ -32,13 +32,13 @@ export async function adicionarUnidade(
 
   if (
     !user ||
-    user.perfil !== PerfilUsuario.SINDICO ||
+    (user.perfil !== PerfilUsuario.SINDICO && user.perfil !== PerfilUsuario.ADMINISTRADOR) ||
     user.id_condominio !== condominioId
   ) {
     return {
       success: false,
       message:
-        "Acesso negado. Apenas o Síndico deste condomínio pode adicionar unidades.",
+        "Acesso negado. Apenas o Síndico ou Administrador deste condomínio pode adicionar unidades.",
     };
   }
 

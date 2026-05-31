@@ -34,7 +34,9 @@
 - [ ] criar página de termos de uso (moradores/porteiro/síndico)
 - [ ] criar página de termos de uso (contratação)
 - [ ] na parte do porteiro, onde tem a lista de retirada, ele ta contanto a quantidade errada, não sei se é por causa das criadas pelo seed
-- [ ] criar as abas do adm, ele vai ter todas as abas dos outros usuarios (porteiro, morador, sindico) além da aba do plano, upgrade, pagamentos, faturas, formas de pagamento e cadastro de sindico
+- [X] criar as abas do adm, ele vai ter todas as abas dos outros usuarios (porteiro, morador, sindico) além da aba do plano, upgrade, pagamentos, faturas, formas de pagamento e cadastro de sindico
+- lapidar cada aba e terminar de desenvolver elas, por exemplo, no historico do porteiro ele não puxa o historico por cada porteiro e tem um campo de meus registros, mas o adm não faz isso
+- o sindico tem que ter acesso ao historico dos porteiros, tem que criar aba
 - [x] adicionar botões de "concordo com os termos de uso" e salvar no banco
 - [x] na hora inserir o codigo do condominio, selecionar automaticamente os blocos e apartamentos disponiveis
 - [x] mostrar mensagens de erro da API no cadastro de morador

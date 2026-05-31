@@ -85,7 +85,7 @@ export default async function HistoricoPorteiroPage({
   const userName = data.user.nome_completo || "Usuário";
   const condominioName = data.condominio.nome_condominio;
 
-  if (data.user.perfil !== PerfilUsuario.PORTEIRO) {
+  if (data.user.perfil !== PerfilUsuario.PORTEIRO && data.user.perfil !== PerfilUsuario.ADMINISTRADOR) {
     redirect(`/${slug}?user=${user}&perfil=${data.user.perfil}`);
   }
 

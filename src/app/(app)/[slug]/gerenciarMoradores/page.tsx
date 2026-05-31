@@ -23,7 +23,7 @@ export default async function GerenciarMoradoresPage({
   if (!sindicoId) redirect("/login");
 
   const data = await validateAndGetCondominioData(slug, sindicoId);
-  if (data.user.perfil !== PerfilUsuario.SINDICO) {
+  if (data.user.perfil !== PerfilUsuario.SINDICO && data.user.perfil !== PerfilUsuario.ADMINISTRADOR) {
     redirect(`/${slug}?user=${sindicoId}&perfil=${data.user.perfil}`);
   }
 

@@ -39,6 +39,9 @@ const Navbar = () => {
           <Link href="#sobre" className="hover:text-foreground transition-colors">
             Como Funciona
           </Link>
+          <Link href="#planos" className="hover:text-foreground transition-colors">
+            Soluções
+          </Link>
 
           <div className="flex items-center gap-4 border-l border-border pl-8">
             <ThemeToggle variant="navbar" />
@@ -83,6 +86,13 @@ const Navbar = () => {
             onClick={() => setMobileOpen(false)}
           >
             Como Funciona
+          </Link>
+          <Link
+            href="#planos"
+            className="text-muted-foreground hover:text-foreground py-2 font-medium"
+            onClick={() => setMobileOpen(false)}
+          >
+            Soluções
           </Link>
 
           <div className="h-px w-full bg-border my-2"></div>

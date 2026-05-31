@@ -1,4 +1,10 @@
-import { PrismaClient, PerfilUsuario, StatusEncomenda, StatusPagamento, TipoRecado } from "@prisma/client";
+import {
+  PrismaClient,
+  PerfilUsuario,
+  StatusEncomenda,
+  StatusPagamento,
+  TipoRecado,
+} from "@prisma/client";
 import { hash } from "bcryptjs";
 
 const db = new PrismaClient();
@@ -30,7 +36,7 @@ async function main() {
   const planoLight = await db.plano.create({
     data: {
       nome_plano: "Plano Light",
-      valor: 89.90,
+      valor: 89.9,
       limite_unidades: 40,
       limite_condominios: 5,
     },
@@ -39,7 +45,7 @@ async function main() {
   await db.plano.create({
     data: {
       nome_plano: "Plano Profissional",
-      valor: 149.90,
+      valor: 149.9,
       limite_unidades: 100,
       limite_condominios: 9999,
     },
@@ -48,7 +54,7 @@ async function main() {
   const planoPremium = await db.plano.create({
     data: {
       nome_plano: "Plano Premium",
-      valor: 299.90,
+      valor: 299.9,
       limite_unidades: 300,
       limite_condominios: 9999,
     },
@@ -57,7 +63,7 @@ async function main() {
   await db.plano.create({
     data: {
       nome_plano: "Plano Enterprise",
-      valor: 599.90,
+      valor: 599.9,
       limite_unidades: 800,
       limite_condominios: 9999,
     },
@@ -89,7 +95,7 @@ async function main() {
     data: {
       id_condominio: condominio.id_condominio,
       id_plano: planoPremium.id_plano,
-      valor_cobrado: 299.90,
+      valor_cobrado: 299.9,
       data_vencimento: new Date(new Date().setDate(new Date().getDate() + 10)),
       data_pagamento: new Date(),
       status_pagamento: StatusPagamento.PAGO,
@@ -118,7 +124,7 @@ async function main() {
     data: {
       id_condominio: condominioAtrasado.id_condominio,
       id_plano: planoLight.id_plano,
-      valor_cobrado: 89.90,
+      valor_cobrado: 89.9,
       data_vencimento: new Date(new Date().setDate(new Date().getDate() - 15)), // Venceu 15 dias atrás
       status_pagamento: StatusPagamento.ATRASADO,
       inadimplente: true,
@@ -243,7 +249,9 @@ async function main() {
     },
   });
 
-  console.log(`Usuários principais criados (Yaya, Síndico, Porteiros preservados).`);
+  console.log(
+    `Usuários principais criados (Yaya, Síndico, Porteiros preservados).`,
+  );
 
   // ==========================================
   // UNIDADES
@@ -280,8 +288,12 @@ async function main() {
     },
   });
 
-  const unidadeA101 = unidadesCriadas.find(u => u.bloco_torre === "Bloco A" && u.numero_unidade === "101");
-  const unidadeB102 = unidadesCriadas.find(u => u.bloco_torre === "Bloco B" && u.numero_unidade === "102");
+  const unidadeA101 = unidadesCriadas.find(
+    (u) => u.bloco_torre === "Bloco A" && u.numero_unidade === "101",
+  );
+  const unidadeB102 = unidadesCriadas.find(
+    (u) => u.bloco_torre === "Bloco B" && u.numero_unidade === "102",
+  );
 
   if (!unidadeA101 || !unidadeB102) {
     throw new Error("Falha ao encontrar as unidades A-101 ou B-102.");
@@ -463,25 +475,27 @@ async function main() {
       id_usuario_origem: sindico.id_usuario,
       tipo_recado: TipoRecado.AVISO_GERAL,
       assunto: "Manutenção dos Elevadores",
-      conteudo: "Informamos que no próximo final de semana haverá manutenção preventiva em todos os elevadores.",
-      status_recado: "ABERTO"
-    }
+      conteudo:
+        "Informamos que no próximo final de semana haverá manutenção preventiva em todos os elevadores.",
+      status_recado: "ABERTO",
+    },
   });
 
   await db.respostaRecado.create({
     data: {
       id_recado: avisoGeral.id_recado,
       id_usuario_resposta: usuarioYaya.id_usuario,
-      conteudo_resposta: "Obrigada por avisar! Serão todos ao mesmo tempo ou um por vez?"
-    }
+      conteudo_resposta:
+        "Obrigada por avisar! Serão todos ao mesmo tempo ou um por vez?",
+    },
   });
 
   await db.respostaRecado.create({
     data: {
       id_recado: avisoGeral.id_recado,
       id_usuario_resposta: sindico.id_usuario,
-      conteudo_resposta: "Um por vez, não se preocupe."
-    }
+      conteudo_resposta: "Um por vez, não se preocupe.",
+    },
   });
 
   const reclamacao = await db.recado.create({
@@ -491,16 +505,17 @@ async function main() {
       tipo_recado: TipoRecado.RECLAMACAO,
       assunto: "Barulho excessivo à noite",
       conteudo: "Gostaria de relatar barulho após as 22h no Bloco B.",
-      status_recado: "EM_ANDAMENTO"
-    }
+      status_recado: "EM_ANDAMENTO",
+    },
   });
 
   await db.respostaRecado.create({
     data: {
       id_recado: reclamacao.id_recado,
       id_usuario_resposta: sindico.id_usuario,
-      conteudo_resposta: "Estamos verificando com as unidades envolvidas. Obrigado pelo relato."
-    }
+      conteudo_resposta:
+        "Estamos verificando com as unidades envolvidas. Obrigado pelo relato.",
+    },
   });
   console.log("Recados e interações no mural criados.");
 
@@ -513,8 +528,8 @@ async function main() {
       id_usuario_destinatario: usuarioYaya.id_usuario,
       tipo_envio: "EMAIL",
       mensagem: "Sua encomenda 'Pacote Amazon' acaba de chegar na portaria!",
-      status_envio: "ENVIADO"
-    }
+      status_envio: "ENVIADO",
+    },
   });
 
   await db.notificacao.create({
@@ -522,9 +537,10 @@ async function main() {
       id_encomenda: encomendaJoao.id_encomenda,
       id_usuario_destinatario: usuarioJoao.id_usuario,
       tipo_envio: "TELEGRAM",
-      mensagem: "O pacote 'Cadeira de Escritório' foi entregue para João Pedro.",
-      status_envio: "LIDO"
-    }
+      mensagem:
+        "O pacote 'Cadeira de Escritório' foi entregue para João Pedro.",
+      status_envio: "LIDO",
+    },
   });
   console.log("Notificações simuladas.");
 

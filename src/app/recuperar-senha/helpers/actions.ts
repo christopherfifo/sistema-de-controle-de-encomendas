@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { Resend } from 'resend';
+import { Resend } from "resend";
 import { v4 as uuidv4 } from "uuid";
 import { recuperarSenhaSchema } from "./schema";
 
@@ -15,36 +15,39 @@ export async function sendPasswordResetEmail(values: { email: string }) {
   const { email } = validatedFields.data;
 
   const existingUser = await db.usuario.findUnique({
-    where: { email }
+    where: { email },
   });
 
   if (!existingUser) {
     // Return success anyway to prevent email enumeration
-    return { success: "Se o email estiver cadastrado, um link de recuperação será enviado." };
+    return {
+      success:
+        "Se o email estiver cadastrado, um link de recuperação será enviado.",
+    };
   }
 
   const token = uuidv4();
   const expires = new Date(new Date().getTime() + 3600 * 1000); // 1 hour
 
   await db.passwordResetToken.deleteMany({
-    where: { email }
+    where: { email },
   });
 
   await db.passwordResetToken.create({
     data: {
       email,
       token,
-      expires
-    }
+      expires,
+    },
   });
 
   const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/resetar-senha?token=${token}`;
 
   try {
     await resend.emails.send({
-      from: 'onboarding@resend.dev', // Default resend onboarding email
+      from: "onboarding@resend.dev", // Default resend onboarding email
       to: email,
-      subject: 'Recuperação de Senha - Sistema de Encomendas',
+      subject: "Recuperação de Senha - Sistema de Encomendas",
       html: `
         <div style="font-family: sans-serif; padding: 20px;">
           <h2>Recuperação de Senha</h2>
@@ -55,10 +58,13 @@ export async function sendPasswordResetEmail(values: { email: string }) {
           <p><a href="${resetLink}">${resetLink}</a></p>
           <p>Este link expira em 1 hora. Se você não solicitou esta alteração, ignore este email.</p>
         </div>
-      `
+      `,
     });
 
-    return { success: "Se o email estiver cadastrado, um link de recuperação será enviado." };
+    return {
+      success:
+        "Se o email estiver cadastrado, um link de recuperação será enviado.",
+    };
   } catch (error) {
     console.error("[RESEND_ERROR]", error);
     return { error: "Erro ao enviar o email. Tente novamente mais tarde." };

@@ -20,7 +20,7 @@ type EncomendaComUnidadeEMorador = Encomenda & {
   unidade: Pick<Unidade, "bloco_torre" | "numero_unidade"> & {
     moradores: {
       usuario: {
-        id_usuario: string; 
+        id_usuario: string;
         nome_completo: string;
       };
     }[];
@@ -73,12 +73,15 @@ export function ListaEncomendasPorteiro({
     <>
       <Accordion type="multiple" className="w-full">
         {encomendasVisiveis.map((encomenda) => {
-          const nomeMorador = encomenda.usuario_cadastro?.nome_completo 
-            || encomenda.unidade.moradores.map(m => m.usuario.nome_completo).join(", ") 
-            || "Morador não encontrado";
+          const nomeMorador =
+            encomenda.usuario_cadastro?.nome_completo ||
+            encomenda.unidade.moradores
+              .map((m) => m.usuario.nome_completo)
+              .join(", ") ||
+            "Morador não encontrado";
 
-          const dataRecebimentoTexto = encomenda.data_recebimento 
-            ? new Date(encomenda.data_recebimento).toLocaleString("pt-BR", { 
+          const dataRecebimentoTexto = encomenda.data_recebimento
+            ? new Date(encomenda.data_recebimento).toLocaleString("pt-BR", {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
@@ -103,34 +106,54 @@ export function ListaEncomendasPorteiro({
                       <span>{nomeMorador}</span>
                     </div>
                     <span className="text-xs bg-muted px-2 py-0.5 rounded-sm w-fit font-mono">
-                      Bloco {encomenda.unidade.bloco_torre} - Apt {encomenda.unidade.numero_unidade}
+                      Bloco {encomenda.unidade.bloco_torre} - Apt{" "}
+                      {encomenda.unidade.numero_unidade}
                     </span>
                   </div>
-                  <Badge variant="outline" className="border-amber-500 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20">Aguardando Retirada</Badge>
+                  <Badge
+                    variant="outline"
+                    className="border-amber-500 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20"
+                  >
+                    Aguardando Retirada
+                  </Badge>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="p-4 bg-muted/30 rounded-b-md">
                 <div className="space-y-4">
                   <ul className="space-y-2 text-sm">
                     <li>
-                      <span className="font-medium text-muted-foreground">Destinatário:</span>{" "}
+                      <span className="font-medium text-muted-foreground">
+                        Destinatário:
+                      </span>{" "}
                       <span className="font-semibold">{nomeMorador}</span>
                     </li>
                     <li>
-                      <span className="font-medium text-muted-foreground">Recebido em:</span>{" "}
+                      <span className="font-medium text-muted-foreground">
+                        Recebido em:
+                      </span>{" "}
                       {dataRecebimentoTexto}
                     </li>
                     <li>
-                      <span className="font-medium text-muted-foreground">Cód. Rastreio:</span>{" "}
-                      <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{encomenda.codigo_rastreio || "Não informado"}</code>
+                      <span className="font-medium text-muted-foreground">
+                        Cód. Rastreio:
+                      </span>{" "}
+                      <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">
+                        {encomenda.codigo_rastreio || "Não informado"}
+                      </code>
                     </li>
                     <li>
-                      <span className="font-medium text-muted-foreground">Tamanho do Volume:</span>{" "}
+                      <span className="font-medium text-muted-foreground">
+                        Tamanho do Volume:
+                      </span>{" "}
                       {encomenda.tamanho}
                     </li>
                     <li>
-                      <span className="font-medium text-muted-foreground">Observação da Portaria:</span>{" "}
-                      <span className="text-destructive font-medium">{encomenda.condicao || "Nenhuma"}</span>
+                      <span className="font-medium text-muted-foreground">
+                        Observação da Portaria:
+                      </span>{" "}
+                      <span className="text-destructive font-medium">
+                        {encomenda.condicao || "Nenhuma"}
+                      </span>
                     </li>
                   </ul>
 

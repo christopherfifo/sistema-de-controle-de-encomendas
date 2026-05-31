@@ -4,7 +4,13 @@ import { useState } from "react";
 import { KeyRound, Copy, Check, UserCheck } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface TokenUsuarioContentProps {
   usuario: {
@@ -39,11 +45,10 @@ export function TokenUsuarioContent({ usuario }: TokenUsuarioContentProps) {
       </CardHeader>
 
       <CardContent className="flex flex-col items-center space-y-6 pt-4 pb-8">
-        
         <div className="p-4 bg-white border rounded-2xl flex flex-col items-center justify-center shadow-inner transition hover:scale-102 duration-200">
-          <QRCodeSVG 
-            value={usuario.token_acesso} 
-            size={160} 
+          <QRCodeSVG
+            value={usuario.token_acesso}
+            size={160}
             level="H"
             includeMargin={false}
           />
@@ -56,10 +61,9 @@ export function TokenUsuarioContent({ usuario }: TokenUsuarioContentProps) {
           <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block">
             Token de Autenticação
           </span>
-          
+
           <div className="flex items-center justify-between gap-2 bg-muted/50 border rounded-xl p-2 pl-4 max-w-[280px] mx-auto shadow-sm backdrop-blur-sm">
-            
-            <div 
+            <div
               onClick={handleCopyToClipboard}
               className="font-mono font-bold text-base tracking-widest cursor-pointer text-primary hover:opacity-80 transition select-all truncate"
               title="Clique para copiar"
@@ -67,10 +71,10 @@ export function TokenUsuarioContent({ usuario }: TokenUsuarioContentProps) {
               {usuario.token_acesso}
             </div>
 
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8 shrink-0 hover:bg-background" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0 hover:bg-background"
               onClick={handleCopyToClipboard}
             >
               {copied ? (

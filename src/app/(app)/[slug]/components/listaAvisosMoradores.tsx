@@ -31,11 +31,17 @@ interface ListaAvisosMoradoresProps {
   porteiroId: string;
 }
 
-export function ListaAvisosMoradores({ avisosIniciais, porteiroId }: ListaAvisosMoradoresProps) {
-  const [avisos, setAvisos] = useState<EncomendaComUnidadeEMorador[]>(avisosIniciais);
+export function ListaAvisosMoradores({
+  avisosIniciais,
+  porteiroId,
+}: ListaAvisosMoradoresProps) {
+  const [avisos, setAvisos] =
+    useState<EncomendaComUnidadeEMorador[]>(avisosIniciais);
 
   const handleSuccess = (encomendaId: string) => {
-    setAvisos((prev) => prev.filter((item) => item.id_encomenda !== encomendaId));
+    setAvisos((prev) =>
+      prev.filter((item) => item.id_encomenda !== encomendaId),
+    );
   };
 
   if (avisos.length === 0) {
@@ -53,12 +59,18 @@ export function ListaAvisosMoradores({ avisosIniciais, porteiroId }: ListaAvisos
   return (
     <Accordion type="multiple" className="w-full">
       {avisos.map((encomenda) => {
-        const nomeMorador = encomenda.usuario_cadastro?.nome_completo 
-          || encomenda.unidade.moradores.map(m => m.usuario.nome_completo).join(", ") 
-          || "Morador não encontrado";
+        const nomeMorador =
+          encomenda.usuario_cadastro?.nome_completo ||
+          encomenda.unidade.moradores
+            .map((m) => m.usuario.nome_completo)
+            .join(", ") ||
+          "Morador não encontrado";
 
         return (
-          <AccordionItem key={encomenda.id_encomenda} value={encomenda.id_encomenda}>
+          <AccordionItem
+            key={encomenda.id_encomenda}
+            value={encomenda.id_encomenda}
+          >
             <AccordionTrigger className="hover:no-underline">
               <div className="flex justify-between items-center w-full pr-4">
                 <div className="flex flex-col text-left space-y-1">
@@ -66,7 +78,10 @@ export function ListaAvisosMoradores({ avisosIniciais, porteiroId }: ListaAvisos
                     ⚠️ {encomenda.tipo_encomenda} — {encomenda.forma_entrega}
                   </span>
                   <div className="flex flex-col text-xs text-muted-foreground">
-                    <span>Unidade: Bloco {encomenda.unidade.bloco_torre} - {encomenda.unidade.numero_unidade}</span>
+                    <span>
+                      Unidade: Bloco {encomenda.unidade.bloco_torre} -{" "}
+                      {encomenda.unidade.numero_unidade}
+                    </span>
                     <div className="flex items-center gap-1 mt-0.5 font-medium text-foreground/80">
                       <User className="h-3 w-3 text-amber-500" />
                       <span>{nomeMorador}</span>
@@ -78,17 +93,29 @@ export function ListaAvisosMoradores({ avisosIniciais, porteiroId }: ListaAvisos
             </AccordionTrigger>
             <AccordionContent className="p-4 bg-amber-50/20 dark:bg-amber-950/10 border border-amber-200/40 rounded-b-md space-y-4">
               <div className="text-sm space-y-1.5">
-                <p><strong>Morador Responsável:</strong> {nomeMorador}</p>
-                <p><strong>Cód. Rastreio:</strong> <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">{encomenda.codigo_rastreio || "Não informado"}</code></p>
-                <p><strong>Obs. Morador:</strong> <span className="italic text-muted-foreground">&quot;{encomenda.condicao || "Nenhuma"}&quot;</span></p>
+                <p>
+                  <strong>Morador Responsável:</strong> {nomeMorador}
+                </p>
+                <p>
+                  <strong>Cód. Rastreio:</strong>{" "}
+                  <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">
+                    {encomenda.codigo_rastreio || "Não informado"}
+                  </code>
+                </p>
+                <p>
+                  <strong>Obs. Morador:</strong>{" "}
+                  <span className="italic text-muted-foreground">
+                    &quot;{encomenda.condicao || "Nenhuma"}&quot;
+                  </span>
+                </p>
               </div>
 
               <hr className="border-muted" />
 
-              <ItemAvisoForm 
-                encomendaId={encomenda.id_encomenda} 
-                porteiroId={porteiroId} 
-                onSuccess={handleSuccess} 
+              <ItemAvisoForm
+                encomendaId={encomenda.id_encomenda}
+                porteiroId={porteiroId}
+                onSuccess={handleSuccess}
               />
             </AccordionContent>
           </AccordionItem>

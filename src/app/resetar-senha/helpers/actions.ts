@@ -4,7 +4,11 @@ import { db } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { resetarSenhaSchema } from "./schema";
 
-export async function resetPassword(values: { token: string, senha: string, confirmarSenha: string }) {
+export async function resetPassword(values: {
+  token: string;
+  senha: string;
+  confirmarSenha: string;
+}) {
   const validatedFields = resetarSenhaSchema.safeParse(values);
   if (!validatedFields.success) {
     return { error: "Dados inválidos." };
@@ -12,7 +16,7 @@ export async function resetPassword(values: { token: string, senha: string, conf
   const { token, senha } = validatedFields.data;
 
   const existingToken = await db.passwordResetToken.findUnique({
-    where: { token }
+    where: { token },
   });
 
   if (!existingToken) {
@@ -25,7 +29,7 @@ export async function resetPassword(values: { token: string, senha: string, conf
   }
 
   const existingUser = await db.usuario.findUnique({
-    where: { email: existingToken.email }
+    where: { email: existingToken.email },
   });
 
   if (!existingUser) {
@@ -36,11 +40,11 @@ export async function resetPassword(values: { token: string, senha: string, conf
 
   await db.usuario.update({
     where: { id_usuario: existingUser.id_usuario },
-    data: { senha_hash: hashedPassword }
+    data: { senha_hash: hashedPassword },
   });
 
   await db.passwordResetToken.delete({
-    where: { id: existingToken.id }
+    where: { id: existingToken.id },
   });
 
   return { success: "Senha redefinida com sucesso!" };

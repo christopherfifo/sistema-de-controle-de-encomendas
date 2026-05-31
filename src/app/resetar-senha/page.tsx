@@ -18,13 +18,17 @@ export default function ResetarSenhaPage() {
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Redefinir Senha</CardTitle>
-          <CardDescription>
-            Crie uma nova senha para sua conta.
-          </CardDescription>
+          <CardDescription>Crie uma nova senha para sua conta.</CardDescription>
         </CardHeader>
 
         <CardContent>
-          <Suspense fallback={<div className="flex justify-center p-4"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+          <Suspense
+            fallback={
+              <div className="flex justify-center p-4">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            }
+          >
             <ResetarSenhaForm />
           </Suspense>
         </CardContent>

@@ -9,11 +9,14 @@ interface OperacaoMoradorParams {
   condominioId: string;
   sindicoId: string;
   tokenSindico: string;
-  idUnidade?: string; 
+  idUnidade?: string;
 }
 
-
-async function validarTokenSindico(sindicoId: string, condominioId: string, tokenDigitado: string) {
+async function validarTokenSindico(
+  sindicoId: string,
+  condominioId: string,
+  tokenDigitado: string,
+) {
   const sindico = await db.usuario.findFirst({
     where: {
       id_usuario: sindicoId,
@@ -34,7 +37,6 @@ async function validarTokenSindico(sindicoId: string, condominioId: string, toke
     throw new Error("Token de confirmação inválido. Operação cancelada.");
   }
 }
-
 
 export async function removerMoradorDoCondominio({
   moradorId,
@@ -60,7 +62,10 @@ export async function removerMoradorDoCondominio({
     });
 
     revalidatePath(`/(app)/[slug]/gerenciarMoradores`, "page");
-    return { success: true, message: "Morador desvinculado e bloqueado com sucesso!" };
+    return {
+      success: true,
+      message: "Morador desvinculado e bloqueado com sucesso!",
+    };
   } catch (error: unknown) {
     const err = error as Error;
     return { success: false, message: err.message || "Erro." };
@@ -76,7 +81,10 @@ export async function reativarMoradorNoCondominio({
 }: OperacaoMoradorParams) {
   try {
     if (!idUnidade) {
-      return { success: false, message: "É necessário selecionar uma unidade para reativar o morador." };
+      return {
+        success: false,
+        message: "É necessário selecionar uma unidade para reativar o morador.",
+      };
     }
 
     await validarTokenSindico(sindicoId, condominioId, tokenSindico);
@@ -103,7 +111,10 @@ export async function reativarMoradorNoCondominio({
     });
 
     revalidatePath(`/(app)/[slug]/gerenciarMoradores`, "page");
-    return { success: true, message: "Morador reativado e vinculado com sucesso!" };
+    return {
+      success: true,
+      message: "Morador reativado e vinculado com sucesso!",
+    };
   } catch (error: unknown) {
     const err = error as Error;
     return { success: false, message: err.message || "Erro." };

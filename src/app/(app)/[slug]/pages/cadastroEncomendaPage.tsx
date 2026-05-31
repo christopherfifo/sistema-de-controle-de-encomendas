@@ -59,7 +59,9 @@ export function CadastroEncomendaPageContent({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const [rastreioVerificado, setRastreioVerificado] = useState<boolean | null>(null);
+  const [rastreioVerificado, setRastreioVerificado] = useState<boolean | null>(
+    null,
+  );
   const [checandoRastreio, setChecandoRastreio] = useState(false);
 
   const form = useForm<CadastroEncomendaFormData>({
@@ -74,7 +76,9 @@ export function CadastroEncomendaPageContent({
     },
   });
 
-  const handleValidarRastreio = async (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleValidarRastreio = async (
+    e: React.FocusEvent<HTMLInputElement>,
+  ) => {
     const codigo = e.target.value.trim();
     if (!codigo || codigo.length < 5) {
       setRastreioVerificado(null);
@@ -85,7 +89,7 @@ export function CadastroEncomendaPageContent({
     try {
       const resposta = await fetch(`/api/rastreio?codigo=${codigo}`);
       const dados = await resposta.json();
-      
+
       if (dados.valido) {
         setRastreioVerificado(true);
         form.setValue("forma_entrega", "Correios");
@@ -151,7 +155,8 @@ export function CadastroEncomendaPageContent({
                           key={u.unidade.id_unidade}
                           value={u.unidade.id_unidade}
                         >
-                          Bloco {u.unidade.bloco_torre} - Apt {u.unidade.numero_unidade}
+                          Bloco {u.unidade.bloco_torre} - Apt{" "}
+                          {u.unidade.numero_unidade}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -169,26 +174,30 @@ export function CadastroEncomendaPageContent({
                   <FormLabel>Código de Rastreio (Opcional)</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input 
-                        placeholder="Ex: AA123456789BR" 
-                        {...field} 
+                      <Input
+                        placeholder="Ex: AA123456789BR"
+                        {...field}
                         disabled={isPending}
                         onBlur={(e) => {
                           field.onBlur();
                           handleValidarRastreio(e);
                         }}
                       />
-                      {checandoRastreio && <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />}
+                      {checandoRastreio && (
+                        <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
+                      )}
                     </div>
                   </FormControl>
                   {rastreioVerificado === true && (
                     <p className="text-xs font-medium text-emerald-600 flex items-center gap-1 mt-1">
-                      <CheckCircle className="h-3.5 w-3.5" /> Objeto localizado nos Correios! Empresa alterada automaticamente.
+                      <CheckCircle className="h-3.5 w-3.5" /> Objeto localizado
+                      nos Correios! Empresa alterada automaticamente.
                     </p>
                   )}
                   {rastreioVerificado === false && (
                     <p className="text-xs font-medium text-amber-600 mt-1">
-                      ⚠️ Código digitado não encontrado ou não pertence aos Correios.
+                      ⚠️ Código digitado não encontrado ou não pertence aos
+                      Correios.
                     </p>
                   )}
                   <FormMessage />
@@ -203,16 +212,25 @@ export function CadastroEncomendaPageContent({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de Encomenda *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || undefined}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || undefined}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione..." />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="PACOTE">📦 Pacote / Caixa</SelectItem>
-                        <SelectItem value="ENVELOPE">✉️ Envelope / Carta</SelectItem>
-                        <SelectItem value="SACOLA">🛍️ Sacola / Alimento</SelectItem>
+                        <SelectItem value="PACOTE">
+                          📦 Pacote / Caixa
+                        </SelectItem>
+                        <SelectItem value="ENVELOPE">
+                          ✉️ Envelope / Carta
+                        </SelectItem>
+                        <SelectItem value="SACOLA">
+                          🛍️ Sacola / Alimento
+                        </SelectItem>
                         <SelectItem value="OUTRO">🏷️ Outros Volumes</SelectItem>
                       </SelectContent>
                     </Select>
@@ -227,7 +245,10 @@ export function CadastroEncomendaPageContent({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Transportadora / Origem *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || undefined}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || undefined}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione..." />
@@ -235,10 +256,14 @@ export function CadastroEncomendaPageContent({
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Correios">💛 Correios</SelectItem>
-                        <SelectItem value="Mercado Livre">💛 Mercado Livre</SelectItem>
+                        <SelectItem value="Mercado Livre">
+                          💛 Mercado Livre
+                        </SelectItem>
                         <SelectItem value="Amazon">💙 Amazon</SelectItem>
                         <SelectItem value="Shopee">🧡 Shopee</SelectItem>
-                        <SelectItem value="Entregador Particular">🛵 Entregador / Motoboy</SelectItem>
+                        <SelectItem value="Entregador Particular">
+                          🛵 Entregador / Motoboy
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -291,7 +316,11 @@ export function CadastroEncomendaPageContent({
               )}
             />
 
-            <Button type="submit" disabled={isPending} className="w-full font-semibold mt-2">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full font-semibold mt-2"
+            >
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Cadastrar Encomenda
             </Button>

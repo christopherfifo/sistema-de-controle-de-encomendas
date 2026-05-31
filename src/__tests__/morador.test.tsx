@@ -21,13 +21,27 @@ jest.mock("@/components/ui/select", () => {
   });
 
   return {
-    Select: ({ onValueChange, children, value }: { onValueChange: (val: string) => void, children: React.ReactNode, value?: string }) => (
+    Select: ({
+      onValueChange,
+      children,
+      value,
+    }: {
+      onValueChange: (val: string) => void;
+      children: React.ReactNode;
+      value?: string;
+    }) => (
       <MockSelectContext.Provider value={{ onValueChange }}>
         <input type="hidden" value={value || ""} onChange={() => {}} />
         {children}
       </MockSelectContext.Provider>
     ),
-    SelectTrigger: ({ children, id }: { children: React.ReactNode, id?: string }) => (
+    SelectTrigger: ({
+      children,
+      id,
+    }: {
+      children: React.ReactNode;
+      id?: string;
+    }) => (
       <button
         role="combobox"
         aria-controls="mock-controls"
@@ -39,9 +53,19 @@ jest.mock("@/components/ui/select", () => {
         {children}
       </button>
     ),
-    SelectValue: ({ placeholder }: { placeholder: string }) => <span>{placeholder}</span>,
-    SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    SelectItem: ({ value, children }: { value: string, children: React.ReactNode }) => {
+    SelectValue: ({ placeholder }: { placeholder: string }) => (
+      <span>{placeholder}</span>
+    ),
+    SelectContent: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
+    SelectItem: ({
+      value,
+      children,
+    }: {
+      value: string;
+      children: React.ReactNode;
+    }) => {
       const { onValueChange } = React.useContext(MockSelectContext);
       return (
         <div
@@ -93,7 +117,7 @@ const mockEncomendasPendentes = [
     codigo_rastreio: null,
     condicao: null,
     data_recebimento: null,
-    url_foto_pacote: null
+    url_foto_pacote: null,
   },
 ];
 
@@ -121,7 +145,9 @@ describe("Fluxo do Morador", () => {
           slug="cond-slug"
           user="user-123"
           perfil="MORADOR"
-          informationsOfUserAndCondominio={mockInfoCondominio as unknown as unknown}
+          informationsOfUserAndCondominio={
+            mockInfoCondominio as unknown as unknown
+          }
           encomendasPendentes={mockEncomendasPendentes as unknown as unknown}
           userId="user-123"
         />,

@@ -3,16 +3,45 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition, useEffect } from "react";
-import { Camera, Loader2, Search, ImageIcon, UserPlus, CheckCircle } from "lucide-react";
+import {
+  Camera,
+  Loader2,
+  Search,
+  ImageIcon,
+  UserPlus,
+  CheckCircle,
+} from "lucide-react";
 
 import { registroEncomendaSchema } from "../schemas/schemaRegistroPorteiro";
-import { registrarEncomendaPorteiro, buscarMoradoresPorNome } from "../helpers/encomendas";
+import {
+  registrarEncomendaPorteiro,
+  buscarMoradoresPorNome,
+} from "../helpers/encomendas";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 
 type MoradorBusca = {
   id_usuario: string;
@@ -27,13 +56,18 @@ interface FormRegistrarEncomendaProps {
   condominioId: string;
 }
 
-export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistrarEncomendaProps) {
+export function FormRegistrarEncomenda({
+  porteiroId,
+  condominioId,
+}: FormRegistrarEncomendaProps) {
   const [isPending, startTransition] = useTransition();
   const [termoBusca, setTermoBusca] = useState("");
   const [listaMoradores, setListaMoradores] = useState<MoradorBusca[]>([]);
   const [previewFoto, setPreviewFoto] = useState<string | null>(null);
   const [modoManual, setModoManual] = useState(false);
-  const [rastreioVerificado, setRastreioVerificado] = useState<boolean | null>(null);
+  const [rastreioVerificado, setRastreioVerificado] = useState<boolean | null>(
+    null,
+  );
   const [checandoRastreio, setChecandoRastreio] = useState(false);
 
   const form = useForm({
@@ -45,7 +79,7 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
       apartamento_manual: "",
       tipo_encomenda: "",
       forma_entrega: "",
-      codigo_rastreio: "", 
+      codigo_rastreio: "",
       condicao: "",
       foto_pacote: "",
     },
@@ -63,7 +97,9 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
     }
   }, [termoBusca, condominioId, modoManual]);
 
-  const handleValidarRastreio = async (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleValidarRastreio = async (
+    e: React.FocusEvent<HTMLInputElement>,
+  ) => {
     const codigo = e.target.value.trim();
     if (!codigo || codigo.length < 5) {
       setRastreioVerificado(null);
@@ -74,7 +110,7 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
     try {
       const resposta = await fetch(`/api/rastreio?codigo=${codigo}`);
       const dados = await resposta.json();
-      
+
       if (dados.valido) {
         setRastreioVerificado(true);
         form.setValue("forma_entrega", "Correios");
@@ -122,7 +158,11 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
   const onSubmit = (data: any) => {
     startTransition(async () => {
       try {
-        const res = await registrarEncomendaPorteiro(porteiroId, condominioId, data);
+        const res = await registrarEncomendaPorteiro(
+          porteiroId,
+          condominioId,
+          data,
+        );
         if (res.success) {
           alert(res.message);
           form.reset();
@@ -145,12 +185,14 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
     <Card className="w-full max-w-2xl mx-auto shadow-sm border">
       <CardHeader>
         <CardTitle>Registrar Encomenda Surpresa</CardTitle>
-        <CardDescription>Busque pelo nome do morador para carregar os dados automáticos ou digite manualmente.</CardDescription>
+        <CardDescription>
+          Busque pelo nome do morador para carregar os dados automáticos ou
+          digite manualmente.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            
             <div className="relative space-y-1.5">
               <FormLabel>Nome do Morador Destinatário *</FormLabel>
               <div className="relative">
@@ -159,7 +201,8 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                   value={termoBusca}
                   onChange={(e) => {
                     setTermoBusca(e.target.value);
-                    if (modoManual) form.setValue("nome_manual_retirante", e.target.value);
+                    if (modoManual)
+                      form.setValue("nome_manual_retirante", e.target.value);
                   }}
                   disabled={isPending}
                   className="pl-9 font-medium"
@@ -187,7 +230,8 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                     onClick={ativarInsercaoManual}
                     className="flex items-center gap-2 w-full p-2.5 text-left text-xs text-sky-600 bg-sky-50/50 hover:bg-sky-50 font-semibold"
                   >
-                    <UserPlus className="h-3.5 w-3.5" /> Não encontrou? Digitar bloco/apartamento na mão
+                    <UserPlus className="h-3.5 w-3.5" /> Não encontrou? Digitar
+                    bloco/apartamento na mão
                   </button>
                 </div>
               )}
@@ -201,7 +245,15 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                   <FormItem>
                     <FormLabel>Bloco / Torre *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: Bloco Z" {...field} disabled={isPending || (!modoManual && !!form.getValues("id_usuario_morador"))} />
+                      <Input
+                        placeholder="Ex: Bloco Z"
+                        {...field}
+                        disabled={
+                          isPending ||
+                          (!modoManual &&
+                            !!form.getValues("id_usuario_morador"))
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -215,7 +267,15 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                   <FormItem>
                     <FormLabel>Apartamento / Unidade *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: 276" {...field} disabled={isPending || (!modoManual && !!form.getValues("id_usuario_morador"))} />
+                      <Input
+                        placeholder="Ex: 276"
+                        {...field}
+                        disabled={
+                          isPending ||
+                          (!modoManual &&
+                            !!form.getValues("id_usuario_morador"))
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -231,9 +291,9 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                   <FormLabel>Código de Rastreio (Opcional)</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input 
-                        placeholder="Ex: AA123456789BR" 
-                        {...field} 
+                      <Input
+                        placeholder="Ex: AA123456789BR"
+                        {...field}
                         value={field.value || ""}
                         disabled={isPending}
                         onBlur={(e) => {
@@ -241,17 +301,21 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                           handleValidarRastreio(e);
                         }}
                       />
-                      {checandoRastreio && <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />}
+                      {checandoRastreio && (
+                        <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-muted-foreground" />
+                      )}
                     </div>
                   </FormControl>
                   {rastreioVerificado === true && (
                     <p className="text-xs font-medium text-emerald-600 flex items-center gap-1 mt-1">
-                      <CheckCircle className="h-3.5 w-3.5" /> Objeto localizado nos Correios! Empresa alterada automaticamente.
+                      <CheckCircle className="h-3.5 w-3.5" /> Objeto localizado
+                      nos Correios! Empresa alterada automaticamente.
                     </p>
                   )}
                   {rastreioVerificado === false && (
                     <p className="text-xs font-medium text-amber-600 mt-1">
-                      ⚠️ Código digitado não encontrado ou não pertence aos Correios.
+                      ⚠️ Código digitado não encontrado ou não pertence aos
+                      Correios.
                     </p>
                   )}
                   <FormMessage />
@@ -266,12 +330,25 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo de Encomenda *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger></FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
-                        <SelectItem value="PACOTE">📦 Pacote / Caixa</SelectItem>
-                        <SelectItem value="ENVELOPE">✉️ Envelope / Carta</SelectItem>
-                        <SelectItem value="SACOLA">🛍️ Sacola / Alimento</SelectItem>
+                        <SelectItem value="PACOTE">
+                          📦 Pacote / Caixa
+                        </SelectItem>
+                        <SelectItem value="ENVELOPE">
+                          ✉️ Envelope / Carta
+                        </SelectItem>
+                        <SelectItem value="SACOLA">
+                          🛍️ Sacola / Alimento
+                        </SelectItem>
                         <SelectItem value="OUTRO">🏷️ Outros Volumes</SelectItem>
                       </SelectContent>
                     </Select>
@@ -286,14 +363,25 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Transportadora / Origem *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || undefined}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger></FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || undefined}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
                         <SelectItem value="Correios">💛 Correios</SelectItem>
-                        <SelectItem value="Mercado Livre">💛 Mercado Livre</SelectItem>
+                        <SelectItem value="Mercado Livre">
+                          💛 Mercado Livre
+                        </SelectItem>
                         <SelectItem value="Amazon">💙 Amazon</SelectItem>
                         <SelectItem value="Shopee">🧡 Shopee</SelectItem>
-                        <SelectItem value="Entregador Particular">🛵 Entregador / Motoboy</SelectItem>
+                        <SelectItem value="Entregador Particular">
+                          🛵 Entregador / Motoboy
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -309,7 +397,11 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                 <FormItem>
                   <FormLabel>Estado / Condição do Pacote *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Caixa sem avarias, amassada, lacrada..." {...field} disabled={isPending} />
+                    <Input
+                      placeholder="Ex: Caixa sem avarias, amassada, lacrada..."
+                      {...field}
+                      disabled={isPending}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -317,9 +409,16 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
             />
 
             <div className="space-y-1.5">
-              <FormLabel>Foto do Pacote (Opcional - Envia para o Telegram)</FormLabel>
+              <FormLabel>
+                Foto do Pacote (Opcional - Envia para o Telegram)
+              </FormLabel>
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <Button type="button" variant="outline" className="w-full sm:w-auto relative gap-2" disabled={isPending}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto relative gap-2"
+                  disabled={isPending}
+                >
                   <Camera className="h-4 w-4" />
                   Capturar Imagem do Pacote
                   <input
@@ -332,13 +431,20 @@ export function FormRegistrarEncomenda({ porteiroId, condominioId }: FormRegistr
                 </Button>
                 {previewFoto && (
                   <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
-                    <ImageIcon className="h-4 w-4" /> Imagem em anexo pronta para o Telegram!
+                    <ImageIcon className="h-4 w-4" /> Imagem em anexo pronta
+                    para o Telegram!
                   </div>
                 )}
               </div>
             </div>
 
-            <Button type="submit" className="w-full font-semibold mt-2" disabled={isPending || (!form.getValues("bloco_manual") && !modoManual)}>
+            <Button
+              type="submit"
+              className="w-full font-semibold mt-2"
+              disabled={
+                isPending || (!form.getValues("bloco_manual") && !modoManual)
+              }
+            >
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Registrar Entrada e Notificar Morador
             </Button>

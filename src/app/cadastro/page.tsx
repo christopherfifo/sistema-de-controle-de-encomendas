@@ -24,7 +24,13 @@ export default function CadastroPage() {
         </CardHeader>
 
         <CardContent>
-          <Suspense fallback={<div className="flex items-center justify-center py-8">Carregando formulário...</div>}>
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center py-8">
+                Carregando formulário...
+              </div>
+            }
+          >
             <CadastroSaaSForm />
           </Suspense>
         </CardContent>

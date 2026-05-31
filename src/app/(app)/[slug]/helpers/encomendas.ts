@@ -128,7 +128,7 @@ export async function registrarEncomendaPorteiro(
   if (data.id_usuario_morador) {
     const vinculo = await db.moradoresUnidades.findFirst({
       where: { id_usuario: data.id_usuario_morador },
-      select: { id_unidade: true }
+      select: { id_unidade: true },
     });
     if (vinculo) unidadeIdFinal = vinculo.id_unidade;
   }
@@ -138,8 +138,8 @@ export async function registrarEncomendaPorteiro(
       where: {
         id_condominio: condominioId,
         bloco_torre: data.bloco_manual || "",
-        numero_unidade: data.apartamento_manual || ""
-      }
+        numero_unidade: data.apartamento_manual || "",
+      },
     });
 
     if (!unidadeExistente) {
@@ -147,8 +147,8 @@ export async function registrarEncomendaPorteiro(
         data: {
           id_condominio: condominioId,
           bloco_torre: data.bloco_manual || "",
-                  numero_unidade: data.apartamento_manual || ""
-        }
+          numero_unidade: data.apartamento_manual || "",
+        },
       });
     }
     unidadeIdFinal = unidadeExistente.id_unidade;
@@ -162,7 +162,7 @@ export async function registrarEncomendaPorteiro(
         data_recebimento: new Date(),
         tipo_encomenda: data.tipo_encomenda,
         forma_entrega: data.forma_entrega,
-        codigo_rastreio: data.codigo_rastreio || null, 
+        codigo_rastreio: data.codigo_rastreio || null,
         tamanho: "MEDIO",
         condicao: data.condicao,
         status: StatusEncomenda.PENDENTE,
@@ -171,15 +171,18 @@ export async function registrarEncomendaPorteiro(
     });
 
     await enviarNotificacaoTelegram(
-      unidadeIdFinal, 
-      data.tipo_encomenda, 
+      unidadeIdFinal,
+      data.tipo_encomenda,
       data.forma_entrega,
       data.condicao || "Nenhuma observação.",
-      data.foto_pacote
+      data.foto_pacote,
     );
 
     revalidatePath(`/(app)/[slug]`, "page");
-    return { success: true, message: "Encomenda registrada e morador notificado!" };
+    return {
+      success: true,
+      message: "Encomenda registrada e morador notificado!",
+    };
   } catch (error) {
     console.error(error);
     throw new Error("Erro ao registrar a encomenda na portaria.");
@@ -237,7 +240,8 @@ export async function registrarRetiradaEncomenda(
     throw new Error(validatedData.error.issues[0].message);
   }
 
-  const { tipo_confirmacao, token_retirante, cpf_retirante } = validatedData.data;
+  const { tipo_confirmacao, token_retirante, cpf_retirante } =
+    validatedData.data;
 
   const encomenda = await db.encomenda.findUnique({
     where: { id_encomenda: encomendaId },
@@ -254,8 +258,9 @@ export async function registrarRetiradaEncomenda(
   let moradorAlvo;
 
   if (tipo_confirmacao === "TOKEN") {
-    if (!token_retirante) throw new Error("Token é obrigatório para validação automática.");
-    
+    if (!token_retirante)
+      throw new Error("Token é obrigatório para validação automática.");
+
     moradorAlvo = await db.usuario.findUnique({
       where: { token_acesso: token_retirante },
     });
@@ -271,14 +276,16 @@ export async function registrarRetiradaEncomenda(
     const cpfLimpoInput = cpf_retirante.replace(/\D/g, "");
 
     moradorAlvo = await db.usuario.findFirst({
-      where: { 
+      where: {
         cpf: cpfLimpoInput,
-        id_condominio: encomenda.unidade.id_condominio 
+        id_condominio: encomenda.unidade.id_condominio,
       },
     });
 
     if (!moradorAlvo) {
-      throw new Error("Nenhum morador encontrado com este CPF neste condomínio.");
+      throw new Error(
+        "Nenhum morador encontrado com este CPF neste condomínio.",
+      );
     }
   }
 
@@ -297,18 +304,21 @@ export async function registrarRetiradaEncomenda(
           id_usuario_retirada: moradorAlvo.id_usuario,
           data_retirada: new Date(),
           forma_confirmacao: tipo_confirmacao,
-          comprovante: tipo_confirmacao === "TOKEN" 
-            ? `Validado via Token de Segurança`
-            : `Confirmado manualmente via checagem direta de CPF`,
+          comprovante:
+            tipo_confirmacao === "TOKEN"
+              ? `Validado via Token de Segurança`
+              : `Confirmado manualmente via checagem direta de CPF`,
         },
       }),
 
-      ...(tipo_confirmacao === "TOKEN" ? [
-        db.usuario.update({
-          where: { id_usuario: moradorAlvo.id_usuario },
-          data: { token_acesso: null }
-        })
-      ] : [])
+      ...(tipo_confirmacao === "TOKEN"
+        ? [
+            db.usuario.update({
+              where: { id_usuario: moradorAlvo.id_usuario },
+              data: { token_acesso: null },
+            }),
+          ]
+        : []),
     ]);
 
     if (moradorAlvo.telegram_chat_id) {
@@ -322,7 +332,7 @@ export async function registrarRetiradaEncomenda(
         codigoRastreio: encomenda.codigo_rastreio,
         dataRetirada: new Date(),
         quemRetirouNome: moradorAlvo.nome_completo,
-        urlFotoProduto: null // Foto não é mais armazenada no banco
+        urlFotoProduto: null, // Foto não é mais armazenada no banco
       }).catch((err) => {
         console.error("[TELEGRAM_BG_ERROR] Falha ao notificar saída:", err);
       });
@@ -330,7 +340,10 @@ export async function registrarRetiradaEncomenda(
 
     revalidatePath(`/(app)/[slug]`, "page");
 
-    return { success: true, message: `Retirada registrada com sucesso para ${moradorAlvo.nome_completo}!` };
+    return {
+      success: true,
+      message: `Retirada registrada com sucesso para ${moradorAlvo.nome_completo}!`,
+    };
   } catch (error) {
     console.error("Erro na transação de retirada:", error);
     throw new Error("Não foi possível registrar a retirada. Tente novamente.");
@@ -352,7 +365,7 @@ export async function gerarNovoTokenRetirada(userId: string) {
 export async function confirmarChegadaEncomendaMorador(
   encomendaId: string,
   porteiroId: string,
-  formData: FormData
+  formData: FormData,
 ) {
   if (!encomendaId || !porteiroId) {
     throw new Error("IDs de encomenda e porteiro são obrigatórios.");
@@ -401,11 +414,14 @@ export async function confirmarChegadaEncomendaMorador(
       encomenda.tipo_encomenda,
       encomenda.forma_entrega,
       condicaoPorteiro,
-      fotoFile || undefined
+      fotoFile || undefined,
     );
 
     revalidatePath(`/(app)/[slug]`, "page");
-    return { success: true, message: "Chegada do pacote registrada e morador notificado!" };
+    return {
+      success: true,
+      message: "Chegada do pacote registrada e morador notificado!",
+    };
   } catch (error) {
     console.error("Erro ao confirmar chegada da encomenda:", error);
     throw new Error("Não foi possível registrar o recebimento da encomenda.");
@@ -417,12 +433,12 @@ async function enviarNotificacaoTelegram(
   tipo: string,
   origem: string,
   observacaoPorteiro: string,
-  fotoPacote?: string | Blob 
+  fotoPacote?: string | Blob,
 ) {
   try {
     const unidade = await db.unidade.findUnique({
       where: { id_unidade: unidadeId },
-      include: { moradores: { include: { usuario: true } } }
+      include: { moradores: { include: { usuario: true } } },
     });
 
     if (!unidade) return;
@@ -444,15 +460,15 @@ async function enviarNotificacaoTelegram(
           `📦 *Volume:* ${tipo} (${origem})`,
           `📝 *Obs da Portaria:* _${observacaoPorteiro}_`,
           ``,
-          `🔑 Gere seu Token de 8 dígitos no painel para efetuar a retirada com o porteiro.`
+          `🔑 Gere seu Token de 8 dígitos no painel para efetuar a retirada com o porteiro.`,
         ].join("\n");
-        
+
         if (fotoPacote) {
           const telegramFormData = new FormData();
           telegramFormData.append("chat_id", chatId);
           telegramFormData.append("caption", texto);
           telegramFormData.append("parse_mode", "Markdown");
-          
+
           if (typeof fotoPacote === "string") {
             if (fotoPacote.startsWith("data:")) {
               const fetchRes = await fetch(fotoPacote);
@@ -465,21 +481,30 @@ async function enviarNotificacaoTelegram(
             telegramFormData.append("photo", fotoPacote, "pacote.jpg");
           }
 
-          const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-            method: "POST",
-            body: telegramFormData,
-          });
+          const res = await fetch(
+            `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
+            {
+              method: "POST",
+              body: telegramFormData,
+            },
+          );
 
           if (!res.ok) {
             const errorData = await res.json();
-            console.error("[TELEGRAM_API_ERROR] Falha ao enviar foto:", errorData);
+            console.error(
+              "[TELEGRAM_API_ERROR] Falha ao enviar foto:",
+              errorData,
+            );
           }
         } else {
-          await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            chat_id: chatId,
-            text: texto,
-            parse_mode: "Markdown"
-          });
+          await axios.post(
+            `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+            {
+              chat_id: chatId,
+              text: texto,
+              parse_mode: "Markdown",
+            },
+          );
         }
       }
     }
@@ -488,35 +513,38 @@ async function enviarNotificacaoTelegram(
   }
 }
 
-export async function buscarMoradoresPorNome(condominioId: string, termo: string) {
+export async function buscarMoradoresPorNome(
+  condominioId: string,
+  termo: string,
+) {
   if (!termo || termo.trim().length < 2) return [];
 
   try {
     const moradores = await db.moradoresUnidades.findMany({
       where: {
-        unidade: { 
-          id_condominio: condominioId 
+        unidade: {
+          id_condominio: condominioId,
         },
         usuario: {
-          nome_completo: { 
-            contains: termo, 
-            mode: "insensitive" 
-          }
-        }
+          nome_completo: {
+            contains: termo,
+            mode: "insensitive",
+          },
+        },
       },
       include: {
         usuario: true,
-        unidade: true
+        unidade: true,
       },
-      take: 6
+      take: 6,
     });
 
-    return moradores.map(m => ({
+    return moradores.map((m) => ({
       id_usuario: m.usuario.id_usuario,
       nome_completo: m.usuario.nome_completo,
       bloco: m.unidade.bloco_torre,
       apartamento: m.unidade.numero_unidade,
-      id_unidade: m.id_unidade
+      id_unidade: m.id_unidade,
     }));
   } catch (error) {
     console.error("Erro na busca de moradores:", error);

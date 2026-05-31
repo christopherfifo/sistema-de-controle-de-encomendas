@@ -9,15 +9,19 @@ interface DadosNotificacaoRetirada {
   formaEntrega: string;
   codigoRastreio?: string | null;
   dataRetirada: Date;
-  quemRetirouNome: string; 
-  urlFotoProduto?: string | null; 
+  quemRetirouNome: string;
+  urlFotoProduto?: string | null;
 }
 
-export async function enviarNotificacaoRetiradaTelegram(dados: DadosNotificacaoRetirada): Promise<boolean> {
+export async function enviarNotificacaoRetiradaTelegram(
+  dados: DadosNotificacaoRetirada,
+): Promise<boolean> {
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
   if (!BOT_TOKEN) {
-    console.error("[TELEGRAM_SERVER_ERROR] O TELEGRAM_BOT_TOKEN não está definido nas variáveis de ambiente (.env).");
+    console.error(
+      "[TELEGRAM_SERVER_ERROR] O TELEGRAM_BOT_TOKEN não está definido nas variáveis de ambiente (.env).",
+    );
     return false;
   }
 
@@ -42,9 +46,9 @@ export async function enviarNotificacaoRetiradaTelegram(dados: DadosNotificacaoR
     `• *Retirado por:* ${dados.quemRetirouNome}`,
     `• *Horário:* ${horaFormatada} do dia ${dataFormatada}`,
     ``,
-    `_Caso você não reconheça esta ação, entre em contato imediatamente com a administração do condomínio._`
+    `_Caso você não reconheça esta ação, entre em contato imediatamente com a administração do condomínio._`,
   ]
-    .filter((linha) => linha !== null) 
+    .filter((linha) => linha !== null)
     .join("\n");
 
   try {
@@ -54,7 +58,10 @@ export async function enviarNotificacaoRetiradaTelegram(dados: DadosNotificacaoR
       telegramFormData.append("caption", textoMensagem);
       telegramFormData.append("parse_mode", "Markdown");
 
-      if (typeof dados.urlFotoProduto === "string" && dados.urlFotoProduto.startsWith("data:")) {
+      if (
+        typeof dados.urlFotoProduto === "string" &&
+        dados.urlFotoProduto.startsWith("data:")
+      ) {
         const fetchRes = await fetch(dados.urlFotoProduto);
         const blob = await fetchRes.blob();
         telegramFormData.append("photo", blob, "produto.jpg");
@@ -62,14 +69,20 @@ export async function enviarNotificacaoRetiradaTelegram(dados: DadosNotificacaoR
         telegramFormData.append("photo", dados.urlFotoProduto);
       }
 
-      const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-        method: "POST",
-        body: telegramFormData,
-      });
+      const res = await fetch(
+        `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
+        {
+          method: "POST",
+          body: telegramFormData,
+        },
+      );
 
       if (!res.ok) {
         const errorData = await res.json();
-        console.error("[TELEGRAM_API_ERROR] Falha ao enviar foto na retirada:", errorData);
+        console.error(
+          "[TELEGRAM_API_ERROR] Falha ao enviar foto na retirada:",
+          errorData,
+        );
       }
     } else {
       await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -81,11 +94,11 @@ export async function enviarNotificacaoRetiradaTelegram(dados: DadosNotificacaoR
 
     return true;
   } catch (error: unknown) {
-    const err = error as { response?: { data?: unknown }, message?: string };
+    const err = error as { response?: { data?: unknown }; message?: string };
     console.error(
       "[TELEGRAM_API_ERROR] Falha ao enviar mensagem para o chat_id:",
       dados.chatId,
-      err?.response?.data || err.message
+      err?.response?.data || err.message,
     );
     return false;
   }

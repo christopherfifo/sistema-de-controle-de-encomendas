@@ -37,13 +37,13 @@ export function PorteiroDashboard({
   porteiroId,
   condominioId,
 }: PorteiroDashboardProps) {
-  
   const avisosMoradores = encomendasPendentes.filter(
-    (enc) => enc.id_usuario_cadastro !== null && enc.id_porteiro_recebimento === null
+    (enc) =>
+      enc.id_usuario_cadastro !== null && enc.id_porteiro_recebimento === null,
   );
 
   const pendentesRetirada = encomendasPendentes.filter(
-    (enc) => enc.id_porteiro_recebimento !== null
+    (enc) => enc.id_porteiro_recebimento !== null,
   );
 
   return (

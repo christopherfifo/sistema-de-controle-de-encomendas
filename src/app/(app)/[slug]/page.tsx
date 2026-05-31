@@ -54,7 +54,7 @@ async function getPorteiroData(idCondominio: string) {
     where: {
       status: StatusEncomenda.PENDENTE,
       unidade: {
-        id_condominio: idCondominio, 
+        id_condominio: idCondominio,
       },
     },
     include: {
@@ -65,12 +65,12 @@ async function getPorteiroData(idCondominio: string) {
         select: {
           bloco_torre: true,
           numero_unidade: true,
-          moradores: { 
+          moradores: {
             include: {
               usuario: {
                 select: {
                   id_usuario: true,
-                  nome_completo: true, 
+                  nome_completo: true,
                 },
               },
             },
@@ -84,8 +84,8 @@ async function getPorteiroData(idCondominio: string) {
   });
 
   const todasUnidades = await db.unidade.findMany({
-    where: { 
-      id_condominio: idCondominio 
+    where: {
+      id_condominio: idCondominio,
     },
     select: {
       id_unidade: true,
@@ -108,7 +108,7 @@ export default async function SlugPage({
   const data = await validateAndGetCondominioData(slug, userId);
   const userName = data.user.nome_completo || "Usuário";
   const condominioName = data.condominio.nome_condominio;
-  const idCondominioReal = data.condominio.id_condominio; 
+  const idCondominioReal = data.condominio.id_condominio;
 
   let pageContent: React.ReactNode = (
     <p>Bem-vindo ao Painel. Selecione uma opção no menu.</p>
@@ -142,7 +142,7 @@ export default async function SlugPage({
     case PerfilUsuario.PORTEIRO:
       const { encomendasPendentes: pEncomendas, todasUnidades } =
         await getPorteiroData(idCondominioReal);
-        
+
       pageContent = (
         <PorteiroDashboard
           encomendasPendentes={pEncomendas}

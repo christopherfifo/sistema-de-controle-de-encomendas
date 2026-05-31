@@ -2,7 +2,9 @@ import * as z from "zod";
 import { removeCpfPunctuation, validarCpfLocalmente } from "@/helpers/cpf";
 
 export const registroPorteiroSchema = z.object({
-  nomeCompleto: z.string().min(3, { message: "Nome deve ter no mínimo 3 caracteres." }),
+  nomeCompleto: z
+    .string()
+    .min(3, { message: "Nome deve ter no mínimo 3 caracteres." }),
   email: z.string().email({ message: "Email inválido." }),
   cpf: z
     .string()
@@ -17,14 +19,18 @@ export const registroPorteiroSchema = z.object({
     .string()
     .transform((val) => val.replace(/\D/g, ""))
     .pipe(z.string().min(10, { message: "Telefone inválido." })),
-  senha: z.string().min(6, { message: "A senha deve ter no mínimo 6 caracteres." }),
+  senha: z
+    .string()
+    .min(6, { message: "A senha deve ter no mínimo 6 caracteres." }),
   moraNoCondominio: z.boolean(),
-  id_unidade: z.string(), 
+  id_unidade: z.string(),
 });
 
 export const edicaoPorteiroSchema = z.object({
   id_usuario: z.string(),
-  nomeCompleto: z.string().min(3, { message: "Nome deve ter no mínimo 3 caracteres." }),
+  nomeCompleto: z
+    .string()
+    .min(3, { message: "Nome deve ter no mínimo 3 caracteres." }),
   email: z.string().email({ message: "Email inválido." }),
   telefone: z
     .string()

@@ -23,7 +23,10 @@ export default async function GerenciarFuncionariosPage({
   }
 
   const porteiros = await db.usuario.findMany({
-    where: { id_condominio: data.condominio.id_condominio, perfil: PerfilUsuario.PORTEIRO },
+    where: {
+      id_condominio: data.condominio.id_condominio,
+      perfil: PerfilUsuario.PORTEIRO,
+    },
     select: {
       id_usuario: true,
       nome_completo: true,
@@ -31,21 +34,24 @@ export default async function GerenciarFuncionariosPage({
       cpf: true,
       telefone: true,
       ativo: true,
-      token_acesso: true, 
-      unidades_residenciais: { include: { unidade: true } }
+      token_acesso: true,
+      unidades_residenciais: { include: { unidade: true } },
     },
     orderBy: { nome_completo: "asc" },
   });
 
   const moradores = await db.usuario.findMany({
-    where: { id_condominio: data.condominio.id_condominio, perfil: PerfilUsuario.MORADOR },
+    where: {
+      id_condominio: data.condominio.id_condominio,
+      perfil: PerfilUsuario.MORADOR,
+    },
     select: { id_usuario: true, nome_completo: true, cpf: true, email: true },
-    orderBy: { nome_completo: "asc" }
+    orderBy: { nome_completo: "asc" },
   });
 
   const unidades = await db.unidade.findMany({
     where: { id_condominio: data.condominio.id_condominio },
-    orderBy: [{ bloco_torre: "asc" }, { numero_unidade: "asc" }]
+    orderBy: [{ bloco_torre: "asc" }, { numero_unidade: "asc" }],
   });
 
   const sidebarProps = {
@@ -58,7 +64,9 @@ export default async function GerenciarFuncionariosPage({
 
   return (
     <div className="flex min-h-screen">
-      <div className="hidden md:block"><SimpleSidebar {...sidebarProps} /></div>
+      <div className="hidden md:block">
+        <SimpleSidebar {...sidebarProps} />
+      </div>
       <main className="flex-1 p-4 md:p-8">
         <GerenciarFuncionariosContent
           porteiros={porteiros}

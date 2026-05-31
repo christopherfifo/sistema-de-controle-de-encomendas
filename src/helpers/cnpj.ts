@@ -40,16 +40,27 @@ export const isValidCNPJ = async (cnpj: string): Promise<boolean> => {
 
   try {
     // Usando a API pública e estável da BrasilAPI para validar o CNPJ ativo
-    const response = await axios.get(`https://brasilapi.com.br/api/cnpj/v1/${cleaned}`, {
-      timeout: 4000
-    });
+    const response = await axios.get(
+      `https://brasilapi.com.br/api/cnpj/v1/${cleaned}`,
+      {
+        timeout: 4000,
+      },
+    );
     return response.status === 200;
   } catch (error: unknown) {
     // Se a API retornar 404 é porque o CNPJ não existe (inválido)
-    if (typeof error === "object" && error !== null && "response" in error && (error as { response?: { status?: number } }).response?.status === 404) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      (error as { response?: { status?: number } }).response?.status === 404
+    ) {
       return false;
     }
-    console.warn("[CNPJ_API_WARNING] Erro na API pública, usando fallback matemático local:", error);
+    console.warn(
+      "[CNPJ_API_WARNING] Erro na API pública, usando fallback matemático local:",
+      error,
+    );
     return validarCnpjLocalmente(cleaned);
   }
 };

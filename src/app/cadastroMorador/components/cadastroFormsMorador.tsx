@@ -36,13 +36,20 @@ import {
   cadastroSchema,
 } from "../helpers/schemaCadastroMorador";
 import { maskCPF } from "@/helpers/cpf";
-import { registerMorador, getUnidadesByCodigoAcesso } from "../helpers/actionCadastroMorador";
+import {
+  registerMorador,
+  getUnidadesByCodigoAcesso,
+} from "../helpers/actionCadastroMorador";
 import { cn } from "@/lib/utils";
 
 export function CadastroFormsMorador() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const codigoFromUrl = searchParams.get("codigo_acesso") || searchParams.get("codigoAcesso") || searchParams.get("codigo") || searchParams.get("condominio");
+  const codigoFromUrl =
+    searchParams.get("codigo_acesso") ||
+    searchParams.get("codigoAcesso") ||
+    searchParams.get("codigo") ||
+    searchParams.get("condominio");
 
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();
@@ -50,7 +57,10 @@ export function CadastroFormsMorador() {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [unidadesData, setUnidadesData] = useState<{blocos: string[], unidadesPorBloco: Record<string, string[]>} | null>(null);
+  const [unidadesData, setUnidadesData] = useState<{
+    blocos: string[];
+    unidadesPorBloco: Record<string, string[]>;
+  } | null>(null);
   const [isFetchingUnidades, setIsFetchingUnidades] = useState(false);
   const [blocoOpen, setBlocoOpen] = useState(false);
   const [apartamentoOpen, setApartamentoOpen] = useState(false);
@@ -115,7 +125,9 @@ export function CadastroFormsMorador() {
 
       if (result.error) {
         if (result.field) {
-          form.setError(result.field as Parameters<typeof form.setError>[0], { message: result.error });
+          form.setError(result.field as Parameters<typeof form.setError>[0], {
+            message: result.error,
+          });
         } else {
           setError(result.error);
         }
@@ -197,17 +209,29 @@ export function CadastroFormsMorador() {
                   <FormLabel>Bloco</FormLabel>
                   {isFetchingUnidades ? (
                     <FormControl>
-                      <Button variant="outline" disabled className="w-full justify-between font-normal text-muted-foreground">
+                      <Button
+                        variant="outline"
+                        disabled
+                        className="w-full justify-between font-normal text-muted-foreground"
+                      >
                         Buscando blocos...
                         <Loader2 className="ml-2 h-4 w-4 animate-spin shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
                   ) : !codigoAcessoWatch || codigoAcessoWatch.length < 5 ? (
                     <FormControl>
-                      <Input placeholder="Aguardando código..." disabled {...field} />
+                      <Input
+                        placeholder="Aguardando código..."
+                        disabled
+                        {...field}
+                      />
                     </FormControl>
                   ) : unidadesData && unidadesData.blocos.length > 0 ? (
-                    <Popover open={blocoOpen} onOpenChange={setBlocoOpen} modal={true}>
+                    <Popover
+                      open={blocoOpen}
+                      onOpenChange={setBlocoOpen}
+                      modal={true}
+                    >
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
@@ -215,21 +239,24 @@ export function CadastroFormsMorador() {
                             role="combobox"
                             className={cn(
                               "w-full justify-between font-normal",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                           >
-                            {field.value
-                              ? field.value
-                              : "Selecione o bloco"}
+                            {field.value ? field.value : "Selecione o bloco"}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                      <PopoverContent
+                        className="w-[--radix-popover-trigger-width] p-0"
+                        align="start"
+                      >
                         <Command>
                           <CommandInput placeholder="Pesquisar bloco..." />
                           <CommandList>
-                            <CommandEmpty>Nenhum bloco encontrado.</CommandEmpty>
+                            <CommandEmpty>
+                              Nenhum bloco encontrado.
+                            </CommandEmpty>
                             <CommandGroup>
                               {unidadesData.blocos.map((bloco) => (
                                 <CommandItem
@@ -246,7 +273,7 @@ export function CadastroFormsMorador() {
                                       "mr-2 h-4 w-4",
                                       bloco === field.value
                                         ? "opacity-100"
-                                        : "opacity-0"
+                                        : "opacity-0",
                                     )}
                                   />
                                   {bloco}
@@ -270,23 +297,38 @@ export function CadastroFormsMorador() {
               control={form.control}
               name="apartamento"
               render={({ field }) => {
-                const apartamentos = blocoWatch && unidadesData ? unidadesData.unidadesPorBloco[blocoWatch] || [] : [];
+                const apartamentos =
+                  blocoWatch && unidadesData
+                    ? unidadesData.unidadesPorBloco[blocoWatch] || []
+                    : [];
                 return (
                   <FormItem className="flex flex-col pt-2">
                     <FormLabel>Apartamento</FormLabel>
                     {isFetchingUnidades ? (
                       <FormControl>
-                        <Button variant="outline" disabled className="w-full justify-between font-normal text-muted-foreground">
+                        <Button
+                          variant="outline"
+                          disabled
+                          className="w-full justify-between font-normal text-muted-foreground"
+                        >
                           Buscando...
                           <Loader2 className="ml-2 h-4 w-4 animate-spin shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     ) : !codigoAcessoWatch || codigoAcessoWatch.length < 5 ? (
                       <FormControl>
-                        <Input placeholder="Aguardando código..." disabled {...field} />
+                        <Input
+                          placeholder="Aguardando código..."
+                          disabled
+                          {...field}
+                        />
                       </FormControl>
                     ) : unidadesData && apartamentos.length > 0 ? (
-                      <Popover open={apartamentoOpen} onOpenChange={setApartamentoOpen} modal={true}>
+                      <Popover
+                        open={apartamentoOpen}
+                        onOpenChange={setApartamentoOpen}
+                        modal={true}
+                      >
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
@@ -295,7 +337,7 @@ export function CadastroFormsMorador() {
                               disabled={!blocoWatch}
                               className={cn(
                                 "w-full justify-between font-normal",
-                                !field.value && "text-muted-foreground"
+                                !field.value && "text-muted-foreground",
                               )}
                             >
                               {field.value
@@ -305,11 +347,16 @@ export function CadastroFormsMorador() {
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                        <PopoverContent
+                          className="w-[--radix-popover-trigger-width] p-0"
+                          align="start"
+                        >
                           <Command>
                             <CommandInput placeholder="Pesquisar apartamento..." />
                             <CommandList>
-                              <CommandEmpty>Nenhum apartamento encontrado.</CommandEmpty>
+                              <CommandEmpty>
+                                Nenhum apartamento encontrado.
+                              </CommandEmpty>
                               <CommandGroup>
                                 {apartamentos.map((apt) => (
                                   <CommandItem
@@ -325,7 +372,7 @@ export function CadastroFormsMorador() {
                                         "mr-2 h-4 w-4",
                                         apt === field.value
                                           ? "opacity-100"
-                                          : "opacity-0"
+                                          : "opacity-0",
                                       )}
                                     />
                                     {apt}
@@ -338,7 +385,14 @@ export function CadastroFormsMorador() {
                       </Popover>
                     ) : (
                       <FormControl>
-                        <Input placeholder="Ex: 101" disabled={!blocoWatch && (unidadesData?.blocos?.length ?? 0) > 0} {...field} />
+                        <Input
+                          placeholder="Ex: 101"
+                          disabled={
+                            !blocoWatch &&
+                            (unidadesData?.blocos?.length ?? 0) > 0
+                          }
+                          {...field}
+                        />
                       </FormControl>
                     )}
                     <FormMessage />
@@ -464,8 +518,19 @@ export function CadastroFormsMorador() {
                 <FormLabel className="text-sm font-normal text-muted-foreground leading-relaxed">
                   <span>
                     Li e aceito as condições do sistema, incluindo os{" "}
-                    <Link href="/termos" className="text-primary hover:underline">Termos de Uso</Link>, e a{" "}
-                    <Link href="/privacidade" className="text-primary hover:underline">Política de Privacidade</Link>
+                    <Link
+                      href="/termos"
+                      className="text-primary hover:underline"
+                    >
+                      Termos de Uso
+                    </Link>
+                    , e a{" "}
+                    <Link
+                      href="/privacidade"
+                      className="text-primary hover:underline"
+                    >
+                      Política de Privacidade
+                    </Link>
                   </span>
                 </FormLabel>
                 <FormMessage />

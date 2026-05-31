@@ -24,7 +24,13 @@ export default function CadastroPage() {
         </CardHeader>
 
         <CardContent>
-          <Suspense fallback={<div className="flex justify-center p-4"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>}>
+          <Suspense
+            fallback={
+              <div className="flex justify-center p-4">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            }
+          >
             <CadastroFormsMorador />
           </Suspense>
         </CardContent>

@@ -5,34 +5,34 @@ import { db } from "@/lib/prisma";
 const DEFAULT_PLANS = [
   {
     nome_plano: "Plano Light",
-    valor: 89.90,
+    valor: 89.9,
     limite_unidades: 40,
     limite_condominios: 5,
   },
   {
     nome_plano: "Plano Profissional",
-    valor: 149.90,
+    valor: 149.9,
     limite_unidades: 100,
     limite_condominios: 9999,
   },
   {
     nome_plano: "Plano Premium",
-    valor: 299.90,
+    valor: 299.9,
     limite_unidades: 300,
     limite_condominios: 9999,
   },
   {
     nome_plano: "Plano Enterprise",
-    valor: 599.90,
+    valor: 599.9,
     limite_unidades: 800,
     limite_condominios: 9999,
-  }
+  },
 ];
 
 export async function syncPlanos() {
   try {
-    const nomesMantidos = DEFAULT_PLANS.map(p => p.nome_plano);
-    
+    const nomesMantidos = DEFAULT_PLANS.map((p) => p.nome_plano);
+
     for (const plano of DEFAULT_PLANS) {
       await db.plano.upsert({
         where: { nome_plano: plano.nome_plano },
@@ -53,9 +53,9 @@ export async function syncPlanos() {
     await db.plano.deleteMany({
       where: {
         nome_plano: {
-          notIn: nomesMantidos
-        }
-      }
+          notIn: nomesMantidos,
+        },
+      },
     });
 
     return { success: true };

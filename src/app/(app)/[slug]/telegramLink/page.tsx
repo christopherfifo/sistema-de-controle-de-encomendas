@@ -4,10 +4,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { redirect } from "next/navigation";
 
-import { SimpleSidebar } from "../components/sidebar"; 
+import { SimpleSidebar } from "../components/sidebar";
 import { PerfilUsuario } from "@prisma/client";
 import { VincularTelegramContent } from "../components/vincularTelegramContent";
-
 
 interface TelegramPageProps {
   params: { slug: string };
@@ -59,16 +58,18 @@ export default async function TelegramConfigPage({
               <SimpleSidebar {...sidebarProps} />
             </SheetContent>
           </Sheet>
-          <h2 className="text-lg font-semibold ml-4">Notificações por Telegram</h2>
+          <h2 className="text-lg font-semibold ml-4">
+            Notificações por Telegram
+          </h2>
         </header>
 
         <section className="p-4 md:p-6 space-y-6">
-          <h1 className="text-2xl font-bold tracking-tight hidden md:block">Ajustes do Perfil</h1>
+          <h1 className="text-2xl font-bold tracking-tight hidden md:block">
+            Ajustes do Perfil
+          </h1>
           <hr className="hidden md:block border-muted" />
-          
-          <VincularTelegramContent
-            userId={user as string}
-          />
+
+          <VincularTelegramContent userId={user as string} />
         </section>
       </main>
     </div>

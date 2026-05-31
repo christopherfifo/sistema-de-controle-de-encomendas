@@ -54,14 +54,14 @@ export default async function GerenciarMoradoresPage({
                       nome_completo: true,
                       cpf: true,
                       telefone: true,
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: { nome_completo: "asc" },
   });
@@ -70,10 +70,7 @@ export default async function GerenciarMoradoresPage({
     where: {
       id_condominio: data.condominio.id_condominio,
     },
-    orderBy: [
-      { bloco_torre: "asc" },
-      { numero_unidade: "asc" }
-    ],
+    orderBy: [{ bloco_torre: "asc" }, { numero_unidade: "asc" }],
   });
 
   const sidebarProps = {
@@ -90,8 +87,8 @@ export default async function GerenciarMoradoresPage({
         <SimpleSidebar {...sidebarProps} />
       </div>
       <main className="flex-1 p-4 md:p-8">
-        <GerenciarMoradoresContent 
-          moradores={moradoresDoCondominio} 
+        <GerenciarMoradoresContent
+          moradores={moradoresDoCondominio}
           unidades={unidadesDoCondominio}
           condominioId={data.condominio.id_condominio}
           sindicoId={sindicoId}

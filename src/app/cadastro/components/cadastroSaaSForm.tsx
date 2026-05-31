@@ -3,7 +3,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition, useEffect } from "react";
-import { Eye, EyeOff, Loader2, CreditCard, ArrowRight, ArrowLeft } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  CreditCard,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -18,18 +25,30 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CadastroFormValues, cadastroSchema } from "../helpers/schemaCadastro";
 import { maskCPF } from "@/helpers/cpf";
 import { formatCNPJ } from "@/helpers/cnpj";
-import { registerCondominioAndAdmin, consultarBandeiraCartao, validarEProcessarPagamento } from "../helpers/actionCadastro";
+import {
+  registerCondominioAndAdmin,
+  consultarBandeiraCartao,
+  validarEProcessarPagamento,
+} from "../helpers/actionCadastro";
 import { getPlanos } from "../../planos/actionPlanos";
 
 export function CadastroSaaSForm() {
   const [step, setStep] = useState<1 | 2>(1);
   const [showPassword, setShowPassword] = useState(false);
   const [bandeira, setBandeira] = useState<string>("Desconhecida");
-  const [planos, setPlanos] = useState<{ id_plano: string; nome_plano: string; valor: string | number }[]>([]);
+  const [planos, setPlanos] = useState<
+    { id_plano: string; nome_plano: string; valor: string | number }[]
+  >([]);
 
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -43,7 +62,7 @@ export function CadastroSaaSForm() {
     async function loadPlanos() {
       const p = await getPlanos();
       setPlanos(p);
-      
+
       // Se tiver um plano na URL, garante que o formulário o selecione
       if (planoIdFromUrl) {
         form.setValue("planoId", planoIdFromUrl);
@@ -118,7 +137,7 @@ export function CadastroSaaSForm() {
   async function handleCartaoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const val = e.target.value.replace(/\D/g, "");
     form.setValue("numeroCartao", val, { shouldValidate: true });
-    
+
     if (val.length >= 6) {
       try {
         const data = await consultarBandeiraCartao(val.slice(0, 6));
@@ -138,13 +157,15 @@ export function CadastroSaaSForm() {
 
   async function onSubmit(values: CadastroFormValues) {
     if (step !== 2) return;
-    
+
     setError(undefined);
     setSuccess(undefined);
 
-    const selectedPlano = planos.find(p => p.id_plano === values.planoId);
-    const valorPlano = selectedPlano ? Number(selectedPlano.valor) : 99.90;
-    const descricaoPlano = selectedPlano ? `Assinatura ${selectedPlano.nome_plano}` : "Assinatura Sistema Condomínio";
+    const selectedPlano = planos.find((p) => p.id_plano === values.planoId);
+    const valorPlano = selectedPlano ? Number(selectedPlano.valor) : 99.9;
+    const descricaoPlano = selectedPlano
+      ? `Assinatura ${selectedPlano.nome_plano}`
+      : "Assinatura Sistema Condomínio";
 
     startTransition(async () => {
       try {
@@ -155,7 +176,11 @@ export function CadastroSaaSForm() {
           cvv: values.cvvCartao,
         };
 
-        const pagamentoRes = await validarEProcessarPagamento(validatePayload, valorPlano, descricaoPlano);
+        const pagamentoRes = await validarEProcessarPagamento(
+          validatePayload,
+          valorPlano,
+          descricaoPlano,
+        );
 
         if (pagamentoRes.error) {
           setError(pagamentoRes.error);
@@ -168,7 +193,9 @@ export function CadastroSaaSForm() {
         if (result.error) {
           setError(result.error);
         } else if (result.success) {
-          setSuccess("Pagamento aprovado e cadastro realizado com sucesso! Redirecionando...");
+          setSuccess(
+            "Pagamento aprovado e cadastro realizado com sucesso! Redirecionando...",
+          );
           form.reset();
           setTimeout(() => {
             router.push(`/`);
@@ -181,16 +208,22 @@ export function CadastroSaaSForm() {
   }
 
   const selectedPlanoId = form.watch("planoId");
-  const selectedPlanoDisplay = planos.find(p => p.id_plano === selectedPlanoId);
+  const selectedPlanoDisplay = planos.find(
+    (p) => p.id_plano === selectedPlanoId,
+  );
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Indicador de Passos */}
         <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground mb-4">
-          <span className={`font-medium ${step === 1 ? 'text-primary' : ''}`}>1. Dados</span>
+          <span className={`font-medium ${step === 1 ? "text-primary" : ""}`}>
+            1. Dados
+          </span>
           <span className="text-muted-foreground/50">/</span>
-          <span className={`font-medium ${step === 2 ? 'text-primary' : ''}`}>2. Pagamento</span>
+          <span className={`font-medium ${step === 2 ? "text-primary" : ""}`}>
+            2. Pagamento
+          </span>
         </div>
 
         {error && (
@@ -218,7 +251,10 @@ export function CadastroSaaSForm() {
                 name="planoId"
                 render={({ field }) => (
                   <FormItem>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o plano ideal" />
@@ -226,22 +262,27 @@ export function CadastroSaaSForm() {
                       </FormControl>
                       <SelectContent>
                         {planos.map((plano) => (
-                          <SelectItem key={plano.id_plano} value={plano.id_plano}>
-                            {plano.nome_plano} - R$ {Number(plano.valor).toFixed(2).replace('.', ',')} /mês
+                          <SelectItem
+                            key={plano.id_plano}
+                            value={plano.id_plano}
+                          >
+                            {plano.nome_plano} - R${" "}
+                            {Number(plano.valor).toFixed(2).replace(".", ",")}{" "}
+                            /mês
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                     <FormLabel className="flex flex-col items-start">
-                      <Link 
-                        href="/planos" 
-                        target="_blank" 
+                      <Link
+                        href="/planos"
+                        target="_blank"
                         className="text-xs text-primary hover:underline font-normal"
                       >
                         Ver detalhes dos planos
                       </Link>
                     </FormLabel>
-                                        <FormMessage />
+                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -412,7 +453,12 @@ export function CadastroSaaSForm() {
               />
             </fieldset>
 
-            <Button type="button" className="w-full" size="lg" onClick={handleNextStep}>
+            <Button
+              type="button"
+              className="w-full"
+              size="lg"
+              onClick={handleNextStep}
+            >
               Próximo
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -427,9 +473,19 @@ export function CadastroSaaSForm() {
             >
               <legend className="-ml-1 px-1 text-sm font-medium flex items-center gap-2">
                 <CreditCard className="w-4 h-4" />
-                Pagamento (Assinatura {selectedPlanoDisplay ? selectedPlanoDisplay.nome_plano : "Mensal"} - R$ {selectedPlanoDisplay ? Number(selectedPlanoDisplay.valor).toFixed(2).replace('.', ',') : "99,90"})
+                Pagamento (Assinatura{" "}
+                {selectedPlanoDisplay
+                  ? selectedPlanoDisplay.nome_plano
+                  : "Mensal"}{" "}
+                - R${" "}
+                {selectedPlanoDisplay
+                  ? Number(selectedPlanoDisplay.valor)
+                      .toFixed(2)
+                      .replace(".", ",")
+                  : "99,90"}
+                )
               </legend>
-              
+
               <FormField
                 control={form.control}
                 name="numeroCartao"
@@ -441,7 +497,7 @@ export function CadastroSaaSForm() {
                         <Input
                           placeholder="0000 0000 0000 0000"
                           {...field}
-                          value={field.value.replace(/(\d{4})/g, '$1 ').trim()}
+                          value={field.value.replace(/(\d{4})/g, "$1 ").trim()}
                           onChange={handleCartaoChange}
                           maxLength={19}
                         />
@@ -527,10 +583,29 @@ export function CadastroSaaSForm() {
                   <div className="space-y-1 leading-none">
                     <FormLabel className="text-sm font-normal text-muted-foreground leading-relaxed">
                       <span>
-                        Li e aceito as condições contratuais do sistema, incluindo os{" "}
-                        <Link href="/termos" className="text-primary hover:underline">Termos de Uso</Link>, a{" "}
-                        <Link href="/privacidade" className="text-primary hover:underline">Política de Privacidade</Link> e o acordo de suporte{" "}
-                        <Link href="/sla" className="text-primary hover:underline">[SLA]</Link>.
+                        Li e aceito as condições contratuais do sistema,
+                        incluindo os{" "}
+                        <Link
+                          href="/termos"
+                          className="text-primary hover:underline"
+                        >
+                          Termos de Uso
+                        </Link>
+                        , a{" "}
+                        <Link
+                          href="/privacidade"
+                          className="text-primary hover:underline"
+                        >
+                          Política de Privacidade
+                        </Link>{" "}
+                        e o acordo de suporte{" "}
+                        <Link
+                          href="/sla"
+                          className="text-primary hover:underline"
+                        >
+                          [SLA]
+                        </Link>
+                        .
                       </span>
                     </FormLabel>
                     <FormMessage />
@@ -540,10 +615,10 @@ export function CadastroSaaSForm() {
             />
 
             <div className="flex gap-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                className="w-1/3" 
+              <Button
+                type="button"
+                variant="outline"
+                className="w-1/3"
                 onClick={handlePrevStep}
                 disabled={isPending}
               >

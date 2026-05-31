@@ -13,7 +13,9 @@ interface VincularTelegramContentProps {
   slug: string;
 }
 
-export function VincularTelegramContent({ userId }: Omit<VincularTelegramContentProps, "slug">) {
+export function VincularTelegramContent({
+  userId,
+}: Omit<VincularTelegramContentProps, "slug">) {
   const [chatId, setChatId] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{
@@ -37,12 +39,14 @@ export function VincularTelegramContent({ userId }: Omit<VincularTelegramContent
       if (resultado.success) {
         setStatus({ type: "success", message: resultado.message });
         setChatId("");
-        
       } else {
         setStatus({ type: "error", message: resultado.message });
       }
     } catch {
-      setStatus({ type: "error", message: "Erro inesperado ao salvar os dados." });
+      setStatus({
+        type: "error",
+        message: "Erro inesperado ao salvar os dados.",
+      });
     } finally {
       setLoading(false);
     }
@@ -51,21 +55,27 @@ export function VincularTelegramContent({ userId }: Omit<VincularTelegramContent
   return (
     <div className="max-w-md mx-auto space-y-6 rounded-lg border bg-background p-6 shadow-sm">
       <div className="space-y-1">
-        <h3 className="text-xl font-semibold tracking-tight">Configurar Notificações</h3>
+        <h3 className="text-xl font-semibold tracking-tight">
+          Configurar Notificações
+        </h3>
         <p className="text-sm text-muted-foreground">
-          Associe seu Telegram para receber alertas instantâneos de encomendas na portaria.
+          Associe seu Telegram para receber alertas instantâneos de encomendas
+          na portaria.
         </p>
       </div>
 
       <div className="rounded-md bg-sky-50 p-4 text-sky-800 border border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-900 space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-wider">Como obter seu Chat ID?</p>
+        <p className="text-xs font-semibold uppercase tracking-wider">
+          Como obter seu Chat ID?
+        </p>
         <ol className="list-decimal list-inside space-y-2 text-xs">
           <li>
-            Clique no botão abaixo para iniciar uma conversa com o bot assistente:
+            Clique no botão abaixo para iniciar uma conversa com o bot
+            assistente:
             <div className="mt-2">
-              <a 
-                href="https://t.me/userinfobot" 
-                target="_blank" 
+              <a
+                href="https://t.me/userinfobot"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 font-medium bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded text-xs transition-colors shadow-sm"
               >
@@ -74,8 +84,13 @@ export function VincularTelegramContent({ userId }: Omit<VincularTelegramContent
               </a>
             </div>
           </li>
-          <li>No Telegram, clique em <strong>&quot;Começar&quot;</strong> (ou /start).</li>
-          <li>Copie a sequência numérica rotulada como <strong>Id</strong>.</li>
+          <li>
+            No Telegram, clique em <strong>&quot;Começar&quot;</strong> (ou
+            /start).
+          </li>
+          <li>
+            Copie a sequência numérica rotulada como <strong>Id</strong>.
+          </li>
         </ol>
       </div>
 

@@ -24,9 +24,7 @@ export async function getOrCreateUserToken({
   });
 
   if (user?.token_acesso) {
-    return formatted
-      ? formatToken(user.token_acesso)
-      : user.token_acesso;
+    return formatted ? formatToken(user.token_acesso) : user.token_acesso;
   }
 
   let token = "";
@@ -56,9 +54,7 @@ export async function getOrCreateUserToken({
     },
   });
 
-  return formatted
-    ? formatToken(token)
-    : token;
+  return formatted ? formatToken(token) : token;
 }
 
 function generateNumericToken(length: number): string {

@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   try {
     const resposta = await fetch(
       `https://mock-correios-api.vercel.app/api/rastreio/${codigo}`,
-      { next: { revalidate: 3600 } }
+      { next: { revalidate: 3600 } },
     );
 
     if (resposta.status === 200) {

@@ -5,16 +5,31 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition, useEffect, useRef } from "react";
 import { Encomenda, Unidade } from "@prisma/client";
 import { Loader2, Camera, ScanQrCode, UserCheck } from "lucide-react";
-import { Html5Qrcode } from "html5-qrcode"; 
+import { Html5Qrcode } from "html5-qrcode";
 
 import { retiradaEncomendaSchema } from "../schemas/schemaRetiradaPorteiro";
 import { z } from "zod";
 import { registrarRetiradaEncomenda } from "../helpers/encomendas";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type EncomendaParaRetirada = Encomenda & {
@@ -24,7 +39,7 @@ type EncomendaParaRetirada = Encomenda & {
 interface ModalRegistrarRetiradaProps {
   encomenda: EncomendaParaRetirada | null;
   porteiroId: string;
-  condominioId: string; 
+  condominioId: string;
   onOpenChange: (open: boolean) => void;
   onRetiradaSuccess: () => void;
 }
@@ -97,12 +112,13 @@ export function ModalRegistrarRetirada({
               form.setValue("token_retirante", decodedText);
               stopScanner();
             },
-            () => {
-            }
+            () => {},
           );
         } catch (err: unknown) {
           console.error("Erro ao acessar a câmera de vídeo:", err);
-          setErrorMessage("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
+          setErrorMessage(
+            "Não foi possível acessar a câmera. Verifique as permissões do navegador.",
+          );
           setScannerAtivo(false);
           html5QrCodeRef.current = null;
         }
@@ -131,35 +147,53 @@ export function ModalRegistrarRetirada({
 
     startTransition(async () => {
       try {
-        const result = await registrarRetiradaEncomenda(data, encomenda.id_encomenda, porteiroId);
+        const result = await registrarRetiradaEncomenda(
+          data,
+          encomenda.id_encomenda,
+          porteiroId,
+        );
         if (result.success) {
           alert(result.message);
           onRetiradaSuccess();
         }
       } catch (error) {
-        setErrorMessage(error instanceof Error ? error.message : "Erro desconhecido");
+        setErrorMessage(
+          error instanceof Error ? error.message : "Erro desconhecido",
+        );
       }
     });
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) { stopScanner(); onOpenChange(false); } }}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          stopScanner();
+          onOpenChange(false);
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
           <DialogTitle>Registrar Saída de Encomenda</DialogTitle>
           <DialogDescription>
-            Unidade: <strong>{encomenda?.unidade.bloco_torre} - {encomenda?.unidade.numero_unidade}</strong>
+            Unidade:{" "}
+            <strong>
+              {encomenda?.unidade.bloco_torre} -{" "}
+              {encomenda?.unidade.numero_unidade}
+            </strong>
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs 
-          value={abaAtiva} 
+        <Tabs
+          value={abaAtiva}
           onValueChange={(v) => {
             const novaAba = v as "TOKEN" | "MANUAL";
             setAbaAtiva(novaAba);
             form.setValue("tipo_confirmacao", novaAba);
             stopScanner();
-          }} 
+          }}
           className="w-full"
         >
           <TabsList className="grid grid-cols-2 w-full">
@@ -172,18 +206,27 @@ export function ModalRegistrarRetirada({
           </TabsList>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
-              
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 pt-4"
+            >
               <TabsContent value="TOKEN" className="space-y-4 m-0">
                 <div className="flex flex-col items-center gap-2">
-                  <Button type="button" variant="outline" className="w-full gap-2" onClick={toggleScanner}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={toggleScanner}
+                  >
                     <Camera className="h-4 w-4" />
-                    {scannerAtivo ? "Desligar Câmera Reader" : "Escanear QR Code com a Câmera"}
+                    {scannerAtivo
+                      ? "Desligar Câmera Reader"
+                      : "Escanear QR Code com a Câmera"}
                   </Button>
-                  
+
                   {scannerAtivo && (
-                    <div 
-                      id="reader-qr" 
+                    <div
+                      id="reader-qr"
                       className="w-full overflow-hidden rounded-md border bg-black mt-2 min-h-[250px] relative [&_video]:w-full [&_video]:object-cover"
                     />
                   )}
@@ -205,7 +248,9 @@ export function ModalRegistrarRetirada({
                           className="text-center text-xl font-bold tracking-widest"
                         />
                       </FormControl>
-                      <FormDescription>Digite ou use a câmera para capturar o código.</FormDescription>
+                      <FormDescription>
+                        Digite ou use a câmera para capturar o código.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -227,7 +272,10 @@ export function ModalRegistrarRetirada({
                           disabled={isPending}
                         />
                       </FormControl>
-                      <FormDescription>Digite o CPF do morador para validar a entrega sem o token do celular.</FormDescription>
+                      <FormDescription>
+                        Digite o CPF do morador para validar a entrega sem o
+                        token do celular.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -241,11 +289,21 @@ export function ModalRegistrarRetirada({
               )}
 
               <DialogFooter className="pt-4 gap-2 sm:gap-0">
-                <Button type="button" variant="outline" onClick={() => { stopScanner(); onOpenChange(false); }} disabled={isPending}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    stopScanner();
+                    onOpenChange(false);
+                  }}
+                  disabled={isPending}
+                >
                   Cancelar
                 </Button>
                 <Button type="submit" disabled={isPending}>
-                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isPending && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Confirmar e Entregar
                 </Button>
               </DialogFooter>

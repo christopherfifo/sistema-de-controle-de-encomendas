@@ -20,7 +20,13 @@ jest.mock("@/components/ui/select", () => {
   });
 
   return {
-    Select: ({ onValueChange, children }: { onValueChange: (val: string) => void, children: React.ReactNode }) => (
+    Select: ({
+      onValueChange,
+      children,
+    }: {
+      onValueChange: (val: string) => void;
+      children: React.ReactNode;
+    }) => (
       <MockSelectContext.Provider value={{ onValueChange }}>
         {children}
       </MockSelectContext.Provider>
@@ -30,9 +36,19 @@ jest.mock("@/components/ui/select", () => {
         {children}
       </div>
     ),
-    SelectValue: ({ placeholder }: { placeholder: string }) => <span>{placeholder}</span>,
-    SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    SelectItem: ({ value, children }: { value: string, children: React.ReactNode }) => {
+    SelectValue: ({ placeholder }: { placeholder: string }) => (
+      <span>{placeholder}</span>
+    ),
+    SelectContent: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    ),
+    SelectItem: ({
+      value,
+      children,
+    }: {
+      value: string;
+      children: React.ReactNode;
+    }) => {
       const { onValueChange } = React.useContext(MockSelectContext);
       return (
         <div

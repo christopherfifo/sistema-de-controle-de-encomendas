@@ -7,16 +7,17 @@ import { SimpleSidebar } from "../components/sidebar";
 import { PerfilUsuario } from "@prisma/client";
 import { TokenUsuarioContent } from "../components/tokenUsuarioContent";
 
-
 interface TokenPageProps {
   params: Promise<{ slug: string }> | { slug: string };
-  searchParams: Promise<{
-    user?: string;
-    perfil?: PerfilUsuario;
-  }> | {
-    user?: string;
-    perfil?: PerfilUsuario;
-  };
+  searchParams:
+    | Promise<{
+        user?: string;
+        perfil?: PerfilUsuario;
+      }>
+    | {
+        user?: string;
+        perfil?: PerfilUsuario;
+      };
 }
 
 export default async function MeuTokenPage({
@@ -46,7 +47,7 @@ export default async function MeuTokenPage({
   const dadosDoUsuario = {
     nome_completo: userName,
     perfil: perfil || data.user.perfil,
-    token_acesso: data.user.token_acesso || "SEM-TOKEN", 
+    token_acesso: data.user.token_acesso || "SEM-TOKEN",
   };
 
   return (

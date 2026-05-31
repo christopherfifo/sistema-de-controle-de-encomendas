@@ -182,18 +182,17 @@ export function SimpleSidebar({
           isOpen ? "w-64" : "w-20",
         )}
       >
-        <div className={cn(
-          "flex items-center h-14 border-b transition-all duration-300",
-          isOpen ? "px-4" : "justify-center"
-        )}>
+        <div
+          className={cn(
+            "flex items-center h-14 border-b transition-all duration-300",
+            isOpen ? "px-4" : "justify-center",
+          )}
+        >
           <Button
             variant="secondary"
             size="icon"
             onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              "shrink-0 transition-all",
-              !isOpen && "size-11"
-            )}
+            className={cn("shrink-0 transition-all", !isOpen && "size-11")}
           >
             <Menu
               className={cn(
@@ -206,7 +205,9 @@ export function SimpleSidebar({
           <div
             className={cn(
               "overflow-hidden transition-all duration-300",
-              !isOpen ? "opacity-0 w-0 invisible ml-0" : "opacity-100 w-full visible ml-2",
+              !isOpen
+                ? "opacity-0 w-0 invisible ml-0"
+                : "opacity-100 w-full visible ml-2",
             )}
           >
             <p className="text-base font-bold text-black wrap-break-words line-clamp-2 leading-tight">
@@ -226,32 +227,45 @@ export function SimpleSidebar({
                   }
                   className={cn(
                     "transition-all duration-300",
-                    isOpen ? "justify-start gap-3 px-4 h-11" : "justify-center px-0 h-14 w-14 self-center"
+                    isOpen
+                      ? "justify-start gap-3 px-4 h-11"
+                      : "justify-center px-0 h-14 w-14 self-center",
                   )}
                   asChild
                 >
                   <Link href={item.href}>
-                    <item.icon className={cn(
-                      "shrink-0 transition-all",
-                      isOpen ? "size-4" : "size-5"
-                    )} />
-                    <span className={cn(
-                      "transition-all duration-300",
-                      !isOpen ? "opacity-0 w-0 hidden" : "opacity-100"
-                    )}>
+                    <item.icon
+                      className={cn(
+                        "shrink-0 transition-all",
+                        isOpen ? "size-4" : "size-5",
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "transition-all duration-300",
+                        !isOpen ? "opacity-0 w-0 hidden" : "opacity-100",
+                      )}
+                    >
                       {item.label}
                     </span>
                   </Link>
                 </Button>
               </TooltipTrigger>
               {!isOpen && (
-                <TooltipContent side="right" className="font-semibold">{item.label}</TooltipContent>
+                <TooltipContent side="right" className="font-semibold">
+                  {item.label}
+                </TooltipContent>
               )}
             </Tooltip>
           ))}
         </nav>
 
-        <div className={cn("px-2 pb-4 flex justify-center self-center", isOpen && "px-4 justify-start w-full")}>
+        <div
+          className={cn(
+            "px-2 pb-4 flex justify-center self-center",
+            isOpen && "px-4 justify-start w-full",
+          )}
+        >
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="w-full">
@@ -259,7 +273,9 @@ export function SimpleSidebar({
               </div>
             </TooltipTrigger>
             {!isOpen && (
-              <TooltipContent side="right" className="font-semibold">Alternar Tema</TooltipContent>
+              <TooltipContent side="right" className="font-semibold">
+                Alternar Tema
+              </TooltipContent>
             )}
           </Tooltip>
         </div>
@@ -286,7 +302,9 @@ export function SimpleSidebar({
                   <User className="size-5 text-primary" />
                 </div>
               </TooltipTrigger>
-              <TooltipContent side="right" className="font-bold">{userName}</TooltipContent>
+              <TooltipContent side="right" className="font-bold">
+                {userName}
+              </TooltipContent>
             </Tooltip>
           )}
 
@@ -301,7 +319,13 @@ export function SimpleSidebar({
                 )}
                 onClick={handleLogout}
               >
-                <LogOut className={cn("shrink-0 transition-colors", isOpen ? "size-4 mr-1" : "size-5", "group-hover:text-white")} />
+                <LogOut
+                  className={cn(
+                    "shrink-0 transition-colors",
+                    isOpen ? "size-4 mr-1" : "size-5",
+                    "group-hover:text-white",
+                  )}
+                />
                 <span className={cn(!isOpen && "sr-only")}>Sair</span>
               </Button>
             </TooltipTrigger>

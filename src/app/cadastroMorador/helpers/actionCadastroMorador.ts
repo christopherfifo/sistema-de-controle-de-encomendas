@@ -91,8 +91,7 @@ export async function registerMorador(
 
     if (!unidade) {
       return {
-        error:
-          "Unidade não encontrada. Verifique bloco e apartamento.",
+        error: "Unidade não encontrada. Verifique bloco e apartamento.",
       };
     }
 
@@ -170,12 +169,9 @@ export async function getUnidadesByCodigoAcesso(codigo_acesso: string) {
             bloco_torre: true,
             numero_unidade: true,
           },
-          orderBy: [
-            { bloco_torre: 'asc' },
-            { numero_unidade: 'asc' }
-          ]
-        }
-      }
+          orderBy: [{ bloco_torre: "asc" }, { numero_unidade: "asc" }],
+        },
+      },
     });
 
     if (!condominio) return null;

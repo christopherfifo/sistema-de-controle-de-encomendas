@@ -58,7 +58,8 @@ export function ResetarSenhaForm() {
   if (!token) {
     return (
       <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
-        Token inválido ou não fornecido. Por favor, solicite a recuperação de senha novamente.
+        Token inválido ou não fornecido. Por favor, solicite a recuperação de
+        senha novamente.
       </div>
     );
   }
@@ -88,7 +89,7 @@ export function ResetarSenhaForm() {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="senha"
@@ -111,7 +112,11 @@ export function ResetarSenhaForm() {
                   className="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
               <FormMessage />
@@ -141,7 +146,11 @@ export function ResetarSenhaForm() {
                   className="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 text-muted-foreground"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
               <FormMessage />

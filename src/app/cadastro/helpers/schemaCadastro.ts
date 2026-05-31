@@ -37,9 +37,18 @@ export const cadastroSchema = z.object({
     message: "Você deve aceitar as condições contratuais do sistema.",
   }),
   numeroCartao: z.string().min(13, { message: "Número do cartão inválido." }),
-  nomeTitularCartao: z.string().min(3, { message: "Nome do titular é obrigatório." }),
-  validadeCartao: z.string().regex(/^(0[1-9]|1[0-2])\/?([0-9]{2}|[0-9]{4})$/, { message: "Validade inválida (MM/AA ou MM/AAAA)." }),
-  cvvCartao: z.string().min(3, { message: "CVV inválido." }).max(4, { message: "CVV inválido." }),
+  nomeTitularCartao: z
+    .string()
+    .min(3, { message: "Nome do titular é obrigatório." }),
+  validadeCartao: z
+    .string()
+    .regex(/^(0[1-9]|1[0-2])\/?([0-9]{2}|[0-9]{4})$/, {
+      message: "Validade inválida (MM/AA ou MM/AAAA).",
+    }),
+  cvvCartao: z
+    .string()
+    .min(3, { message: "CVV inválido." })
+    .max(4, { message: "CVV inválido." }),
 });
 
 export type CadastroFormValues = z.infer<typeof cadastroSchema>;

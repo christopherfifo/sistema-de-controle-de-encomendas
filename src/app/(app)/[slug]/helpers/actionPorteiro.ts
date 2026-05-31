@@ -40,13 +40,16 @@ export async function adicionarPorteiro(
 
     const {
       nomeCompleto,
-      email,
-      cpf,
+      email: rawEmail,
+      cpf: rawCpf,
       senha,
       telefone,
       moraNoCondominio,
       id_unidade,
     } = validated.data;
+
+    const email = rawEmail.trim();
+    const cpf = rawCpf.trim();
 
     const isCpfReal = await isValideCPF(cpf);
     if (!isCpfReal)

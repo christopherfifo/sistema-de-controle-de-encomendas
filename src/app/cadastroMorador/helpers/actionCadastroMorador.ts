@@ -35,14 +35,17 @@ export async function registerMorador(
 
   const {
     nomeCompleto,
-    email,
-    cpf,
+    email: rawEmail,
+    cpf: rawCpf,
     senha,
     telefone,
     codigo_acesso,
     bloco,
     apartamento,
   } = validatedFields.data;
+
+  const email = rawEmail.trim();
+  const cpf = rawCpf.trim();
 
   const isCpfReal = await isValideCPF(cpf);
   if (!isCpfReal) {

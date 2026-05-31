@@ -14,7 +14,6 @@ type AuthResult = {
   condominioId?: string;
 };
 
-// Função auxiliar síncrona para validar formato de e-mail no servidor
 function isValidEmail(value: string): boolean {
   return z.string().email().safeParse(value).success;
 }
@@ -28,18 +27,17 @@ export async function authenticate(
     return { error: "Campos inválidos." };
   }
 
-  const { login, password } = validatedFields.data;
+  const { login: rawLogin, password } = validatedFields.data;
+  const login = rawLogin.trim();
 
   try {
     const isEmail = login.includes("@");
 
-    // 🛡️ VALIDAÇÃO DE SEGURANÇA NO SERVIDOR (LIVRE DE CORS)
     if (isEmail) {
       if (!isValidEmail(login)) {
         return { error: "Por favor, insira um e-mail válido." };
       }
     } else {
-      // Se não tem "@", assume-se que tentou digitar um CPF
       const cpfLimpo = removeCpfPunctuation(login);
       const cpfValido = await isValideCPF(cpfLimpo);
       if (!cpfValido) {

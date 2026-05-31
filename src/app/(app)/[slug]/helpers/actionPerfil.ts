@@ -29,13 +29,16 @@ interface UpdateDadosParams {
 
 export async function updateDadosPessoais({
   userId,
-  nome,
-  email,
+  nome: rawNome,
+  email: rawEmail,
   telefone,
   token,
 }: UpdateDadosParams) {
   try {
     await validarToken(userId, token);
+
+    const nome = rawNome.trim();
+    const email = rawEmail.trim();
 
     await db.usuario.update({
       where: { id_usuario: userId },

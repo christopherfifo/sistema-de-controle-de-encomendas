@@ -27,14 +27,17 @@ export async function registerCondominioAndAdmin(
 
   const {
     nomeCompleto,
-    email,
-    cpf,
+    email: rawEmail,
+    cpf: rawCpf,
     senha,
     telefone,
     nomeCondominio,
     cnpj,
     planoId,
   } = validatedFields.data;
+
+  const email = rawEmail.trim();
+  const cpf = rawCpf.trim();
 
   const hashedPassword = await bcrypt.hash(senha, 10);
   try {

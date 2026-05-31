@@ -1,13 +1,13 @@
 import { validateAndGetCondominioData } from "@/data/get-data-by-slug";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { redirect } from "next/navigation";
 import { SimpleSidebar } from "../components/sidebar";
 import { PerfilUsuario } from "@prisma/client";
-import { TokenUsuarioContent } from "../components/tokenUsuarioContent";
+import { MeuPerfilContent } from "../components/meuPerfilContent";
 
-interface TokenPageProps {
+interface PerfilPageProps {
   params: Promise<{ slug: string }> | { slug: string };
   searchParams:
     | Promise<{
@@ -20,10 +20,10 @@ interface TokenPageProps {
       };
 }
 
-export default async function MeuTokenPage({
+export default async function MeuPerfilPage({
   params,
   searchParams,
-}: TokenPageProps) {
+}: PerfilPageProps) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
 
@@ -45,9 +45,12 @@ export default async function MeuTokenPage({
   };
 
   const dadosDoUsuario = {
-    nome_completo: userName,
-    perfil: perfil || data.user.perfil,
-    token_acesso: data.user.token_acesso || "SEM-TOKEN",
+    id_usuario: data.user.id_usuario,
+    nome_completo: data.user.nome_completo,
+    cpf: data.user.cpf,
+    email: data.user.email,
+    telefone: data.user.telefone,
+    telegram_chat_id: data.user.telegram_chat_id,
   };
 
   return (
@@ -66,11 +69,6 @@ export default async function MeuTokenPage({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0 w-64">
-              <div className="sr-only">
-                <SheetTitle>Menu de Navegação do Token</SheetTitle>
-                <SheetDescription>Visualização e gerenciamento do token de acesso do usuário.</SheetDescription>
-              </div>
-
               <SimpleSidebar {...sidebarProps} />
             </SheetContent>
           </Sheet>
@@ -78,9 +76,7 @@ export default async function MeuTokenPage({
         </header>
 
         <div className="p-4 md:p-8 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-screen">
-          <div className="w-full max-w-sm">
-            <TokenUsuarioContent usuario={dadosDoUsuario} />
-          </div>
+          <MeuPerfilContent user={dadosDoUsuario} />
         </div>
       </main>
     </div>

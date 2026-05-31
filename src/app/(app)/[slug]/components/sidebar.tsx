@@ -25,6 +25,7 @@ import {
   ExternalLink,
   FolderKanban,
   IdCardLanyard,
+  UserPen,
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
@@ -108,6 +109,12 @@ export function SimpleSidebar({
         icon: IdCardLanyard,
         pathCheck: `/${condominioId}/telegramLink`,
       },
+      {
+        label: "Perfil",
+        href: createHref("/meuPerfil"),
+        icon: UserPen,
+        pathCheck: `/${condominioId}/meuPerfil`,
+      },
     ];
   } else if (perfil === PerfilUsuario.PORTEIRO) {
     navItems = [
@@ -134,6 +141,12 @@ export function SimpleSidebar({
         href: createHref("/telegramLink"),
         icon: IdCardLanyard,
         pathCheck: `/${condominioId}/telegramLink`,
+      },
+      {
+        label: "Perfil",
+        href: createHref("/meuPerfil"),
+        icon: UserPen,
+        pathCheck: `/${condominioId}/meuPerfil`,
       },
     ];
   } else if (perfil === PerfilUsuario.SINDICO) {
@@ -173,6 +186,12 @@ export function SimpleSidebar({
         href: createHref("/telegramLink"),
         icon: IdCardLanyard,
         pathCheck: `/${condominioId}/telegramLink`,
+      },
+      {
+        label: "Perfil",
+        href: createHref("/meuPerfil"),
+        icon: UserPen,
+        pathCheck: `/${condominioId}/meuPerfil`,
       },
     ];
   }
@@ -293,16 +312,16 @@ export function SimpleSidebar({
 
         <div
           className={cn(
-            "p-3 border-t flex items-center justify-between overflow-hidden bg-muted/20",
+            "p-3 border-t flex items-center justify-between overflow-hidden bg-muted/40 dark:bg-muted/20",
             !isOpen && "justify-center flex-col space-y-6",
           )}
         >
           {isOpen ? (
             <div className="flex items-center min-w-0 pr-2">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mr-3 shrink-0 border border-primary/20">
-                <User className="size-4 text-primary" />
+              <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center mr-3 shrink-0 border border-primary/20">
+                <User className="size-5 text-primary" />
               </div>
-              <span className="font-semibold whitespace-nowrap overflow-hidden text-ellipsis text-sm block">
+              <span className="font-bold whitespace-nowrap overflow-hidden text-ellipsis text-sm block text-foreground">
                 {userName}
               </span>
             </div>
@@ -323,21 +342,26 @@ export function SimpleSidebar({
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
+                size={isOpen ? "sm" : "icon"}
                 className={cn(
-                  "hover:bg-destructive hover:text-white shrink-0 transition-all group",
-                  isOpen ? "size-9" : "size-11",
+                  "shrink-0 transition-all group flex items-center justify-center",
+                  "hover:bg-destructive hover:text-destructive-foreground",
+                  "dark:hover:bg-destructive dark:hover:text-white",
+                  isOpen ? "px-3 h-9 gap-2 rounded-lg" : "size-11 rounded-full",
                 )}
                 onClick={handleLogout}
               >
                 <LogOut
                   className={cn(
                     "shrink-0 transition-colors",
-                    isOpen ? "size-4 mr-1" : "size-5",
-                    "group-hover:text-white",
+                    isOpen ? "size-4" : "size-5",
                   )}
                 />
-                <span className={cn(!isOpen && "sr-only")}>Sair</span>
+                {isOpen && (
+                  <span className="text-xs font-extrabold uppercase tracking-tight">
+                    Sair
+                  </span>
+                )}
               </Button>
             </TooltipTrigger>
             {!isOpen && <TooltipContent side="right">Sair</TooltipContent>}

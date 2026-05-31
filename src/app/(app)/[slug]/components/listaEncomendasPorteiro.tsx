@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PackageCheck, PackageSearch, User } from "lucide-react";
+import { PackageCheck, PackageSearch, User, Search } from "lucide-react";
 import { ModalRegistrarRetirada } from "./modalRegistrarRetirada";
+import { Input } from "@/components/ui/input";
 
 type EncomendaComUnidadeEMorador = Encomenda & {
   usuario_cadastro?: {
@@ -40,6 +41,7 @@ export function ListaEncomendasPorteiro({
 }: ListaEncomendasPorteiroProps) {
   const [encomendasVisiveis, setEncomendasVisiveis] =
     useState<EncomendaComUnidadeEMorador[]>(encomendasIniciais);
+  const [termoFiltro, setTermoFiltro] = useState("");
 
   useEffect(() => {
     setEncomendasVisiveis(encomendasIniciais);
@@ -59,7 +61,6 @@ export function ListaEncomendasPorteiro({
     setEncomendaSelecionada(null);
   };
 
-
   const encomendasProcessadas = encomendasVisiveis.flatMap((enc) => {
     if (enc.id_usuario_cadastro) {
       return [enc];
@@ -77,7 +78,20 @@ export function ListaEncomendasPorteiro({
     return [enc];
   });
 
-  if (encomendasProcessadas.length === 0) {
+  const encomendasExibidas = encomendasProcessadas
+    .filter((enc) => {
+      const busca = termoFiltro.toLowerCase();
+      const nome = enc.usuario_cadastro?.nome_completo?.toLowerCase() || "";
+      const unidade = `${enc.unidade.bloco_torre} ${enc.unidade.numero_unidade}`.toLowerCase();
+      return nome.includes(busca) || unidade.includes(busca);
+    })
+    .sort((a, b) => {
+      const dateA = a.data_recebimento ? new Date(a.data_recebimento).getTime() : 0;
+      const dateB = b.data_recebimento ? new Date(b.data_recebimento).getTime() : 0;
+      return dateB - dateA; 
+    });
+
+  if (encomendasVisiveis.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-lg">
         <PackageSearch className="h-12 w-12 text-muted-foreground" />
@@ -92,103 +106,129 @@ export function ListaEncomendasPorteiro({
   }
 
   return (
-    <>
-      <Accordion type="multiple" className="w-full">
-        {encomendasProcessadas.map((encomenda, index) => {
-          const nomeMorador =
-            encomenda.usuario_cadastro?.nome_completo ||
-            "Morador não encontrado";
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Filtrar por nome do morador ou unidade..."
+          value={termoFiltro}
+          onChange={(e) => setTermoFiltro(e.target.value)}
+          className="pl-9 h-9"
+        />
+      </div>
 
-          const dataRecebimentoTexto = encomenda.data_recebimento
-            ? new Date(encomenda.data_recebimento).toLocaleString("pt-BR", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "N/A";
+      {encomendasExibidas.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10 border rounded-lg bg-muted/10 text-center px-4">
+          <p className="text-sm text-muted-foreground">
+            Nenhum resultado encontrado para &quot;{termoFiltro}&quot;.
+          </p>
+          <Button 
+            variant="link" 
+            size="sm" 
+            onClick={() => setTermoFiltro("")}
+            className="mt-1"
+          >
+            Limpar busca
+          </Button>
+        </div>
+      ) : (
+        <Accordion type="multiple" className="w-full">
+          {encomendasExibidas.map((encomenda, index) => {
+            const nomeMorador =
+              encomenda.usuario_cadastro?.nome_completo ||
+              "Morador não encontrado";
 
-          return (
-            <AccordionItem
-              key={`${encomenda.id_encomenda}-${index}`}
-              value={`${encomenda.id_encomenda}-${index}`}
-            >
-              <AccordionTrigger className="hover:no-underline">
-                <div className="flex justify-between items-center w-full pr-4">
-                  <div className="flex flex-col text-left space-y-1">
-                    <span className="font-semibold text-base">
-                      {encomenda.tipo_encomenda} — {encomenda.forma_entrega}
-                    </span>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
-                      <User className="h-3.5 w-3.5 text-primary" />
-                      <span>{nomeMorador}</span>
-                    </div>
-                    <span className="text-xs bg-muted px-2 py-0.5 rounded-sm w-fit font-mono">
-                      Bloco {encomenda.unidade.bloco_torre} - Apt{" "}
-                      {encomenda.unidade.numero_unidade}
-                    </span>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="border-amber-500 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20"
-                  >
-                    Aguardando Retirada
-                  </Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-4 bg-muted/30 rounded-b-md">
-                <div className="space-y-4">
-                  <ul className="space-y-2 text-sm">
-                    <li>
-                      <span className="font-medium text-muted-foreground">
-                        Destinatário:
-                      </span>{" "}
-                      <span className="font-semibold">{nomeMorador}</span>
-                    </li>
-                    <li>
-                      <span className="font-medium text-muted-foreground">
-                        Recebido em:
-                      </span>{" "}
-                      {dataRecebimentoTexto}
-                    </li>
-                    <li>
-                      <span className="font-medium text-muted-foreground">
-                        Cód. Rastreio:
-                      </span>{" "}
-                      <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">
-                        {encomenda.codigo_rastreio || "Não informado"}
-                      </code>
-                    </li>
-                    <li>
-                      <span className="font-medium text-muted-foreground">
-                        Tamanho do Volume:
-                      </span>{" "}
-                      {encomenda.tamanho}
-                    </li>
-                    <li>
-                      <span className="font-medium text-muted-foreground">
-                        Observação da Portaria:
-                      </span>{" "}
-                      <span className="text-destructive font-medium">
-                        {encomenda.condicao || "Nenhuma"}
+            const dataRecebimentoTexto = encomenda.data_recebimento
+              ? new Date(encomenda.data_recebimento).toLocaleString("pt-BR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "N/A";
+
+            return (
+              <AccordionItem
+                key={`${encomenda.id_encomenda}-${index}`}
+                value={`${encomenda.id_encomenda}-${index}`}
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex justify-between items-center w-full pr-4 text-left">
+                    <div className="flex flex-col space-y-1">
+                      <span className="font-semibold text-base">
+                        {encomenda.tipo_encomenda} — {encomenda.forma_entrega}
                       </span>
-                    </li>
-                  </ul>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground font-medium">
+                        <User className="h-3.5 w-3.5 text-primary" />
+                        <span>{nomeMorador}</span>
+                      </div>
+                      <span className="text-xs bg-muted px-2 py-0.5 rounded-sm w-fit font-mono">
+                        Bloco {encomenda.unidade.bloco_torre} - Apt{" "}
+                        {encomenda.unidade.numero_unidade}
+                      </span>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className="border-amber-500 text-amber-600 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-950/20"
+                    >
+                      Pendente
+                    </Badge>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="p-4 bg-muted/30 rounded-b-md">
+                  <div className="space-y-4">
+                    <ul className="space-y-2 text-sm">
+                      <li>
+                        <span className="font-medium text-muted-foreground">
+                          Destinatário:
+                        </span>{" "}
+                        <span className="font-semibold">{nomeMorador}</span>
+                      </li>
+                      <li>
+                        <span className="font-medium text-muted-foreground">
+                          Recebido em:
+                        </span>{" "}
+                        {dataRecebimentoTexto}
+                      </li>
+                      <li>
+                        <span className="font-medium text-muted-foreground">
+                          Cód. Rastreio:
+                        </span>{" "}
+                        <code className="bg-muted px-1 py-0.5 rounded text-xs font-mono">
+                          {encomenda.codigo_rastreio || "Não informado"}
+                        </code>
+                      </li>
+                      <li>
+                        <span className="font-medium text-muted-foreground">
+                          Tamanho:
+                        </span>{" "}
+                        {encomenda.tamanho}
+                      </li>
+                      <li>
+                        <span className="font-medium text-muted-foreground">
+                          Estado:
+                        </span>{" "}
+                        <span className="text-destructive font-medium">
+                          {encomenda.condicao || "Nenhuma"}
+                        </span>
+                      </li>
+                    </ul>
 
-                  <Button
-                    className="w-full sm:w-auto bg-primary hover:bg-primary/95"
-                    onClick={() => setEncomendaSelecionada(encomenda)}
-                  >
-                    <PackageCheck className="h-4 w-4 mr-2" />
-                    Registrar Retirada
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          );
-        })}
-      </Accordion>
+                    <Button
+                      className="w-full sm:w-auto bg-primary hover:bg-primary/95"
+                      onClick={() => setEncomendaSelecionada(encomenda)}
+                    >
+                      <PackageCheck className="h-4 w-4 mr-2" />
+                      Registrar Retirada
+                    </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      )}
 
       <ModalRegistrarRetirada
         encomenda={encomendaSelecionada}
@@ -201,6 +241,6 @@ export function ListaEncomendasPorteiro({
         }}
         onRetiradaSuccess={handleRetiradaSuccess}
       />
-    </>
+    </div>
   );
 }

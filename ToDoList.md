@@ -27,9 +27,9 @@
 - [x] criar o sistema de cadastro e validação dos cartoes
 - [x] sistema de pagamento
 - [x] tela de planos com descrição para cada um
-- [ ] quando criamos uma encomenda e pesquisamos o usuario pelo nome, ele seleciona 2 vezes
-- [ ] a aba de encomendas pendentes (avisos de moradores) do porteiro não sincroniza com a mudança no banco de dados
-- [ ] arrumar a aba de retirada de encomendas do porteiro, ta puxando varias pessoas para uma encomenda
+- [X] quando criamos uma encomenda e pesquisamos o usuario pelo nome, ele seleciona 2 vezes
+- [X] a aba de encomendas pendentes (avisos de moradores) do porteiro não sincroniza com a mudança no banco de dados
+- [X] arrumar a aba de retirada de encomendas do porteiro, ta puxando varias pessoas para uma encomenda
 - [ ] permitir cadastro de síndico na tela administrativa (após contratação do sistema)
 - [ ] criar página de termos de uso (moradores/porteiro/síndico)
 - [ ] criar página de termos de uso (contratação)

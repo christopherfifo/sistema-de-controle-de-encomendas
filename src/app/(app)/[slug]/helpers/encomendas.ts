@@ -166,7 +166,7 @@ export async function registrarEncomendaPorteiro(
         tamanho: "MEDIO",
         condicao: data.condicao,
         status: StatusEncomenda.PENDENTE,
-        id_usuario_cadastro: null,
+        id_usuario_cadastro: data.id_usuario_morador || null,
       },
     });
 
@@ -176,6 +176,7 @@ export async function registrarEncomendaPorteiro(
       data.forma_entrega,
       data.condicao || "Nenhuma observação.",
       data.foto_pacote,
+      data.id_usuario_morador || undefined,
     );
 
     revalidatePath(`/(app)/[slug]`, "page");
@@ -433,6 +434,7 @@ async function enviarNotificacaoTelegram(
   origem: string,
   observacaoPorteiro: string,
   fotoPacote?: string | Blob,
+  idUsuarioAlvo?: string,
 ) {
   try {
     const unidade = await db.unidade.findUnique({
@@ -445,15 +447,29 @@ async function enviarNotificacaoTelegram(
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     if (!BOT_TOKEN) return;
 
+    let nomeDestinatarioEspecifico = "";
+    if (idUsuarioAlvo) {
+      const alvo = unidade.moradores.find(
+        (m) => m.id_usuario === idUsuarioAlvo,
+      );
+      if (alvo) nomeDestinatarioEspecifico = alvo.usuario.nome_completo;
+    }
+
     for (const vinculo of unidade.moradores) {
       const chatId = vinculo.usuario.telegram_chat_id;
-      const nomeMorador = vinculo.usuario.nome_completo;
+      const nomeMoradorNotificado = vinculo.usuario.nome_completo;
 
       if (chatId) {
+        const isParaOutro =
+          idUsuarioAlvo && vinculo.id_usuario !== idUsuarioAlvo;
+        const saudacao = isParaOutro
+          ? `Olá, *${nomeMoradorNotificado}*! Um novo volume chegou para sua unidade, destinado a *${nomeDestinatarioEspecifico}*.`
+          : `Olá, *${nomeMoradorNotificado}*! Um novo volume deu entrada para você neste momento.`;
+
         const texto = [
           `📦 *🚨 Nova Encomenda Registrada na Portaria!*`,
           ``,
-          `Olá, *${nomeMorador}*! Um novo volume deu entrada para você neste momento.`,
+          saudacao,
           ``,
           `🏢 *Local de Entrega:* Bloco ${unidade.bloco_torre} - Ap ${unidade.numero_unidade}`,
           `📦 *Volume:* ${tipo} (${origem})`,

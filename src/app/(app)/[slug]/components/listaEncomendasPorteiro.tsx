@@ -59,7 +59,25 @@ export function ListaEncomendasPorteiro({
     setEncomendaSelecionada(null);
   };
 
-  if (encomendasVisiveis.length === 0) {
+
+  const encomendasProcessadas = encomendasVisiveis.flatMap((enc) => {
+    if (enc.id_usuario_cadastro) {
+      return [enc];
+    }
+
+    if (enc.unidade.moradores.length > 0) {
+      return enc.unidade.moradores.map((m) => ({
+        ...enc,
+        usuario_cadastro: {
+          nome_completo: m.usuario.nome_completo,
+        },
+      }));
+    }
+
+    return [enc];
+  });
+
+  if (encomendasProcessadas.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-lg">
         <PackageSearch className="h-12 w-12 text-muted-foreground" />
@@ -76,12 +94,9 @@ export function ListaEncomendasPorteiro({
   return (
     <>
       <Accordion type="multiple" className="w-full">
-        {encomendasVisiveis.map((encomenda) => {
+        {encomendasProcessadas.map((encomenda, index) => {
           const nomeMorador =
             encomenda.usuario_cadastro?.nome_completo ||
-            encomenda.unidade.moradores
-              .map((m) => m.usuario.nome_completo)
-              .join(", ") ||
             "Morador não encontrado";
 
           const dataRecebimentoTexto = encomenda.data_recebimento
@@ -96,8 +111,8 @@ export function ListaEncomendasPorteiro({
 
           return (
             <AccordionItem
-              key={encomenda.id_encomenda}
-              value={encomenda.id_encomenda}
+              key={`${encomenda.id_encomenda}-${index}`}
+              value={`${encomenda.id_encomenda}-${index}`}
             >
               <AccordionTrigger className="hover:no-underline">
                 <div className="flex justify-between items-center w-full pr-4">

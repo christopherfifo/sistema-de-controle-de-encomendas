@@ -6,13 +6,49 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export function ThemeToggle({ isOpen = true }: { isOpen?: boolean }) {
+export function ThemeToggle({
+  isOpen = true,
+  variant = "sidebar",
+}: {
+  isOpen?: boolean;
+  variant?: "sidebar" | "navbar" | "ghost";
+}) {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  // Avoid hydration mismatch
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  const isDark = theme === "dark";
+
+  const toggleTheme = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
+
+  if (variant === "navbar" || variant === "ghost") {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleTheme}
+        className="text-foreground hover:bg-accent"
+      >
+        {isDark ? <Sun className="size-5 text-yellow-500" /> : <Moon className="size-5 text-slate-700" />}
+        <span className="sr-only">Alternar tema</span>
+      </Button>
+    );
+  }
 
   return (
     <Button
       variant="secondary"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      onClick={toggleTheme}
       className={cn(
         "transition-all duration-300",
         isOpen
@@ -20,15 +56,15 @@ export function ThemeToggle({ isOpen = true }: { isOpen?: boolean }) {
           : "justify-center px-0 h-14 w-14 self-center",
       )}
     >
-      {theme === "light" ? (
-        <Sun
+      {isDark ? (
+        <Moon
           className={cn(
             "shrink-0 transition-all",
             isOpen ? "size-4" : "size-5",
           )}
         />
       ) : (
-        <Moon
+        <Sun
           className={cn(
             "shrink-0 transition-all",
             isOpen ? "size-4" : "size-5",
@@ -41,7 +77,7 @@ export function ThemeToggle({ isOpen = true }: { isOpen?: boolean }) {
           !isOpen ? "opacity-0 w-0 hidden" : "opacity-100",
         )}
       >
-        Modo {theme === "light" ? "Escuro" : "Claro"}
+        Modo {isDark ? "Escuro" : "Claro"}
       </span>
     </Button>
   );

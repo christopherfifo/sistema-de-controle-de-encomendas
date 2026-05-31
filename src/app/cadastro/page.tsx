@@ -9,12 +9,16 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { CadastroSaaSForm } from "./components/cadastroSaaSForm";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 import { Suspense } from "react";
 
 export default function CadastroPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/40 p-4 py-8">
+    <main className="flex min-h-screen items-center justify-center bg-muted/40 p-4 py-8 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle variant="ghost" />
+      </div>
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Crie sua Conta</CardTitle>

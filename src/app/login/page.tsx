@@ -9,10 +9,14 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { LoginForm } from "./loginForm";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function LoginPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+    <main className="flex min-h-screen items-center justify-center bg-muted/40 p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle variant="ghost" />
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Login</CardTitle>

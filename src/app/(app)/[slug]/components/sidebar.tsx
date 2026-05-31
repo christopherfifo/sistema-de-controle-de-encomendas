@@ -221,7 +221,7 @@ export function SimpleSidebar({
                 : "opacity-100 w-full visible ml-2",
             )}
           >
-            <p className="text-base font-bold text-black wrap-break-words line-clamp-2 leading-tight">
+            <p className="text-base font-bold text-foreground wrap-break-words line-clamp-2 leading-tight">
               {" "}
               {condominioName}
             </p>

@@ -158,6 +158,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       termo_aceite: true,
       ativo: true,
+      token_acesso: gerarToken8Digitos(),
     },
   });
 

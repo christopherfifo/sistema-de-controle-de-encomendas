@@ -9,10 +9,7 @@ import {
   Home, 
   Building2, 
   Info, 
-  CheckCircle2, 
-  Clock, 
-  UserCheck, 
-  Search
+  UserCheck
 } from "lucide-react";
 
 interface AdminDashboardProps {
@@ -23,9 +20,9 @@ interface AdminDashboardProps {
     totalFuncionarios: number;
     totalEncomendasPendentes: number;
   };
-  encomendasPendentes: any[];
-  funcionarios: any[];
-  unidades: any[];
+  encomendasPendentes: Record<string, any>[];
+  funcionarios: Record<string, any>[];
+  unidades: Record<string, any>[];
 }
 
 export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unidades }: AdminDashboardProps) {
@@ -125,14 +122,14 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                       </tr>
                     </thead>
                     <tbody className="[&_tr:last-child]:border-0">
-                      {encomendasPendentes.map((enc: any) => (
+                      {encomendasPendentes.map((enc) => (
                         <tr key={enc.id_encomenda} className="border-b transition-colors hover:bg-muted/50">
                           <td className="p-2 align-middle font-medium">
-                            {enc.unidade.bloco_torre} - {enc.unidade.numero_unidade}
+                            {enc.unidade?.bloco_torre} - {enc.unidade?.numero_unidade}
                           </td>
                           <td className="p-2 align-middle uppercase text-xs">{enc.tipo_encomenda}</td>
                           <td className="p-2 align-middle text-muted-foreground">
-                            {new Date(enc.data_recebimento).toLocaleString()}
+                            {enc.data_recebimento ? new Date(enc.data_recebimento).toLocaleString() : ""}
                           </td>
                           <td className="p-2 align-middle">
                             <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-200">
@@ -157,17 +154,17 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {unidades.map((u: any) => (
+                {unidades.map((u) => (
                   <div key={u.id_unidade} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
                     <div>
                       <div className="font-bold">{u.bloco_torre} - {u.numero_unidade}</div>
                       <div className="text-xs text-muted-foreground">
-                        {u.moradores.length > 0 
-                          ? u.moradores[0].usuario.nome_completo 
+                        {u.moradores && u.moradores.length > 0 
+                          ? u.moradores[0].usuario?.nome_completo 
                           : "Sem moradores"}
                       </div>
                     </div>
-                    {u.moradores.length > 0 ? (
+                    {u.moradores && u.moradores.length > 0 ? (
                       <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/10">Ocupada</Badge>
                     ) : (
                       <Badge variant="outline" className="text-muted-foreground">Vaga</Badge>
@@ -190,7 +187,7 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                 {funcionarios.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nenhum funcionário cadastrado.</p>
                 ) : (
-                  funcionarios.map((f: any) => (
+                  funcionarios.map((f) => (
                     <div key={f.id_usuario} className="flex items-center justify-between p-4 border rounded-xl hover:bg-muted/30 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">

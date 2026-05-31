@@ -10,7 +10,6 @@ interface DadosNotificacaoRetirada {
   codigoRastreio?: string | null;
   dataRetirada: Date;
   quemRetirouNome: string;
-  urlFotoProduto?: string | null;
 }
 
 export async function enviarNotificacaoRetiradaTelegram(
@@ -52,45 +51,11 @@ export async function enviarNotificacaoRetiradaTelegram(
     .join("\n");
 
   try {
-    if (dados.urlFotoProduto) {
-      const telegramFormData = new FormData();
-      telegramFormData.append("chat_id", dados.chatId);
-      telegramFormData.append("caption", textoMensagem);
-      telegramFormData.append("parse_mode", "Markdown");
-
-      if (
-        typeof dados.urlFotoProduto === "string" &&
-        dados.urlFotoProduto.startsWith("data:")
-      ) {
-        const fetchRes = await fetch(dados.urlFotoProduto);
-        const blob = await fetchRes.blob();
-        telegramFormData.append("photo", blob, "produto.jpg");
-      } else {
-        telegramFormData.append("photo", dados.urlFotoProduto);
-      }
-
-      const res = await fetch(
-        `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,
-        {
-          method: "POST",
-          body: telegramFormData,
-        },
-      );
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error(
-          "[TELEGRAM_API_ERROR] Falha ao enviar foto na retirada:",
-          errorData,
-        );
-      }
-    } else {
-      await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        chat_id: dados.chatId,
-        text: textoMensagem,
-        parse_mode: "Markdown",
-      });
-    }
+    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      chat_id: dados.chatId,
+      text: textoMensagem,
+      parse_mode: "Markdown",
+    });
 
     return true;
   } catch (error: unknown) {

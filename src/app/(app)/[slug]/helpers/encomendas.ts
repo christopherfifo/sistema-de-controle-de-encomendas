@@ -332,7 +332,6 @@ export async function registrarRetiradaEncomenda(
         codigoRastreio: encomenda.codigo_rastreio,
         dataRetirada: new Date(),
         quemRetirouNome: moradorAlvo.nome_completo,
-        urlFotoProduto: null, // Foto não é mais armazenada no banco
       }).catch((err) => {
         console.error("[TELEGRAM_BG_ERROR] Falha ao notificar saída:", err);
       });

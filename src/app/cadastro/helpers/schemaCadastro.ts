@@ -40,11 +40,9 @@ export const cadastroSchema = z.object({
   nomeTitularCartao: z
     .string()
     .min(3, { message: "Nome do titular é obrigatório." }),
-  validadeCartao: z
-    .string()
-    .regex(/^(0[1-9]|1[0-2])\/?([0-9]{2}|[0-9]{4})$/, {
-      message: "Validade inválida (MM/AA ou MM/AAAA).",
-    }),
+  validadeCartao: z.string().regex(/^(0[1-9]|1[0-2])\/?([0-9]{2}|[0-9]{4})$/, {
+    message: "Validade inválida (MM/AA ou MM/AAAA).",
+  }),
   cvvCartao: z
     .string()
     .min(3, { message: "CVV inválido." })

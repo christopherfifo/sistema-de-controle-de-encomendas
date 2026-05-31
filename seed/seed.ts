@@ -9,6 +9,11 @@ import { hash } from "bcryptjs";
 
 const db = new PrismaClient();
 
+// Função helper para gerar tokens numéricos aleatórios de 8 dígitos
+function gerarToken8Digitos(): string {
+  return Math.floor(10000000 + Math.random() * 90000000).toString();
+}
+
 async function main() {
   console.log("Iniciando o script de seed...");
 
@@ -31,7 +36,7 @@ async function main() {
   console.log("Senha padrão criptografada.");
 
   // ==========================================
-  // PLANOS
+  // PLANOS (Árvore comercial completa do SaaS)
   // ==========================================
   const planoLight = await db.plano.create({
     data: {
@@ -68,12 +73,11 @@ async function main() {
       limite_condominios: 9999,
     },
   });
-  console.log(`Planos criados.`);
+  console.log(`Planos comerciais criados.`);
 
   // ==========================================
   // CONDOMÍNIOS E FATURAS
   // ==========================================
-  // 1. Condomínio Principal (Regular)
   const condominio = await db.condominio.create({
     data: {
       nome_condominio: "Residencial Pequeno Príncipe",
@@ -83,19 +87,18 @@ async function main() {
       bairro: "Centro",
       cidade: "Curitiba",
       uf: "PR",
-      qtd_unidades: 24,
+      qtd_unidades: 28, // 4 blocos * 7 moradores = 28 unidades
       qtd_blocos_torres: 4,
-      id_plano: planoPremium.id_plano,
+      id_plano: planoLight.id_plano, // Associado ao Plano Light corretamente
       ativo: true,
     },
   });
 
-  // Fatura paga (condomínio em dia)
   await db.fatura.create({
     data: {
       id_condominio: condominio.id_condominio,
-      id_plano: planoPremium.id_plano,
-      valor_cobrado: 299.9,
+      id_plano: planoLight.id_plano,
+      valor_cobrado: 89.9,
       data_vencimento: new Date(new Date().setDate(new Date().getDate() + 10)),
       data_pagamento: new Date(),
       status_pagamento: StatusPagamento.PAGO,
@@ -103,7 +106,6 @@ async function main() {
     },
   });
 
-  // 2. Condomínio Inadimplente (Fatura Atrasada)
   const condominioAtrasado = await db.condominio.create({
     data: {
       nome_condominio: "Condomínio Flores do Campo",
@@ -125,14 +127,13 @@ async function main() {
       id_condominio: condominioAtrasado.id_condominio,
       id_plano: planoLight.id_plano,
       valor_cobrado: 89.9,
-      data_vencimento: new Date(new Date().setDate(new Date().getDate() - 15)), // Venceu 15 dias atrás
+      data_vencimento: new Date(new Date().setDate(new Date().getDate() - 15)),
       status_pagamento: StatusPagamento.ATRASADO,
       inadimplente: true,
       forma_pagamento: "BOLETO",
     },
   });
 
-  // 3. Condomínio Inativo
   await db.condominio.create({
     data: {
       nome_condominio: "Residencial Fantasma",
@@ -141,10 +142,10 @@ async function main() {
       ativo: false,
     },
   });
-  console.log(`Condomínios criados (1 ativo, 1 inadimplente, 1 inativo).`);
+  console.log(`Condomínios criados (1 ativo no plano Light, 1 inadimplente, 1 inativo).`);
 
   // ==========================================
-  // USUÁRIOS
+  // USUÁRIOS (Com tokens aleatórios de 8 dígitos)
   // ==========================================
   await db.usuario.create({
     data: {
@@ -171,6 +172,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       termo_aceite: true,
       ativo: true,
+      token_acesso: gerarToken8Digitos(),
     },
   });
 
@@ -185,7 +187,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       ativo: true,
       termo_aceite: true,
-      token_acesso: "11111111",
+      token_acesso: gerarToken8Digitos(),
     },
   });
 
@@ -200,7 +202,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       ativo: true,
       termo_aceite: true,
-      token_acesso: "22222222",
+      token_acesso: gerarToken8Digitos(),
     },
   });
 
@@ -215,7 +217,7 @@ async function main() {
       id_condominio: condominio.id_condominio,
       ativo: true,
       termo_aceite: true,
-      token_acesso: "33333333",
+      token_acesso: gerarToken8Digitos(),
     },
   });
 
@@ -230,11 +232,10 @@ async function main() {
       id_condominio: condominio.id_condominio,
       ativo: true,
       termo_aceite: true,
-      token_acesso: "44444444",
+      token_acesso: gerarToken8Digitos(),
     },
   });
 
-  // Usuário no condomínio atrasado
   const moradorAtrasado = await db.usuario.create({
     data: {
       nome_completo: "Carlos Inadimplente",
@@ -246,33 +247,30 @@ async function main() {
       id_condominio: condominioAtrasado.id_condominio,
       ativo: true,
       termo_aceite: true,
+      token_acesso: gerarToken8Digitos(),
     },
   });
 
-  console.log(
-    `Usuários principais criados (Yaya, Síndico, Porteiros preservados).`,
-  );
+  console.log(`Usuários criados com tokens de 8 dígitos dinâmicos.`);
 
   // ==========================================
-  // UNIDADES
+  // UNIDADES (7 moradores por bloco para deixar espaço de testes)
   // ==========================================
-  const blocos = ["A", "B", "C", "D"];
-  const apartamentos: string[] = [];
+  const blocosConfig = [
+    { nome: "A", inicio: 1, fim: 7 },   // Bloco A: 1 ao 7
+    { nome: "B", inicio: 8, fim: 14 },  // Bloco B: 8 ao 14
+    { nome: "C", inicio: 15, fim: 21 }, // Bloco C: 15 ao 21
+    { nome: "D", inicio: 22, fim: 28 }, // Bloco D: 22 ao 28
+  ];
   const unidadesCriadas = [];
 
-  for (let andar = 1; andar <= 2; andar++) {
-    for (let num = 1; num <= 3; num++) {
-      apartamentos.push(`${andar}0${num}`);
-    }
-  }
-
-  for (const bloco of blocos) {
-    for (const apto of apartamentos) {
+  for (const config of blocosConfig) {
+    for (let i = config.inicio; i <= config.fim; i++) {
       const unidade = await db.unidade.create({
         data: {
           id_condominio: condominio.id_condominio,
-          bloco_torre: `Bloco ${bloco}`,
-          numero_unidade: apto,
+          bloco_torre: `Bloco ${config.nome}`,
+          numero_unidade: i.toString(),
         },
       });
       unidadesCriadas.push(unidade);
@@ -288,22 +286,23 @@ async function main() {
     },
   });
 
-  const unidadeA101 = unidadesCriadas.find(
-    (u) => u.bloco_torre === "Bloco A" && u.numero_unidade === "101",
+  // Remapeando os testes para os novos índices corretos de 1 a 7 por bloco
+  const unidadeA1 = unidadesCriadas.find(
+    (u) => u.bloco_torre === "Bloco A" && u.numero_unidade === "1",
   );
-  const unidadeB102 = unidadesCriadas.find(
-    (u) => u.bloco_torre === "Bloco B" && u.numero_unidade === "102",
+  const unidadeB9 = unidadesCriadas.find(
+    (u) => u.bloco_torre === "Bloco B" && u.numero_unidade === "9",
   );
 
-  if (!unidadeA101 || !unidadeB102) {
-    throw new Error("Falha ao encontrar as unidades A-101 ou B-102.");
+  if (!unidadeA1 || !unidadeB9) {
+    throw new Error("Falha ao mapear as novas sequências numéricas de 7 moradores por bloco.");
   }
 
   // Vínculos Morador -> Unidade
   await db.moradoresUnidades.create({
     data: {
       id_usuario: usuarioYaya.id_usuario,
-      id_unidade: unidadeA101.id_unidade,
+      id_unidade: unidadeA1.id_unidade,
       principal: true,
     },
   });
@@ -311,7 +310,7 @@ async function main() {
   await db.moradoresUnidades.create({
     data: {
       id_usuario: usuarioJoao.id_usuario,
-      id_unidade: unidadeB102.id_unidade,
+      id_unidade: unidadeB9.id_unidade,
       principal: true,
     },
   });
@@ -323,15 +322,14 @@ async function main() {
       principal: true,
     },
   });
-  console.log("Unidades e vínculos de moradores criados.");
+  console.log("Unidades (7 por bloco) e vínculos de moradores aplicados com sucesso.");
 
   // ==========================================
   // ENCOMENDAS E RETIRADAS
   // ==========================================
-  // Encomendas Entregues (Yaya)
   const encomendaA1 = await db.encomenda.create({
     data: {
-      id_unidade: unidadeA101.id_unidade,
+      id_unidade: unidadeA1.id_unidade,
       id_porteiro_recebimento: porteiro1.id_usuario,
       data_recebimento: new Date("2025-11-01T10:30:00"),
       tipo_encomenda: "Caixa Média",
@@ -351,7 +349,7 @@ async function main() {
 
   const encomendaA2 = await db.encomenda.create({
     data: {
-      id_unidade: unidadeA101.id_unidade,
+      id_unidade: unidadeA1.id_unidade,
       id_porteiro_recebimento: porteiro2.id_usuario,
       data_recebimento: new Date("2025-11-02T11:00:00"),
       tipo_encomenda: "Pacote Correios",
@@ -369,10 +367,9 @@ async function main() {
     },
   });
 
-  // Encomendas Pré-cadastradas Entregues (Yaya)
   const encomendaB1 = await db.encomenda.create({
     data: {
-      id_unidade: unidadeA101.id_unidade,
+      id_unidade: unidadeA1.id_unidade,
       id_usuario_cadastro: usuarioYaya.id_usuario,
       id_porteiro_recebimento: porteiro1.id_usuario,
       data_recebimento: new Date("2025-11-04T14:00:00"),
@@ -392,10 +389,9 @@ async function main() {
     },
   });
 
-  // Encomendas Canceladas (Yaya)
   await db.encomenda.create({
     data: {
-      id_unidade: unidadeA101.id_unidade,
+      id_unidade: unidadeA1.id_unidade,
       id_porteiro_recebimento: porteiro1.id_usuario,
       data_recebimento: new Date("2025-11-05T09:00:00"),
       tipo_encomenda: "Envelope (Cancelado)",
@@ -406,10 +402,9 @@ async function main() {
     },
   });
 
-  // Encomendas PENDENTES (Pré-cadastradas Yaya)
   const pendenteYaya1 = await db.encomenda.create({
     data: {
-      id_unidade: unidadeA101.id_unidade,
+      id_unidade: unidadeA1.id_unidade,
       id_usuario_cadastro: usuarioYaya.id_usuario,
       tipo_encomenda: "Pacote Amazon",
       tamanho: "Médio",
@@ -421,7 +416,7 @@ async function main() {
 
   await db.encomenda.create({
     data: {
-      id_unidade: unidadeA101.id_unidade,
+      id_unidade: unidadeA1.id_unidade,
       id_usuario_cadastro: usuarioYaya.id_usuario,
       tipo_encomenda: "Pacote DHL",
       tamanho: "Grande",
@@ -432,10 +427,9 @@ async function main() {
     },
   });
 
-  // Encomenda Pendente e Entregue para João (Bloco B - 102)
   await db.encomenda.create({
     data: {
-      id_unidade: unidadeB102.id_unidade,
+      id_unidade: unidadeB9.id_unidade,
       id_usuario_cadastro: usuarioJoao.id_usuario,
       tipo_encomenda: "Notebook",
       tamanho: "Médio",
@@ -446,7 +440,7 @@ async function main() {
 
   const encomendaJoao = await db.encomenda.create({
     data: {
-      id_unidade: unidadeB102.id_unidade,
+      id_unidade: unidadeB9.id_unidade,
       id_porteiro_recebimento: porteiro2.id_usuario,
       data_recebimento: new Date("2025-11-08T10:00:00"),
       tipo_encomenda: "Cadeira de Escritório",
@@ -475,8 +469,7 @@ async function main() {
       id_usuario_origem: sindico.id_usuario,
       tipo_recado: TipoRecado.AVISO_GERAL,
       assunto: "Manutenção dos Elevadores",
-      conteudo:
-        "Informamos que no próximo final de semana haverá manutenção preventiva em todos os elevadores.",
+      conteudo: "Informamos que no próximo final de semana haverá manutenção preventiva em todos os elevadores.",
       status_recado: "ABERTO",
     },
   });
@@ -485,8 +478,7 @@ async function main() {
     data: {
       id_recado: avisoGeral.id_recado,
       id_usuario_resposta: usuarioYaya.id_usuario,
-      conteudo_resposta:
-        "Obrigada por avisar! Serão todos ao mesmo tempo ou um por vez?",
+      conteudo_resposta: "Obrigada por avisar! Serão todos ao mesmo tempo ou um por vez?",
     },
   });
 
@@ -513,8 +505,7 @@ async function main() {
     data: {
       id_recado: reclamacao.id_recado,
       id_usuario_resposta: sindico.id_usuario,
-      conteudo_resposta:
-        "Estamos verificando com as unidades envolvidas. Obrigado pelo relato.",
+      conteudo_resposta: "Estamos verificando com as unidades envolvidas. Obrigado pelo relato.",
     },
   });
   console.log("Recados e interações no mural criados.");
@@ -537,8 +528,7 @@ async function main() {
       id_encomenda: encomendaJoao.id_encomenda,
       id_usuario_destinatario: usuarioJoao.id_usuario,
       tipo_envio: "TELEGRAM",
-      mensagem:
-        "O pacote 'Cadeira de Escritório' foi entregue para João Pedro.",
+      mensagem: "O pacote 'Cadeira de Escritório' foi entregue para João Pedro.",
       status_envio: "LIDO",
     },
   });

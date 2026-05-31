@@ -322,7 +322,7 @@ export async function registrarRetiradaEncomenda(
         codigoRastreio: encomenda.codigo_rastreio,
         dataRetirada: new Date(),
         quemRetirouNome: moradorAlvo.nome_completo,
-        urlFotoProduto: encomenda.url_foto_pacote
+        urlFotoProduto: null // Foto não é mais armazenada no banco
       }).catch((err) => {
         console.error("[TELEGRAM_BG_ERROR] Falha ao notificar saída:", err);
       });
@@ -378,13 +378,21 @@ export async function confirmarChegadaEncomendaMorador(
   }
 
   try {
+    const fotoFile = formData.get("foto") as File | null;
+    let urlFotoPacote = null;
+
+    if (fotoFile && fotoFile.size > 0) {
+      const arrayBuffer = await fotoFile.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      urlFotoPacote = `data:${fotoFile.type};base64,${buffer.toString("base64")}`;
+    }
+
     await db.encomenda.update({
       where: { id_encomenda: encomendaId },
       data: {
         id_porteiro_recebimento: porteiroId,
         data_recebimento: new Date(),
         condicao: condicaoPorteiro,
-        url_foto_pacote: null, 
       },
     });
 
@@ -392,7 +400,8 @@ export async function confirmarChegadaEncomendaMorador(
       encomenda.id_unidade,
       encomenda.tipo_encomenda,
       encomenda.forma_entrega,
-      condicaoPorteiro
+      condicaoPorteiro,
+      fotoFile || undefined
     );
 
     revalidatePath(`/(app)/[slug]`, "page");
@@ -408,7 +417,7 @@ async function enviarNotificacaoTelegram(
   tipo: string,
   origem: string,
   observacaoPorteiro: string,
-  fotoPacote?: string 
+  fotoPacote?: string | Blob 
 ) {
   try {
     const unidade = await db.unidade.findUnique({
@@ -439,18 +448,32 @@ async function enviarNotificacaoTelegram(
         ].join("\n");
         
         if (fotoPacote) {
-          const formData = new FormData();
-          formData.append("chat_id", chatId);
-          formData.append("caption", texto);
-          formData.append("parse_mode", "Markdown");
+          const telegramFormData = new FormData();
+          telegramFormData.append("chat_id", chatId);
+          telegramFormData.append("caption", texto);
+          telegramFormData.append("parse_mode", "Markdown");
           
-          const fetchRes = await fetch(fotoPacote);
-          const blob = await fetchRes.blob();
-          formData.append("photo", blob, "pacote.jpg");
+          if (typeof fotoPacote === "string") {
+            if (fotoPacote.startsWith("data:")) {
+              const fetchRes = await fetch(fotoPacote);
+              const blob = await fetchRes.blob();
+              telegramFormData.append("photo", blob, "pacote.jpg");
+            } else {
+              telegramFormData.append("photo", fotoPacote);
+            }
+          } else {
+            telegramFormData.append("photo", fotoPacote, "pacote.jpg");
+          }
 
-          await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, formData, {
-            headers: { "Content-Type": "multipart/form-data" }
+          const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+            method: "POST",
+            body: telegramFormData,
           });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            console.error("[TELEGRAM_API_ERROR] Falha ao enviar foto:", errorData);
+          }
         } else {
           await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             chat_id: chatId,

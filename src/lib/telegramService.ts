@@ -49,12 +49,28 @@ export async function enviarNotificacaoRetiradaTelegram(dados: DadosNotificacaoR
 
   try {
     if (dados.urlFotoProduto) {
-      await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-        chat_id: dados.chatId,
-        photo: dados.urlFotoProduto,
-        caption: textoMensagem,
-        parse_mode: "Markdown",
+      const telegramFormData = new FormData();
+      telegramFormData.append("chat_id", dados.chatId);
+      telegramFormData.append("caption", textoMensagem);
+      telegramFormData.append("parse_mode", "Markdown");
+
+      if (typeof dados.urlFotoProduto === "string" && dados.urlFotoProduto.startsWith("data:")) {
+        const fetchRes = await fetch(dados.urlFotoProduto);
+        const blob = await fetchRes.blob();
+        telegramFormData.append("photo", blob, "produto.jpg");
+      } else {
+        telegramFormData.append("photo", dados.urlFotoProduto);
+      }
+
+      const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+        method: "POST",
+        body: telegramFormData,
       });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("[TELEGRAM_API_ERROR] Falha ao enviar foto na retirada:", errorData);
+      }
     } else {
       await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         chat_id: dados.chatId,

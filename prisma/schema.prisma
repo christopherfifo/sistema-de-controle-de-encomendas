@@ -149,7 +149,6 @@ model Encomenda {
   condicao         String?
   data_recebimento DateTime?
   status           StatusEncomenda @default(PENDENTE)
-  url_foto_pacote  String?
 
   retirada     Retirada?
   notificacoes Notificacao[]

@@ -33,7 +33,7 @@ import {
   promoverMoradorATitular,
 } from "../helpers/actionMorador";
 
-interface GerenciarCadastroMoradoresContentProps {
+export interface GerenciarCadastroMoradoresContentProps {
   moradores: {
     id_usuario: string;
     nome_completo: string;

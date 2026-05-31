@@ -5,7 +5,10 @@ import { Menu } from "lucide-react";
 import { redirect } from "next/navigation";
 import { SimpleSidebar } from "../components/sidebar";
 import { PerfilUsuario } from "@prisma/client";
-import { GerenciarCadastroMoradoresContent } from "../components/gerenciarCadastroMoradoresContent";
+import { 
+  GerenciarCadastroMoradoresContent, 
+  GerenciarCadastroMoradoresContentProps 
+} from "../components/gerenciarCadastroMoradoresContent";
 import { db } from "@/lib/prisma";
 
 interface PageProps {
@@ -112,7 +115,7 @@ export default async function GestaoMoradoresPage({
 
         <div className="p-4 md:p-8">
           <GerenciarCadastroMoradoresContent 
-            moradores={moradores as any} 
+            moradores={moradores as unknown as GerenciarCadastroMoradoresContentProps["moradores"]} 
             unidades={unidades}
             condominioId={slug}
             sindicoId={user}

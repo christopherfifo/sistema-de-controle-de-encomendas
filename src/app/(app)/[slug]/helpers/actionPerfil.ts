@@ -50,9 +50,10 @@ export async function updateDadosPessoais({
     });
 
     revalidatePath(`/(app)/[slug]/meuPerfil`, "page");
-    return { success: true, message: "Dados pessoais atualizados com sucesso!" };
-  } catch (error: any) {
-    return { success: false, message: error.message || "Erro ao atualizar dados." };
+    return { success: true, message: "Dados pessoais updated com sucesso!" };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erro ao atualizar dados.";
+    return { success: false, message };
   }
 }
 
@@ -79,7 +80,8 @@ export async function updateTelegramId({
 
     revalidatePath(`/(app)/[slug]/meuPerfil`, "page");
     return { success: true, message: "ID do Telegram atualizado com sucesso!" };
-  } catch (error: any) {
-    return { success: false, message: error.message || "Erro ao atualizar Telegram." };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Erro ao atualizar Telegram.";
+    return { success: false, message };
   }
 }

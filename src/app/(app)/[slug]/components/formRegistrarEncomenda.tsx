@@ -85,8 +85,10 @@ export function FormRegistrarEncomenda({
     },
   });
 
-  useEffect(() => {
-    if (termoBusca.trim().length >= 2 && !modoManual) {
+useEffect(() => {
+    const moradorJaSelecionado = form.getValues("nome_manual_retirante") === termoBusca;
+
+    if (termoBusca.trim().length >= 2 && !modoManual && !moradorJaSelecionado) {
       const delayDebounce = setTimeout(async () => {
         const dados = await buscarMoradoresPorNome(condominioId, termoBusca);
         setListaMoradores(dados);
@@ -95,7 +97,7 @@ export function FormRegistrarEncomenda({
     } else {
       setListaMoradores([]);
     }
-  }, [termoBusca, condominioId, modoManual]);
+  }, [termoBusca, condominioId, modoManual, form.getValues]);
 
   const handleValidarRastreio = async (
     e: React.FocusEvent<HTMLInputElement>,

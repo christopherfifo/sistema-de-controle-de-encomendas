@@ -23,9 +23,10 @@ import {
   SquareChartGantt,
   ShieldAlert,
   ExternalLink,
-  FolderKanban,
   IdCardLanyard,
   UserPen,
+  UserCog,
+  Users,
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
@@ -176,10 +177,10 @@ export function SimpleSidebar({
         pathCheck: `/${condominioId}/gerenciarLinksCadastro`,
       },
       {
-        label: "Gerenciar Moradores",
-        href: createHref("/gerenciarMoradores"),
-        icon: FolderKanban,
-        pathCheck: `/${condominioId}/gerenciarMoradores`,
+        label: "Gestão de Moradores",
+        href: createHref("/gerenciarCadastroMoradores"),
+        icon: Users,
+        pathCheck: `/${condominioId}/gerenciarCadastroMoradores`,
       },
       {
         label: "Vincular Telegram",

@@ -22,11 +22,13 @@ import {
   Building,
   ShieldCheck,
   X,
+  RefreshCw,
 } from "lucide-react";
 import { maskCPF } from "@/helpers/cpf";
 import {
   removerMoradorDoCondominio,
   reativarMoradorNoCondominio,
+  alterarUnidadeMorador,
 } from "../helpers/actionMorador";
 
 interface GerenciarMoradoresContentProps {
@@ -81,7 +83,7 @@ export function GerenciarMoradoresContent({
   const [idsExpandidos, setIdsExpandidos] = useState<string[]>([]);
 
   const [modalAberto, setModalAberto] = useState(false);
-  const [tipoOperacao, setTipoOperacao] = useState<"bloquear" | "reativar">(
+  const [tipoOperacao, setTipoOperacao] = useState<"bloquear" | "reativar" | "alterarUnidade">(
     "bloquear",
   );
   const [moradorAlvo, setMoradorAlvo] = useState<{
@@ -139,7 +141,7 @@ export function GerenciarMoradoresContent({
   });
 
   const abrirModal = (
-    tipo: "bloquear" | "reativar",
+    tipo: "bloquear" | "reativar" | "alterarUnidade",
     id: string,
     nome: string,
   ) => {
@@ -164,8 +166,16 @@ export function GerenciarMoradoresContent({
           sindicoId,
           tokenSindico: tokenConfirmacao,
         });
-      } else {
+      } else if (tipoOperacao === "reativar") {
         res = await reativarMoradorNoCondominio({
+          moradorId: moradorAlvo.id,
+          condominioId,
+          sindicoId,
+          tokenSindico: tokenConfirmacao,
+          idUnidade: unidadeParaVincular,
+        });
+      } else {
+        res = await alterarUnidadeMorador({
           moradorId: moradorAlvo.id,
           condominioId,
           sindicoId,
@@ -316,6 +326,19 @@ export function GerenciarMoradoresContent({
                 </div>
 
                 <div className="flex items-center gap-2 self-end sm:self-center">
+                  {m.ativo && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 h-8 text-xs border-primary text-primary hover:bg-primary/5"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        abrirModal("alterarUnidade", m.id_usuario, m.nome_completo);
+                      }}
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" /> Mudar Unidade
+                    </Button>
+                  )}
                   {m.ativo ? (
                     <Button
                       size="sm"
@@ -464,12 +487,14 @@ export function GerenciarMoradoresContent({
 
             <CardHeader>
               <CardTitle
-                className={`text-xl flex items-center gap-2 ${tipoOperacao === "bloquear" ? "text-destructive" : "text-green-600"}`}
+                className={`text-xl flex items-center gap-2 ${tipoOperacao === "bloquear" ? "text-destructive" : "text-primary"}`}
               >
                 <ShieldCheck className="h-5 w-5" />{" "}
                 {tipoOperacao === "bloquear"
                   ? "Bloquear Morador"
-                  : "Reativar Cadastro"}
+                  : tipoOperacao === "reativar"
+                  ? "Reativar Cadastro"
+                  : "Mudar Unidade"}
               </CardTitle>
               <CardDescription>
                 {tipoOperacao === "bloquear" ? (
@@ -478,11 +503,15 @@ export function GerenciarMoradoresContent({
                     <strong>{moradorAlvo?.nome}</strong> e limpará seus vínculos
                     com os apartamentos.
                   </>
-                ) : (
+                ) : tipoOperacao === "reativar" ? (
                   <>
                     Você está prestes a reativar a credencial de{" "}
                     <strong>{moradorAlvo?.nome}</strong> para reingresso no
                     condomínio.
+                  </>
+                ) : (
+                  <>
+                    Transfira <strong>{moradorAlvo?.nome}</strong> para uma nova unidade habitacional.
                   </>
                 )}
               </CardDescription>
@@ -490,13 +519,13 @@ export function GerenciarMoradoresContent({
 
             <CardContent>
               <form onSubmit={handleExecutarOperacao} className="space-y-4">
-                {tipoOperacao === "reativar" && (
+                {(tipoOperacao === "reativar" || tipoOperacao === "alterarUnidade") && (
                   <div className="space-y-1.5">
                     <Label
                       htmlFor="modal-unidade"
                       className="font-semibold text-xs"
                     >
-                      Vincular à Unidade Habitacional
+                      {tipoOperacao === "reativar" ? "Vincular à Unidade" : "Nova Unidade Habitacional"}
                     </Label>
                     <select
                       id="modal-unidade"
@@ -522,7 +551,7 @@ export function GerenciarMoradoresContent({
                     htmlFor="token-input"
                     className="text-sm font-semibold"
                   >
-                    Insira seu Token de Acesso Administrativo (Síndico)
+                    Token de Acesso do Síndico
                   </Label>
                   <Input
                     id="token-input"
@@ -543,14 +572,16 @@ export function GerenciarMoradoresContent({
                     variant={
                       tipoOperacao === "bloquear" ? "destructive" : "default"
                     }
-                    className={`flex-1 ${tipoOperacao === "reativar" && "bg-green-600 hover:bg-green-700"}`}
+                    className={`flex-1 ${tipoOperacao !== "bloquear" && "bg-primary hover:bg-primary/90"}`}
                     disabled={isPending}
                   >
                     {isPending
                       ? "Processando..."
                       : tipoOperacao === "bloquear"
                         ? "Confirmar Bloqueio"
-                        : "Confirmar Reativação"}
+                        : tipoOperacao === "reativar"
+                        ? "Confirmar Reativação"
+                        : "Confirmar Mudança"}
                   </Button>
                   <Button
                     type="button"

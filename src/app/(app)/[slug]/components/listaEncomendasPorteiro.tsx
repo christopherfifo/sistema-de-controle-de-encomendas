@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Encomenda, Unidade } from "@prisma/client";
 import {
   Accordion,
@@ -40,6 +40,10 @@ export function ListaEncomendasPorteiro({
 }: ListaEncomendasPorteiroProps) {
   const [encomendasVisiveis, setEncomendasVisiveis] =
     useState<EncomendaComUnidadeEMorador[]>(encomendasIniciais);
+
+  useEffect(() => {
+    setEncomendasVisiveis(encomendasIniciais);
+  }, [encomendasIniciais]);
 
   const [encomendaSelecionada, setEncomendaSelecionada] =
     useState<EncomendaComUnidadeEMorador | null>(null);

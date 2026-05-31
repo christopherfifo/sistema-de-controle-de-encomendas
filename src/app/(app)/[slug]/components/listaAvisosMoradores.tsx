@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Encomenda, Unidade } from "@prisma/client";
 import { ClipboardCheck, User } from "lucide-react";
 
@@ -37,6 +37,10 @@ export function ListaAvisosMoradores({
 }: ListaAvisosMoradoresProps) {
   const [avisos, setAvisos] =
     useState<EncomendaComUnidadeEMorador[]>(avisosIniciais);
+
+  useEffect(() => {
+    setAvisos(avisosIniciais);
+  }, [avisosIniciais]);
 
   const handleSuccess = (encomendaId: string) => {
     setAvisos((prev) =>

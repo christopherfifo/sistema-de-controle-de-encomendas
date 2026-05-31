@@ -1,7 +1,7 @@
 import { validateAndGetCondominioData } from "@/data/get-data-by-slug";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { SimpleSidebar } from "./components/sidebar";
 import { db } from "@/lib/prisma";
@@ -193,6 +193,11 @@ export default async function SlugPage({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0 w-64">
+              <div className="sr-only">
+                <SheetTitle>Menu de Navegação</SheetTitle>
+                <SheetDescription>Abra as ferramentas e configurações do condomínio</SheetDescription>
+              </div>
+
               <SimpleSidebar {...sidebarProps} />
             </SheetContent>
           </Sheet>

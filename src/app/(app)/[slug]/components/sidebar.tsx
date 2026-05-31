@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -29,6 +29,7 @@ import {
 import { PerfilUsuario } from "@prisma/client";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NavItem {
   label: string;
@@ -54,8 +55,15 @@ export function SimpleSidebar({
 }: SimpleSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isMobile) {
+      setIsOpen(true);
+    }
+  }, [isMobile]);
 
   const createHref = (path: string) => {
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
@@ -177,9 +185,10 @@ export function SimpleSidebar({
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          "hidden md:flex flex-col border-r bg-background h-screen sticky top-0 z-50",
-          "transition-all duration-300 ease-in-out",
+          "flex flex-col border-r bg-background h-screen transition-all duration-300 ease-in-out",
+          !isMobile && "sticky top-0 z-50",
           isOpen ? "w-64" : "w-20",
+          isMobile && "w-full border-none",
         )}
       >
         <div
@@ -188,24 +197,26 @@ export function SimpleSidebar({
             isOpen ? "px-4" : "justify-center",
           )}
         >
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn("shrink-0 transition-all", !isOpen && "size-11")}
-          >
-            <Menu
-              className={cn(
-                "transition-transform duration-300",
-                isOpen ? "size-5" : "size-5 rotate-180",
-              )}
-            />
-          </Button>
+          {!isMobile && (
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={() => setIsOpen(!isOpen)}
+              className={cn("shrink-0 transition-all", !isOpen && "size-11")}
+            >
+              <Menu
+                className={cn(
+                  "transition-transform duration-300",
+                  isOpen ? "size-5" : "size-5 rotate-180",
+                )}
+              />
+            </Button>
+          )}
 
           <div
             className={cn(
               "overflow-hidden transition-all duration-300",
-              !isOpen
+              !isOpen && !isMobile
                 ? "opacity-0 w-0 invisible ml-0"
                 : "opacity-100 w-full visible ml-2",
             )}

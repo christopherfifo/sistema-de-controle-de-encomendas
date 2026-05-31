@@ -4,6 +4,9 @@ import { PerfilUsuario } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { SimpleSidebar } from "../components/sidebar";
 import { GerenciarMoradoresContent } from "../components/gerenciarMoradoresContent";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
 
 interface GerenciarMoradoresPageProps {
   params: Promise<{ slug: string }>;
@@ -86,13 +89,33 @@ export default async function GerenciarMoradoresPage({
       <div className="hidden md:block">
         <SimpleSidebar {...sidebarProps} />
       </div>
-      <main className="flex-1 p-4 md:p-8">
-        <GerenciarMoradoresContent
-          moradores={moradoresDoCondominio}
-          unidades={unidadesDoCondominio}
-          condominioId={data.condominio.id_condominio}
-          sindicoId={sindicoId}
-        />
+
+      <main className="flex-1">
+        <header className="flex items-center p-4 border-b md:hidden sticky top-0 bg-background z-10">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Abrir menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="flex flex-col p-0 w-64">
+              <SimpleSidebar {...sidebarProps} />
+            </SheetContent>
+          </Sheet>
+          <h2 className="text-lg font-semibold ml-4">
+            {data.condominio.nome_condominio}
+          </h2>
+        </header>
+
+        <div className="p-4 md:p-8">
+          <GerenciarMoradoresContent
+            moradores={moradoresDoCondominio}
+            unidades={unidadesDoCondominio}
+            condominioId={data.condominio.id_condominio}
+            sindicoId={sindicoId}
+          />
+        </div>
       </main>
     </div>
   );

@@ -12,6 +12,35 @@ import {
   UserCheck
 } from "lucide-react";
 
+interface EncomendaAdmin {
+  id_encomenda: string;
+  tipo_encomenda: string;
+  data_recebimento: string | Date | null;
+  unidade?: {
+    bloco_torre: string;
+    numero_unidade: string;
+  };
+}
+
+interface UnidadeAdmin {
+  id_unidade: string;
+  bloco_torre: string;
+  numero_unidade: string;
+  moradores?: {
+    usuario?: {
+      nome_completo: string;
+    };
+  }[];
+}
+
+interface FuncionarioAdmin {
+  id_usuario: string;
+  nome_completo: string;
+  email: string;
+  telefone: string;
+  ativo: boolean;
+}
+
 interface AdminDashboardProps {
   stats: {
     totalUnidades: number;
@@ -20,9 +49,9 @@ interface AdminDashboardProps {
     totalFuncionarios: number;
     totalEncomendasPendentes: number;
   };
-  encomendasPendentes: Record<string, any>[];
-  funcionarios: Record<string, any>[];
-  unidades: Record<string, any>[];
+  encomendasPendentes: Record<string, unknown>[];
+  funcionarios: Record<string, unknown>[];
+  unidades: Record<string, unknown>[];
 }
 
 export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unidades }: AdminDashboardProps) {
@@ -122,7 +151,9 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                       </tr>
                     </thead>
                     <tbody className="[&_tr:last-child]:border-0">
-                      {encomendasPendentes.map((enc) => (
+                      {encomendasPendentes.map((_enc) => {
+                        const enc = _enc as unknown as EncomendaAdmin;
+                        return (
                         <tr key={enc.id_encomenda} className="border-b transition-colors hover:bg-muted/50">
                           <td className="p-2 align-middle font-medium">
                             {enc.unidade?.bloco_torre} - {enc.unidade?.numero_unidade}
@@ -137,7 +168,7 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                             </Badge>
                           </td>
                         </tr>
-                      ))}
+                      )})}
                     </tbody>
                   </table>
                 </div>
@@ -154,7 +185,9 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {unidades.map((u) => (
+                {unidades.map((_u) => {
+                  const u = _u as unknown as UnidadeAdmin;
+                  return (
                   <div key={u.id_unidade} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
                     <div>
                       <div className="font-bold">{u.bloco_torre} - {u.numero_unidade}</div>
@@ -170,7 +203,7 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                       <Badge variant="outline" className="text-muted-foreground">Vaga</Badge>
                     )}
                   </div>
-                ))}
+                )})}
               </div>
             </CardContent>
           </Card>
@@ -187,7 +220,9 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                 {funcionarios.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nenhum funcionário cadastrado.</p>
                 ) : (
-                  funcionarios.map((f) => (
+                  funcionarios.map((_f) => {
+                    const f = _f as unknown as FuncionarioAdmin;
+                    return (
                     <div key={f.id_usuario} className="flex items-center justify-between p-4 border rounded-xl hover:bg-muted/30 transition-colors">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -202,7 +237,7 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                         {f.ativo ? "Ativo" : "Inativo"}
                       </Badge>
                     </div>
-                  ))
+                  )})
                 )}
               </div>
             </CardContent>

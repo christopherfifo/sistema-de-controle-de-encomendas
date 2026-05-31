@@ -39,6 +39,9 @@ export function VincularTelegramContent({
       if (resultado.success) {
         setStatus({ type: "success", message: resultado.message });
         setChatId("");
+        setTimeout(() => {
+          window.location.href = "https://t.me/syscondominio_portaria_bot";
+        }, 2000);
       } else {
         setStatus({ type: "error", message: resultado.message });
       }
@@ -64,34 +67,40 @@ export function VincularTelegramContent({
         </p>
       </div>
 
-      <div className="rounded-md bg-sky-50 p-4 text-sky-800 border border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-900 space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-wider">
-          Como obter seu Chat ID?
+      <div className="rounded-md bg-amber-50 p-3 text-amber-900 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900 space-y-2">
+        <p className="text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+          <AlertCircle className="h-3.5 w-3.5" />
+          Ativação Única Obrigatória
         </p>
-        <ol className="list-decimal list-inside space-y-2 text-xs">
-          <li>
-            Clique no botão abaixo para iniciar uma conversa com o bot
-            assistente:
-            <div className="mt-2">
-              <a
-                href="https://t.me/userinfobot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 font-medium bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded text-xs transition-colors shadow-sm"
-              >
-                Abrir @userinfobot no Telegram
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
-          </li>
-          <li>
-            No Telegram, clique em <strong>&quot;Começar&quot;</strong> (ou
-            /start).
-          </li>
-          <li>
-            Copie a sequência numérica rotulada como <strong>Id</strong>.
-          </li>
-        </ol>
+        <p className="text-xs leading-tight">
+          Para liberar suas notificações, você <strong>PRECISA</strong> acessar o bot e clicar em <strong>&quot;Começar&quot;</strong> apenas uma vez. O Telegram só enviará alertas após essa permissão inicial.
+        </p>
+        <a
+          href="https://t.me/syscondominio_portaria_bot"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 font-bold bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded text-[11px] transition-colors shadow-sm w-full justify-center"
+        >
+          Ativar Bot (Clique aqui)
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      </div>
+
+      <div className="rounded-md bg-sky-50 p-3 text-sky-800 border border-sky-200 dark:bg-sky-950/30 dark:text-sky-400 dark:border-sky-900 space-y-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wider">Como obter seu ID?</p>
+        <div className="flex flex-col gap-2 text-xs">
+          <p>1. Abra o <strong>@userinfobot</strong> e clique em <strong>Começar</strong>.</p>
+          <p>2. Copie o número do campo <strong>Id</strong> e cole abaixo.</p>
+          <a
+            href="https://t.me/userinfobot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 font-medium text-sky-700 hover:text-sky-900 dark:text-sky-400 underline text-[11px]"
+          >
+            Abrir @userinfobot
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -115,18 +124,31 @@ export function VincularTelegramContent({
 
         {status.type && (
           <div
-            className={`flex items-start gap-2 rounded-md p-3 text-sm border ${
+            className={`flex flex-col gap-3 rounded-md p-3 text-sm border ${
               status.type === "success"
                 ? "bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400"
                 : "bg-destructive/10 text-destructive border-destructive/20"
             }`}
           >
-            {status.type === "success" ? (
-              <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-emerald-600" />
-            ) : (
-              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <div className="flex items-start gap-2">
+              {status.type === "success" ? (
+                <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-emerald-600" />
+              ) : (
+                <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              )}
+              <span>{status.message}</span>
+            </div>
+            
+            {status.type === "success" && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full bg-emerald-600 text-white hover:bg-emerald-700 hover:text-white border-none"
+                onClick={() => window.open("https://t.me/syscondominio_portaria_bot", "_blank")}
+              >
+                Ir para o Bot agora (Obrigatório)
+              </Button>
             )}
-            <span>{status.message}</span>
           </div>
         )}
 

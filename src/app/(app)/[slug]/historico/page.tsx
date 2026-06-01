@@ -47,8 +47,16 @@ export default async function HistoricoPage({
     include: {
       unidade: {
         select: {
+          id_unidade: true,
           bloco_torre: true,
           numero_unidade: true,
+        },
+      },
+      usuario_cadastro: {
+        select: {
+          id_usuario: true,
+          nome_completo: true,
+          telefone: true,
         },
       },
       retirada: {

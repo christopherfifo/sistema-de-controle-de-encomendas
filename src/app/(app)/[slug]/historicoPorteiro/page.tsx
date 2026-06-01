@@ -19,7 +19,8 @@ interface SlugPageProps {
 }
 
 type EncomendaComDetalhes = Encomenda & {
-  unidade: Pick<Unidade, "bloco_torre" | "numero_unidade">;
+  unidade: Pick<Unidade, "id_unidade" | "bloco_torre" | "numero_unidade">;
+  usuario_cadastro: Pick<Usuario, "id_usuario" | "nome_completo" | "telefone"> | null;
   retirada:
     | (Retirada & {
         usuario_retirada: Pick<Usuario, "id_usuario" | "nome_completo">;
@@ -30,7 +31,6 @@ type EncomendaComDetalhes = Encomenda & {
 
 async function getHistoricoPorteiro(
   slug: string,
-  userId: string,
 ): Promise<EncomendaComDetalhes[]> {
   const encomendas = await db.encomenda.findMany({
     where: {
@@ -44,8 +44,16 @@ async function getHistoricoPorteiro(
     include: {
       unidade: {
         select: {
+          id_unidade: true,
           bloco_torre: true,
           numero_unidade: true,
+        },
+      },
+      usuario_cadastro: {
+        select: {
+          id_usuario: true,
+          nome_completo: true,
+          telefone: true,
         },
       },
       retirada: {
@@ -89,7 +97,22 @@ export default async function HistoricoPorteiroPage({
     redirect(`/${slug}?user=${user}&perfil=${data.user.perfil}`);
   }
 
-  const encomendasDoHistorico = await getHistoricoPorteiro(slug, user!);
+  const encomendasDoHistorico = await getHistoricoPorteiro(slug);
+  
+  let porteiros: Pick<Usuario, "id_usuario" | "nome_completo">[] = [];
+  if (data.user.perfil === PerfilUsuario.ADMINISTRADOR) {
+    porteiros = await db.usuario.findMany({
+      where: {
+        id_condominio: slug,
+        perfil: PerfilUsuario.PORTEIRO,
+      },
+      select: {
+        id_usuario: true,
+        nome_completo: true,
+      },
+      orderBy: { nome_completo: 'asc' }
+    });
+  }
 
   const sidebarProps = {
     condominioId: slug,
@@ -126,6 +149,8 @@ export default async function HistoricoPorteiroPage({
             encomendasDoHistorico={encomendasDoHistorico}
             condominioName={condominioName}
             porteiroId={user!}
+            isAdmin={data.user.perfil === PerfilUsuario.ADMINISTRADOR}
+            porteiros={porteiros}
           />
         </section>
       </main>

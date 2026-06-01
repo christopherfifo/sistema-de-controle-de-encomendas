@@ -24,7 +24,8 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Label } from "@/components/ui/label";
 
 type EncomendaComDetalhes = Encomenda & {
-  unidade: Pick<Unidade, "bloco_torre" | "numero_unidade">;
+  unidade: Pick<Unidade, "id_unidade" | "bloco_torre" | "numero_unidade">;
+  usuario_cadastro: Pick<Usuario, "id_usuario" | "nome_completo" | "telefone"> | null;
   retirada:
     | (Retirada & {
         usuario_retirada: Pick<Usuario, "id_usuario" | "nome_completo">;
@@ -37,6 +38,8 @@ interface HistoricoPorteiroPageProps {
   encomendasDoHistorico: EncomendaComDetalhes[];
   condominioName: string;
   porteiroId: string;
+  isAdmin?: boolean;
+  porteiros?: Pick<Usuario, "id_usuario" | "nome_completo">[];
 }
 
 type StatusFilterType = "ENTREGUE" | "CANCELADA" | "ALL";
@@ -45,9 +48,11 @@ export function HistoricoPorteiroPageContent({
   encomendasDoHistorico,
   condominioName,
   porteiroId,
+  isAdmin = false,
+  porteiros = [],
 }: HistoricoPorteiroPageProps) {
-  const [scopeFilter, setScopeFilter] = useState<"ALL" | "MINE">("ALL");
-
+  const [scopeFilter, setScopeFilter] = useState<"ALL" | "MINE" | "SPECIFIC">("ALL");
+  const [specificPorteiroId, setSpecificPorteiroId] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<StatusFilterType>("ALL");
 
   const filteredEncomendas = useMemo(() => {
@@ -55,6 +60,9 @@ export function HistoricoPorteiroPageContent({
       .filter((e) => {
         if (scopeFilter === "MINE") {
           return e.id_porteiro_recebimento === porteiroId;
+        }
+        if (scopeFilter === "SPECIFIC" && specificPorteiroId) {
+          return e.id_porteiro_recebimento === specificPorteiroId;
         }
         return true;
       })
@@ -65,7 +73,7 @@ export function HistoricoPorteiroPageContent({
 
         return e.status === statusFilter;
       });
-  }, [encomendasDoHistorico, scopeFilter, statusFilter, porteiroId]);
+  }, [encomendasDoHistorico, scopeFilter, statusFilter, porteiroId, specificPorteiroId]);
 
   return (
     <>
@@ -101,18 +109,45 @@ export function HistoricoPorteiroPageContent({
             <ToggleGroup
               type="single"
               value={scopeFilter}
-              onValueChange={(val: "ALL" | "MINE") => {
-                if (val) setScopeFilter(val);
+              onValueChange={(val: "ALL" | "MINE" | "SPECIFIC") => {
+                if (val) {
+                  setScopeFilter(val);
+                  if (val !== "SPECIFIC") setSpecificPorteiroId("");
+                }
               }}
               className="justify-start"
             >
               <ToggleGroupItem value="ALL" aria-label="Todas as encomendas">
                 Todas as Encomendas
               </ToggleGroupItem>
-              <ToggleGroupItem value="MINE" aria-label="Minhas encomendas">
-                Meus Registros
-              </ToggleGroupItem>
+              {!isAdmin && (
+                <ToggleGroupItem value="MINE" aria-label="Minhas encomendas">
+                  Meus Registros
+                </ToggleGroupItem>
+              )}
+              {isAdmin && (
+                <ToggleGroupItem value="SPECIFIC" aria-label="Porteiro específico">
+                  Por Porteiro Específico
+                </ToggleGroupItem>
+              )}
             </ToggleGroup>
+            
+            {isAdmin && scopeFilter === "SPECIFIC" && (
+              <div className="mt-3 max-w-sm">
+                <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={specificPorteiroId}
+                  onChange={(e) => setSpecificPorteiroId(e.target.value)}
+                >
+                  <option value="">Selecione um porteiro...</option>
+                  {porteiros.map((p) => (
+                    <option key={p.id_usuario} value={p.id_usuario}>
+                      {p.nome_completo}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

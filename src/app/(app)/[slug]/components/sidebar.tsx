@@ -93,12 +93,6 @@ export function SimpleSidebar({
         pathCheck: `/${condominioId}`,
       },
       {
-        label: "Encomendas Pendentes",
-        href: createHref("/"),
-        icon: Package,
-        pathCheck: `/${condominioId}`,
-      },
-      {
         label: "Histórico Global",
         href: createHref("/historico"),
         icon: History,

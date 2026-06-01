@@ -16,10 +16,22 @@ interface EncomendaAdmin {
   id_encomenda: string;
   tipo_encomenda: string;
   data_recebimento: string | Date | null;
+  tamanho: string;
+  forma_entrega: string;
+  codigo_rastreio: string | null;
+  condicao: string | null;
   unidade?: {
     bloco_torre: string;
     numero_unidade: string;
   };
+  usuario_cadastro?: {
+    nome_completo: string;
+    telefone: string;
+    email: string;
+  } | null;
+  porteiro_recebimento?: {
+    nome_completo: string;
+  } | null;
 }
 
 interface UnidadeAdmin {
@@ -27,8 +39,12 @@ interface UnidadeAdmin {
   bloco_torre: string;
   numero_unidade: string;
   moradores?: {
+    principal: boolean;
     usuario?: {
       nome_completo: string;
+      email: string;
+      telefone: string;
+      cpf: string;
     };
   }[];
 }
@@ -38,6 +54,9 @@ interface FuncionarioAdmin {
   nome_completo: string;
   email: string;
   telefone: string;
+  cpf: string;
+  perfil: string;
+  data_criacao: string | Date;
   ativo: boolean;
 }
 
@@ -144,8 +163,9 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                   <table className="w-full caption-bottom text-sm">
                     <thead className="[&_tr]:border-b">
                       <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Unidade</th>
-                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Tipo</th>
+                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">ID / Unidade</th>
+                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Detalhes</th>
+                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Destinatário</th>
                         <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Recebimento</th>
                         <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Status</th>
                       </tr>
@@ -156,11 +176,31 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                         return (
                         <tr key={enc.id_encomenda} className="border-b transition-colors hover:bg-muted/50">
                           <td className="p-2 align-middle font-medium">
+                            <div className="text-xs text-muted-foreground mb-1" title={enc.id_encomenda}>
+                              {enc.id_encomenda.split('-')[0]}...
+                            </div>
                             {enc.unidade?.bloco_torre} - {enc.unidade?.numero_unidade}
                           </td>
-                          <td className="p-2 align-middle uppercase text-xs">{enc.tipo_encomenda}</td>
-                          <td className="p-2 align-middle text-muted-foreground">
-                            {enc.data_recebimento ? new Date(enc.data_recebimento).toLocaleString() : ""}
+                          <td className="p-2 align-middle text-xs">
+                            <div className="font-semibold uppercase">{enc.tipo_encomenda} ({enc.tamanho})</div>
+                            {enc.forma_entrega && <div>Entrega: {enc.forma_entrega}</div>}
+                            {enc.codigo_rastreio && <div>Rastreio: {enc.codigo_rastreio}</div>}
+                          </td>
+                          <td className="p-2 align-middle text-xs">
+                            {enc.usuario_cadastro ? (
+                              <>
+                                <div className="font-semibold">{enc.usuario_cadastro.nome_completo}</div>
+                                <div className="text-muted-foreground">{enc.usuario_cadastro.telefone}</div>
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground italic">Não especificado</span>
+                            )}
+                          </td>
+                          <td className="p-2 align-middle text-xs">
+                            <div>{enc.data_recebimento ? new Date(enc.data_recebimento).toLocaleString() : ""}</div>
+                            {enc.porteiro_recebimento && (
+                              <div className="text-muted-foreground mt-1">Por: {enc.porteiro_recebimento.nome_completo}</div>
+                            )}
                           </td>
                           <td className="p-2 align-middle">
                             <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-200">
@@ -181,27 +221,45 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
           <Card>
             <CardHeader>
               <CardTitle>Relação de Unidades</CardTitle>
-              <CardDescription>Unidades ocupadas e seus moradores principais.</CardDescription>
+              <CardDescription>Informações detalhadas sobre os grupos familiares em cada unidade.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {unidades.map((_u) => {
                   const u = _u as unknown as UnidadeAdmin;
                   return (
-                  <div key={u.id_unidade} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
-                    <div>
-                      <div className="font-bold">{u.bloco_torre} - {u.numero_unidade}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {u.moradores && u.moradores.length > 0 
-                          ? u.moradores[0].usuario?.nome_completo 
-                          : "Sem moradores"}
-                      </div>
+                  <div key={u.id_unidade} className="flex flex-col p-4 border rounded-lg bg-card shadow-sm">
+                    <div className="flex items-center justify-between mb-3 border-b pb-2">
+                      <div className="font-bold text-lg">{u.bloco_torre} - {u.numero_unidade}</div>
+                      {u.moradores && u.moradores.length > 0 ? (
+                        <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/10">Ocupada</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-muted-foreground">Vaga</Badge>
+                      )}
                     </div>
-                    {u.moradores && u.moradores.length > 0 ? (
-                      <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/10">Ocupada</Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-muted-foreground">Vaga</Badge>
-                    )}
+                    
+                    <div className="space-y-2 flex-1">
+                      {u.moradores && u.moradores.length > 0 ? (
+                        u.moradores.map((m, idx) => (
+                          <div key={idx} className="flex justify-between items-start text-sm p-2 rounded-md bg-muted/30">
+                            <div>
+                              <div className="font-medium flex items-center gap-2">
+                                {m.usuario?.nome_completo}
+                                {m.principal && <Badge variant="secondary" className="text-[10px] h-4 px-1 py-0">Responsável</Badge>}
+                              </div>
+                              <div className="text-xs text-muted-foreground mt-0.5">
+                                {m.usuario?.telefone} • {m.usuario?.email}
+                              </div>
+                            </div>
+                            <div className="text-xs text-muted-foreground font-mono">
+                              {m.usuario?.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-sm text-muted-foreground italic text-center py-4">Nenhum morador registrado.</div>
+                      )}
+                    </div>
                   </div>
                 )})}
               </div>
@@ -213,29 +271,52 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
           <Card>
             <CardHeader>
               <CardTitle>Quadro de Funcionários</CardTitle>
-              <CardDescription>Porteiros registrados no condomínio.</CardDescription>
+              <CardDescription>Todos os funcionários registrados, incluindo porteiros e síndicos.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {funcionarios.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nenhum funcionário cadastrado.</p>
                 ) : (
                   funcionarios.map((_f) => {
                     const f = _f as unknown as FuncionarioAdmin;
                     return (
-                    <div key={f.id_usuario} className="flex items-center justify-between p-4 border rounded-xl hover:bg-muted/30 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <UserCheck className="h-5 w-5 text-primary" />
+                    <div key={f.id_usuario} className="flex flex-col p-4 border rounded-xl bg-card shadow-sm hover:border-primary/50 transition-colors">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
+                            <UserCheck className="h-6 w-6 text-primary" />
+                          </div>
+                          <div>
+                            <div className="font-bold text-base">{f.nome_completo}</div>
+                            <Badge variant="outline" className="mt-1 font-mono text-xs uppercase bg-muted">
+                              {f.perfil}
+                            </Badge>
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-bold">{f.nome_completo}</div>
-                          <div className="text-xs text-muted-foreground">{f.email} | {f.telefone}</div>
+                        <Badge variant={f.ativo ? "default" : "secondary"}>
+                          {f.ativo ? "Ativo" : "Inativo"}
+                        </Badge>
+                      </div>
+                      
+                      <div className="space-y-1.5 text-sm bg-muted/30 p-3 rounded-lg mt-2">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Email:</span>
+                          <span className="font-medium">{f.email}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Telefone:</span>
+                          <span className="font-medium">{f.telefone}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">CPF:</span>
+                          <span className="font-mono">{f.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Data Cadastro:</span>
+                          <span>{new Date(f.data_criacao).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <Badge variant={f.ativo ? "default" : "secondary"}>
-                        {f.ativo ? "Ativo" : "Inativo"}
-                      </Badge>
                     </div>
                   )})
                 )}

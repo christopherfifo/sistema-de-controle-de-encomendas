@@ -176,20 +176,24 @@ export default async function SlugPage({
             include: {
               moradores: {
                 select: { 
+                  principal: true,
                   usuario: {
-                    select: { nome_completo: true }
+                    select: { nome_completo: true, email: true, telefone: true, cpf: true }
                   }
                 }
               }
             }
           },
           usuarios: {
-            where: { perfil: PerfilUsuario.PORTEIRO },
+            where: { perfil: { in: [PerfilUsuario.PORTEIRO, PerfilUsuario.SINDICO] } },
             select: { 
               id_usuario: true,
               nome_completo: true,
               email: true,
               telefone: true,
+              cpf: true,
+              perfil: true,
+              data_criacao: true,
               ativo: true
             }
           }
@@ -206,6 +210,9 @@ export default async function SlugPage({
             select: { bloco_torre: true, numero_unidade: true }
           },
           usuario_cadastro: {
+            select: { nome_completo: true, telefone: true, email: true }
+          },
+          porteiro_recebimento: {
             select: { nome_completo: true }
           }
         },

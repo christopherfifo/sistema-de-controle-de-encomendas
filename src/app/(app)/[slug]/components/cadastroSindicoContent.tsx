@@ -1,30 +1,802 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserPlus } from "lucide-react";
+import { useState, useTransition } from "react";
+import { useForm, Control } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Loader2,
+  ShieldAlert,
+  UserX,
+  UserCheck,
+  Trash2,
+  Edit2,
+  UserPlus,
+  CheckCircle,
+  KeyRound,
+  Copy,
+  Check,
+} from "lucide-react";
 
-export function CadastroSindicoContent() {
+import {
+  registroSindicoSchema,
+  edicaoSindicoSchema,
+  RegistroSindicoFormData,
+  EdicaoSindicoFormData,
+} from "../schemas/schemaSindico";
+import {
+  adicionarSindico,
+  atualizarSindico,
+  transformarMoradorEmSindico,
+  alternarStatusSindico,
+  excluirSindico,
+} from "../helpers/actionSindico";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { maskCPF } from "@/helpers/cpf";
+
+interface SindicoInfo {
+  id_usuario: string;
+  nome_completo: string;
+  cpf: string;
+  email: string;
+  telefone: string;
+  ativo: boolean;
+  token_acesso: string | null;
+  unidades_residenciais: {
+    principal: boolean;
+    unidade: {
+      id_unidade: string;
+      bloco_torre: string;
+      numero_unidade: string;
+    };
+  }[];
+}
+
+interface MoradorInfo {
+  id_usuario: string;
+  nome_completo: string;
+  cpf: string;
+  email: string;
+}
+
+interface UnidadeInfo {
+  id_unidade: string;
+  bloco_torre: string;
+  numero_unidade: string;
+}
+
+interface CadastroSindicoContentProps {
+  sindicos: SindicoInfo[];
+  moradores: MoradorInfo[];
+  unidades: UnidadeInfo[];
+  condominioId: string;
+  adminId: string;
+  nomeCondominio: string;
+}
+
+function formatarTokenVisual(token: string | null): string {
+  if (!token) return "---";
+  if (token.length === 6) {
+    return `${token.slice(0, 3)}-${token.slice(3, 6)}`;
+  }
+  if (token.length === 8) {
+    return `${token.slice(0, 4)}-${token.slice(4, 8)}`;
+  }
+  return token;
+}
+
+export function CadastroSindicoContent({
+  sindicos,
+  moradores,
+  unidades,
+  condominioId,
+  adminId,
+  nomeCondominio,
+}: CadastroSindicoContentProps) {
+  const [isPending, startTransition] = useTransition();
+  const [activeTab, setActiveTab] = useState("lista");
+  const [editandoSindicoId, setEditandoSindicoId] = useState<string | null>(
+    null,
+  );
+  const [tokenSindicoEdicao, setTokenSindicoEdicao] = useState<string>("");
+  const [copiadoId, setCopiadoId] = useState<string | null>(null);
+
+  const formCadastro = useForm<RegistroSindicoFormData>({
+    resolver: zodResolver(registroSindicoSchema),
+    defaultValues: {
+      nomeCompleto: "",
+      email: "",
+      cpf: "",
+      telefone: "",
+      senha: "",
+      moraNoCondominio: false,
+      id_unidade: "",
+    },
+  });
+
+  const formEdicao = useForm<EdicaoSindicoFormData>({
+    resolver: zodResolver(edicaoSindicoSchema),
+    defaultValues: {
+      id_usuario: "",
+      nomeCompleto: "",
+      email: "",
+      telefone: "",
+      moraNoCondominio: false,
+      id_unidade: "",
+    },
+  });
+
+  const watchMoraCadastro = formCadastro.watch("moraNoCondominio");
+  const watchMoraEdicao = formEdicao.watch("moraNoCondominio");
+
+  const handleCopiarToken = (token: string | null, idContexto: string) => {
+    if (!token || token === "---") return;
+    navigator.clipboard.writeText(token);
+    setCopiadoId(idContexto);
+    setTimeout(() => setCopiadoId(null), 2000);
+  };
+
+  const handleEntrarModoEdicao = (sindico: SindicoInfo) => {
+    setEditandoSindicoId(sindico.id_usuario);
+    setTokenSindicoEdicao(sindico.token_acesso || "");
+    const primeiraUnidade =
+      sindico.unidades_residenciais?.[0]?.unidade?.id_unidade || "";
+
+    formEdicao.reset({
+      id_usuario: sindico.id_usuario,
+      nomeCompleto: sindico.nome_completo,
+      email: sindico.email,
+      telefone: sindico.telefone,
+      moraNoCondominio: sindico.unidades_residenciais?.length > 0,
+      id_unidade: primeiraUnidade,
+    });
+    setActiveTab("formulario");
+  };
+
+  const onCadastrarSubmit = (data: RegistroSindicoFormData) => {
+    const dadosTratados = {
+      ...data,
+      id_unidade: data.moraNoCondominio ? data.id_unidade : "",
+    };
+
+    startTransition(async () => {
+      const res = await adicionarSindico(
+        dadosTratados,
+        condominioId,
+        adminId,
+      );
+
+      if (res.success) {
+        alert("Ok");
+        formCadastro.reset();
+        setActiveTab("lista");
+      } else {
+        alert(res.message);
+      }
+    });
+  };
+
+  const onEditarSubmit = (data: EdicaoSindicoFormData) => {
+    const dadosTratados = {
+      ...data,
+      id_unidade: data.moraNoCondominio ? data.id_unidade : "",
+    };
+
+    startTransition(async () => {
+      const res = await atualizarSindico(
+        dadosTratados,
+        condominioId,
+        adminId,
+      );
+      alert(res.message);
+      if (res.success) {
+        setEditandoSindicoId(null);
+        setTokenSindicoEdicao("");
+        formEdicao.reset();
+        setActiveTab("lista");
+      }
+    });
+  };
+
+  const handlePromoverMorador = (moradorId: string, nome: string) => {
+    if (
+      confirm(
+        `Confirmar a promoção de "${nome}" como Síndico do sistema? Ele manterá os dados de moradia originais.`,
+      )
+    ) {
+      startTransition(async () => {
+        const res = await transformarMoradorEmSindico(
+          moradorId,
+          condominioId,
+          adminId,
+        );
+
+        if (res.success) {
+          alert("Ok");
+          setActiveTab("lista");
+        } else {
+          alert(res.message);
+        }
+      });
+    }
+  };
+
+  const handleAlternarStatus = (id: string, ativo: boolean) => {
+    if (confirm("Deseja alterar o status de atividade deste síndico?")) {
+      startTransition(async () => {
+        await alternarStatusSindico(id, ativo, condominioId);
+      });
+    }
+  };
+
+  const handleExcluir = (id: string) => {
+    if (
+      confirm(
+        "Excluir permanentemente? Se houver histórico no banco, o sistema impedirá por segurança.",
+      )
+    ) {
+      startTransition(async () => {
+        const res = await excluirSindico(id, condominioId);
+        alert(res.message);
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Cadastro de Síndico</h2>
+        <h2 className="text-3xl font-bold tracking-tight">
+          Gestão de Síndicos
+        </h2>
         <p className="text-muted-foreground">
-          Registre novos síndicos para o condomínio.
+          Gerenciamento completo e atribuições de síndicos de {nomeCondominio}
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5 text-primary" />
-            <CardTitle>Novo Síndico</CardTitle>
-          </div>
-          <CardDescription>Preencha os dados para cadastrar um novo gestor.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Conteúdo de cadastro de síndico em desenvolvimento.</p>
-        </CardContent>
-      </Card>
+      <Separator />
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsTrigger value="lista">Lista de Síndicos</TabsTrigger>
+          <TabsTrigger value="formulario">
+            {editandoSindicoId ? "Editando Síndico" : "Novo Síndico"}
+          </TabsTrigger>
+          <TabsTrigger value="promover">Promover Morador</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="lista" className="space-y-4 pt-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShieldAlert className="h-5 w-5 text-primary" /> Síndicos Atuais
+              </CardTitle>
+              <CardDescription>
+                Visualize o status de acesso e complemente informações de habitação dos síndicos.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {sindicos.map((s) => {
+                const mora = s.unidades_residenciais?.length > 0;
+                const estaCopiado = copiadoId === s.id_usuario;
+
+                return (
+                  <div
+                    key={s.id_usuario}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/40 border rounded-xl gap-4"
+                  >
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-bold text-lg">
+                          {s.nome_completo}
+                        </span>
+                        <span
+                          className={`text-[10px] px-2 py-0.5 font-bold rounded-full ${s.ativo ? "bg-green-100 text-green-700" : "bg-destructive/10 text-destructive"}`}
+                        >
+                          {s.ativo ? "Ativo" : "Bloqueado"}
+                        </span>
+
+                        <div className="text-[10px] pl-2 pr-1 py-0.5 font-mono font-bold bg-amber-100 text-amber-800 rounded-full flex items-center gap-1.5 border border-amber-200">
+                          <KeyRound className="h-3 w-3" /> Token:{" "}
+                          {formatarTokenVisual(s.token_acesso)}
+                          {s.token_acesso && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleCopiarToken(s.token_acesso, s.id_usuario)
+                              }
+                              className="p-0.5 hover:bg-amber-200 rounded transition-colors text-amber-900"
+                              title="Copiar token bruto"
+                            >
+                              {estaCopiado ? (
+                                <Check className="h-3 w-3 text-green-600" />
+                              ) : (
+                                <Copy className="h-3 w-3" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+
+                        {mora && (
+                          <span className="text-[10px] px-2 py-0.5 font-bold bg-blue-100 text-blue-700 rounded-full">
+                            Mora no local (
+                            {s.unidades_residenciais[0].unidade.bloco_torre} -
+                            Apt{" "}
+                            {s.unidades_residenciais[0].unidade.numero_unidade})
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        CPF: {maskCPF(s.cpf)} • Email: {s.email} • Tel:{" "}
+                        {s.telefone}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-center">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleEntrarModoEdicao(s)}
+                        title="Editar dados cadastrais / Moradia"
+                      >
+                        <Edit2 className="h-4 w-4 text-primary" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() =>
+                          handleAlternarStatus(s.id_usuario, s.ativo)
+                        }
+                      >
+                        {s.ativo ? (
+                          <UserX className="h-4 w-4 text-destructive" />
+                        ) : (
+                          <UserCheck className="h-4 w-4 text-green-600" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleExcluir(s.id_usuario)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+              {sindicos.length === 0 && (
+                <p className="text-sm text-center text-muted-foreground py-6">
+                  Nenhum síndico cadastrado.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="formulario" className="pt-2">
+          <Card className="max-w-xl">
+            <CardHeader>
+              <CardTitle>
+                {editandoSindicoId
+                  ? "Alterar Dados Básicos e Moradia"
+                  : "Cadastrar Novo Síndico"}
+              </CardTitle>
+              <CardDescription>
+                {editandoSindicoId
+                  ? "CPFs, senhas e tokens não podem ser alterados pelo administrador."
+                  : "Crie uma conta nova de síndico com senha provisória de acesso."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {editandoSindicoId ? (
+                <Form {...formEdicao}>
+                  <form
+                    onSubmit={formEdicao.handleSubmit(onEditarSubmit)}
+                    className="space-y-4"
+                  >
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                        <KeyRound className="h-4 w-4" /> Token de Acesso (Imutável)
+                      </label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={formatarTokenVisual(tokenSindicoEdicao)}
+                          disabled
+                          className="bg-amber-50/50 dark:bg-amber-950/20 font-mono font-bold text-amber-700 border-amber-200"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="border-amber-200 text-amber-800 hover:bg-amber-50"
+                          onClick={() =>
+                            handleCopiarToken(
+                              tokenSindicoEdicao,
+                              "form-edicao",
+                            )
+                          }
+                          title="Copiar token original"
+                        >
+                          {copiadoId === "form-edicao" ? (
+                            <Check className="h-4 w-4 text-green-600 mr-2" />
+                          ) : (
+                            <Copy className="h-4 w-4 mr-2" />
+                          )}
+                          {copiadoId === "form-edicao" ? "Copiado!" : "Copiar"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <FormField
+                      control={
+                        formEdicao.control as Control<EdicaoSindicoFormData>
+                      }
+                      name="nomeCompleto"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nome Completo</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={
+                        formEdicao.control as Control<EdicaoSindicoFormData>
+                      }
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email de Acesso</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              {...field}
+                              disabled={isPending}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={
+                        formEdicao.control as Control<EdicaoSindicoFormData>
+                      }
+                      name="telefone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Telefone</FormLabel>
+                          <FormControl>
+                            <Input {...field} disabled={isPending} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={
+                        formEdicao.control as Control<EdicaoSindicoFormData>
+                      }
+                      name="moraNoCondominio"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-muted/20">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                if (!checked)
+                                  formEdicao.setValue("id_unidade", "");
+                              }}
+                              disabled={isPending}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Este síndico reside no condomínio?
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {watchMoraEdicao && (
+                      <FormField
+                        control={
+                          formEdicao.control as Control<EdicaoSindicoFormData>
+                        }
+                        name="id_unidade"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Selecione a Unidade Habitacional
+                            </FormLabel>
+                            <select
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                              {...field}
+                              disabled={isPending}
+                            >
+                              <option value="">
+                                -- Selecione o Apartamento --
+                              </option>
+                              {unidades.map((u) => (
+                                <option key={u.id_unidade} value={u.id_unidade}>
+                                  {u.bloco_torre} - Apt {u.numero_unidade}
+                                </option>
+                              ))}
+                            </select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        type="submit"
+                        className="flex-1"
+                        disabled={isPending}
+                      >
+                        {isPending && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Salvar Alterações
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setEditandoSindicoId(null);
+                          setTokenSindicoEdicao("");
+                          formEdicao.reset();
+                          setActiveTab("lista");
+                        }}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              ) : (
+                <Form {...formCadastro}>
+                  <form
+                    onSubmit={formCadastro.handleSubmit(onCadastrarSubmit)}
+                    className="space-y-3"
+                  >
+                    <FormField
+                      control={
+                        formCadastro.control as Control<RegistroSindicoFormData>
+                      }
+                      name="nomeCompleto"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nome Completo</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Nome do síndico"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={
+                        formCadastro.control as Control<RegistroSindicoFormData>
+                      }
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="email"
+                              placeholder="email@provedor.com"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={
+                        formCadastro.control as Control<RegistroSindicoFormData>
+                      }
+                      name="cpf"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>CPF</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="000.000.000-00"
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(maskCPF(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={
+                        formCadastro.control as Control<RegistroSindicoFormData>
+                      }
+                      name="telefone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Telefone</FormLabel>
+                          <FormControl>
+                            <Input placeholder="(11) 99999-0000" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={
+                        formCadastro.control as Control<RegistroSindicoFormData>
+                      }
+                      name="senha"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Senha Provisória do Síndico</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Mínimo 6 caracteres"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={
+                        formCadastro.control as Control<RegistroSindicoFormData>
+                      }
+                      name="moraNoCondominio"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-muted/20">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                if (!checked)
+                                  formCadastro.setValue("id_unidade", "");
+                              }}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Este síndico reside no condomínio?
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {watchMoraCadastro && (
+                      <FormField
+                        control={
+                          formCadastro.control as Control<RegistroSindicoFormData>
+                        }
+                        name="id_unidade"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Selecione a Unidade Habitacional
+                            </FormLabel>
+                            <select
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                              {...field}
+                            >
+                              <option value="">
+                                -- Selecione o Apartamento --
+                              </option>
+                              {unidades.map((u) => (
+                                <option key={u.id_unidade} value={u.id_unidade}>
+                                  {u.bloco_torre} - Apt {u.numero_unidade}
+                                </option>
+                              ))}
+                            </select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full mt-2"
+                      disabled={isPending}
+                    >
+                      {isPending && <Loader2 className="animate-spin mr-2" />}
+                      Cadastrar Síndico
+                    </Button>
+                  </form>
+                </Form>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="promover" className="pt-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserPlus className="h-5 w-5 text-primary" /> Promover Morador
+                existente para Síndico
+              </CardTitle>
+              <CardDescription>
+                Se um morador foi escolhido como síndico, mude o cargo dele
+                aqui. Isso dará acessos às telas de gestão mantendo o
+                histórico residencial intacto.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {moradores.map((m) => (
+                <div
+                  key={m.id_usuario}
+                  className="flex items-center justify-between p-4 bg-muted/30 border rounded-xl"
+                >
+                  <div>
+                    <p className="font-bold">{m.nome_completo}</p>
+                    <p className="text-xs text-muted-foreground">
+                      CPF: {maskCPF(m.cpf)} • {m.email}
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 border-primary text-primary hover:bg-primary/10"
+                    onClick={() =>
+                      handlePromoverMorador(m.id_usuario, m.nome_completo)
+                    }
+                    disabled={isPending}
+                  >
+                    <CheckCircle className="h-4 w-4" /> Tornar Síndico
+                  </Button>
+                </div>
+              ))}
+              {moradores.length === 0 && (
+                <p className="text-sm text-center text-muted-foreground py-6">
+                  Nenhum morador comum disponível para alteração de perfil.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

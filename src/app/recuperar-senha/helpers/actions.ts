@@ -1,11 +1,17 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { v4 as uuidv4 } from "uuid";
 import { recuperarSenhaSchema } from "./schema";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER || "condodrop.mail@gmail.com",
+    pass: process.env.EMAIL_PASS || "rata hych tewm pekj",
+  },
+});
 
 export async function sendPasswordResetEmail(values: { email: string }) {
   const validatedFields = recuperarSenhaSchema.safeParse(values);
@@ -41,13 +47,14 @@ export async function sendPasswordResetEmail(values: { email: string }) {
     },
   });
 
-  const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/resetar-senha?token=${token}`;
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const resetLink = `${baseUrl}/resetar-senha?token=${token}`;
 
   try {
-    await resend.emails.send({
-      from: "onboarding@resend.dev", // Default resend onboarding email
+    await transporter.sendMail({
+      from: `"CondoDrop" <${process.env.EMAIL_USER || "condodrop.mail@gmail.com"}>`,
       to: email,
-      subject: "Recuperação de Senha - Sistema de Encomendas",
+      subject: "Recuperação de Senha - CondoDrop",
       html: `
         <div style="font-family: sans-serif; padding: 20px;">
           <h2>Recuperação de Senha</h2>
@@ -66,7 +73,7 @@ export async function sendPasswordResetEmail(values: { email: string }) {
         "Se o email estiver cadastrado, um link de recuperação será enviado.",
     };
   } catch (error) {
-    console.error("[RESEND_ERROR]", error);
+    console.error("[NODEMAILER_ERROR]", error);
     return { error: "Erro ao enviar o email. Tente novamente mais tarde." };
   }
 }

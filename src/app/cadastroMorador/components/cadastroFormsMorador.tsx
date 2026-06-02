@@ -520,6 +520,8 @@ export function CadastroFormsMorador() {
                     Li e aceito as condições do sistema, incluindo os{" "}
                     <Link
                       href="/termos"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
                       Termos de Uso
@@ -527,6 +529,8 @@ export function CadastroFormsMorador() {
                     , e a{" "}
                     <Link
                       href="/privacidade"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
                       Política de Privacidade

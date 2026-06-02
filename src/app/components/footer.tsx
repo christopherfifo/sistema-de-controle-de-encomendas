@@ -64,11 +64,11 @@ const Footer = () => {
             reservados.
           </p>
           <div className="flex gap-6">
-            <Link href="/termos" className="hover:text-foreground transition-colors">
+            <Link href="/privacidade" className="hover:text-foreground transition-colors">
               Privacidade
             </Link>
             <Link
-              href="/privacidade"
+              href="/termos"
               className="hover:text-foreground transition-colors"
             >
               Termos de Uso

@@ -587,6 +587,8 @@ export function CadastroSaaSForm() {
                         incluindo os{" "}
                         <Link
                           href="/termos"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
                           Termos de Uso
@@ -594,6 +596,8 @@ export function CadastroSaaSForm() {
                         , a{" "}
                         <Link
                           href="/privacidade"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="text-primary hover:underline"
                         >
                           Política de Privacidade

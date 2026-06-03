@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { PlanosContent } from "../components/planosContent";
+import { db } from "@/lib/prisma";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -26,6 +27,14 @@ export default async function PlanosPage({
   if (data.user.perfil !== PerfilUsuario.ADMINISTRADOR) {
     redirect(`/${slug}?user=${user}&perfil=${data.user.perfil}`);
   }
+
+  const availablePlanos = await db.plano.findMany({ orderBy: { valor: "asc" } });
+  const serializedPlanos = availablePlanos.map(p => ({
+    id_plano: p.id_plano,
+    nome_plano: p.nome_plano,
+    valor: Number(p.valor),
+    limite_unidades: p.limite_unidades
+  }));
 
   const sidebarProps = {
     condominioId: slug,
@@ -60,7 +69,11 @@ export default async function PlanosPage({
         </header>
 
         <div className="p-4 md:p-8">
-            <PlanosContent />
+            <PlanosContent 
+              condominioId={slug}
+              currentPlanoId={data.condominio.id_plano}
+              availablePlanos={serializedPlanos}
+            />
         </div>
       </main>
     </div>

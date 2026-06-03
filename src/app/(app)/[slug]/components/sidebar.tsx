@@ -33,6 +33,7 @@ import {
   FileText,
   Banknote,
   UserPlus,
+  Home,
 } from "lucide-react";
 import { PerfilUsuario } from "@prisma/client";
 
@@ -123,28 +124,28 @@ export function SimpleSidebar({
         pathCheck: `/${condominioId}/gerenciarCadastroMoradores`,
       },
       {
+        label: "Gerenciar Unidades",
+        href: createHref("/gerenciarUnidades"),
+        icon: Home,
+        pathCheck: `/${condominioId}/gerenciarUnidades`,
+      },
+      {
+        label: "Token de Acesso",
+        href: createHref("/meuToken"),
+        icon: ShieldAlert,
+        pathCheck: `/${condominioId}/meuToken`,
+      },
+      {
         label: "Planos & Upgrade",
         href: createHref("/planos"),
         icon: CreditCard,
         pathCheck: `/${condominioId}/planos`,
       },
       {
-        label: "Pagamentos",
-        href: createHref("/pagamentos"),
+        label: "Financeiro",
+        href: createHref("/financeiro"),
         icon: Wallet,
-        pathCheck: `/${condominioId}/pagamentos`,
-      },
-      {
-        label: "Faturas",
-        href: createHref("/faturas"),
-        icon: FileText,
-        pathCheck: `/${condominioId}/faturas`,
-      },
-      {
-        label: "Formas de Pagamento",
-        href: createHref("/formasPagamento"),
-        icon: Banknote,
-        pathCheck: `/${condominioId}/formasPagamento`,
+        pathCheck: `/${condominioId}/financeiro`,
       },
       {
         label: "Cadastro de Síndico",
@@ -264,6 +265,12 @@ export function SimpleSidebar({
         pathCheck: `/${condominioId}/gerenciarCadastroMoradores`,
       },
       {
+        label: "Gerenciar Unidades",
+        href: createHref("/gerenciarUnidades"),
+        icon: Home,
+        pathCheck: `/${condominioId}/gerenciarUnidades`,
+      },
+      {
         label: "Vincular Telegram",
         href: createHref("/telegramLink"),
         icon: IdCardLanyard,
@@ -329,7 +336,7 @@ export function SimpleSidebar({
           </div>
         </div>
 
-        <nav className="flex flex-col space-y-1 p-2 flex-1">
+        <nav className="flex flex-col space-y-1 p-2 flex-1 overflow-y-auto overflow-x-hidden">
           {navItems.map((item) => (
             <Tooltip key={item.label}>
               <TooltipTrigger asChild>

@@ -51,3 +51,7 @@
 - [ ] enviar email ao morador ao chegar uma encomenda (além da notificação do telegram)
 - [x] arrumar todos os erros de lint do projeto
 - [x] adicionar botão para trocar o tema da aplicação
+
+no historico global eu preciso saber também quem cadastrol (os dados do morador) e os dados da moradia bloco e apt. além disso, quero lago visualmente mais bonito e facil de ler. quero também um botão que permita eu mudar o modo de exibição para alinhar por bloco familiar
+
+no historioco da portaria tem o problema do campo meus registros, mas o adm não da baixa, além disso eu preciso de mais uma maneira de filtro, porque ali vai ter vez que eu vou querer pegar o historico de um porteiro especifico. eu preciso saber também quem cadastrol (os dados do morador) e os dados da moradia bloco e apt. além disso, quero lago visualmente mais bonito e facil de ler.

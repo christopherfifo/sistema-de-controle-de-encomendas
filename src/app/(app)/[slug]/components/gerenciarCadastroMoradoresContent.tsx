@@ -32,6 +32,7 @@ import {
   alterarUnidadeMorador,
   promoverMoradorATitular,
 } from "../helpers/actionMorador";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface GerenciarCadastroMoradoresContentProps {
   moradores: {
@@ -86,7 +87,12 @@ export function GerenciarCadastroMoradoresContent({
   const [unidadeParaVincular, setUnidadeParaVincular] = useState("");
   const [tokenConfirmacao, setTokenConfirmacao] = useState("");
 
-  const moradoresFiltrados = moradores.filter((m) =>
+  const [tabAtual, setTabTabAtual] = useState<"ativos" | "inativos">("ativos");
+
+  const moradoresAtivos = moradores.filter(m => m.ativo);
+  const moradoresInativos = moradores.filter(m => !m.ativo);
+
+  const moradoresParaExibir = (tabAtual === "ativos" ? moradoresAtivos : moradoresInativos).filter((m) =>
     m.nome_completo.toLowerCase().includes(pesquisa.toLowerCase()) ||
     m.cpf.includes(pesquisa) ||
     m.email.toLowerCase().includes(pesquisa.toLowerCase())
@@ -157,136 +163,159 @@ export function GerenciarCadastroMoradoresContent({
 
       <Separator />
 
-      <div className="relative">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar morador por nome, CPF ou e-mail..."
-          className="pl-9 h-12 rounded-xl border-primary/20 focus-visible:ring-primary"
-          value={pesquisa}
-          onChange={(e) => setPesquisa(e.target.value)}
-        />
-      </div>
+      <Tabs value={tabAtual} onValueChange={(v) => setTabTabAtual(v as any)} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="ativos" className="relative">
+            Ativos
+            <span className="ml-2 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-bold">
+              {moradoresAtivos.length}
+            </span>
+          </TabsTrigger>
+          <TabsTrigger value="inativos">
+            Desativados / Histórico
+            <span className="ml-2 bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-[10px] font-bold">
+              {moradoresInativos.length}
+            </span>
+          </TabsTrigger>
+        </TabsList>
 
-      <div className="grid gap-4">
-        {moradoresFiltrados.map((m) => {
-          const expandido = idsExpandidos.includes(m.id_usuario);
-          
-          return (
-            <Card key={m.id_usuario} className={`overflow-hidden border transition-all duration-200 ${!m.ativo ? "border-destructive/30 bg-destructive/[0.01]" : "border-border hover:border-primary/30"}`}>
-              <div 
-                className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 ${!isSimplificado && "cursor-pointer hover:bg-muted/10"}`}
-                onClick={() => !isSimplificado && toggleExpandir(m.id_usuario)}
-              >
-                <div className="flex items-start gap-4">
-                  <div className={`mt-1 p-2 rounded-xl hidden sm:block ${m.ativo ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>
-                    <Building className="h-5 w-5" />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`font-bold text-lg ${!m.ativo && "line-through text-muted-foreground"}`}>{m.nome_completo}</span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase ${m.ativo ? "bg-emerald-100 text-emerald-700" : "bg-destructive/10 text-destructive"}`}>
-                        {m.ativo ? "Ativo" : "Inativo"}
-                      </span>
-                      {m.unidades_residenciais.map(ur => (
-                        <span key={ur.unidade.id_unidade} className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-full font-bold">
-                          {ur.unidade.bloco_torre} - Apt {ur.unidade.numero_unidade} {ur.principal && "(Titular)"}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground font-medium">CPF: {maskCPF(m.cpf)} • {m.email}</p>
-                  </div>
-                </div>
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={`Buscar em ${tabAtual === "ativos" ? "ativos" : "desativados"} por nome, CPF ou e-mail...`}
+            className="pl-9 h-12 rounded-xl border-primary/20 focus-visible:ring-primary"
+            value={pesquisa}
+            onChange={(e) => setPesquisa(e.target.value)}
+          />
+        </div>
 
-                <div className="flex items-center gap-2 self-end md:self-center">
-                  {m.ativo ? (
-                    <>
-                      <Button size="sm" variant="outline" className="gap-2 h-8 text-xs font-bold border-primary/20 text-primary hover:bg-primary/5" onClick={(e) => { e.stopPropagation(); abrirModal("alterarUnidade", m.id_usuario, m.nome_completo); }}>
-                        <RefreshCw className="h-3.5 w-3.5" /> Mudar Unidade
-                      </Button>
-                      <Button size="sm" variant="destructive" className="gap-2 h-8 text-xs font-bold" onClick={(e) => { e.stopPropagation(); abrirModal("bloquear", m.id_usuario, m.nome_completo); }}>
-                        <UserMinus className="h-3.5 w-3.5" /> Desativar
-                      </Button>
-                    </>
-                  ) : (
-                    <Button size="sm" variant="outline" className="gap-2 h-8 text-xs font-bold border-emerald-600 text-emerald-600 hover:bg-emerald-50" onClick={(e) => { e.stopPropagation(); abrirModal("reativar", m.id_usuario, m.nome_completo); }}>
-                      <UserCheck className="h-3.5 w-3.5" /> Reativar
-                    </Button>
-                  )}
-                  
-                  {!isSimplificado && (
-                    <Button size="icon" variant="ghost" className="h-8 w-8">
-                      {expandido ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {expandido && !isSimplificado && (
-                <CardContent className="border-t bg-muted/10 p-5 space-y-6 animate-in slide-in-from-top-2 duration-300">
-                  <div className="grid gap-6 sm:grid-cols-2 text-sm">
-                    <div className="space-y-2">
-                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.15em]">Dados do Contato</p>
+        <div className="grid gap-4">
+          {moradoresParaExibir.length === 0 ? (
+            <p className="text-center py-10 text-muted-foreground text-sm border-2 border-dashed rounded-2xl">
+              Nenhum morador encontrado nesta categoria.
+            </p>
+          ) : (
+            moradoresParaExibir.map((m) => {
+              const expandido = idsExpandidos.includes(m.id_usuario);
+              
+              return (
+                <Card key={m.id_usuario} className={`overflow-hidden border transition-all duration-200 ${!m.ativo ? "border-destructive/30 bg-destructive/[0.01]" : "border-border hover:border-primary/30"}`}>
+                  <div 
+                    className={`p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 ${!isSimplificado && "cursor-pointer hover:bg-muted/10"}`}
+                    onClick={() => !isSimplificado && toggleExpandir(m.id_usuario)}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className={`mt-1 p-2 rounded-xl hidden sm:block ${m.ativo ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>
+                        <Building className="h-5 w-5" />
+                      </div>
                       <div className="space-y-1">
-                        <p className="font-bold">Telefone: <span className="font-medium text-muted-foreground ml-1">{m.telefone || "Não informado"}</span></p>
-                        <p className="font-bold">Membro desde: <span className="font-medium text-muted-foreground ml-1">{new Date(m.data_criacao).toLocaleDateString("pt-BR")}</span></p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`font-bold text-lg ${!m.ativo && "line-through text-muted-foreground"}`}>{m.nome_completo}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-black uppercase ${m.ativo ? "bg-emerald-100 text-emerald-700" : "bg-destructive/10 text-destructive"}`}>
+                            {m.ativo ? "Ativo" : "Inativo"}
+                          </span>
+                          {m.unidades_residenciais.map(ur => (
+                            <span key={ur.unidade.id_unidade} className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-full font-bold">
+                              {ur.unidade.bloco_torre} - Apt {ur.unidade.numero_unidade} {ur.principal && "(Titular)"}
+                            </span>
+                          ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground font-medium">CPF: {maskCPF(m.cpf)} • {m.email}</p>
                       </div>
                     </div>
+
+                    <div className="flex items-center gap-2 self-end md:self-center">
+                      {m.ativo ? (
+                        <>
+                          <Button size="sm" variant="outline" className="gap-2 h-8 text-xs font-bold border-primary/20 text-primary hover:bg-primary/5" onClick={(e) => { e.stopPropagation(); abrirModal("alterarUnidade", m.id_usuario, m.nome_completo); }}>
+                            <RefreshCw className="h-3.5 w-3.5" /> Mudar Unidade
+                          </Button>
+                          <Button size="sm" variant="destructive" className="gap-2 h-8 text-xs font-bold" onClick={(e) => { e.stopPropagation(); abrirModal("bloquear", m.id_usuario, m.nome_completo); }}>
+                            <UserMinus className="h-3.5 w-3.5" /> Desativar
+                          </Button>
+                        </>
+                      ) : (
+                        <Button size="sm" variant="outline" className="gap-2 h-8 text-xs font-bold border-emerald-600 text-emerald-600 hover:bg-emerald-50" onClick={(e) => { e.stopPropagation(); abrirModal("reativar", m.id_usuario, m.nome_completo); }}>
+                          <UserCheck className="h-3.5 w-3.5" /> Reativar
+                        </Button>
+                      )}
+                      
+                      {!isSimplificado && (
+                        <Button size="icon" variant="ghost" className="h-8 w-8">
+                          {expandido ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.15em] flex items-center gap-2">
-                      <LayoutList className="h-3 w-3" /> Núcleos Familiares (Coabitantes)
-                    </p>
-
-                    {m.unidades_residenciais.map((ur) => {
-                      const coabitantes = ur.unidade.moradores.filter(co => co.usuario.id_usuario !== m.id_usuario);
-                      return (
-                        <div key={ur.unidade.id_unidade} className="bg-background border rounded-2xl p-4 space-y-4 shadow-sm">
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs font-black text-primary uppercase tracking-tight">
-                              Unidade {ur.unidade.numero_unidade} • Bloco {ur.unidade.bloco_torre}
-                            </p>
-                            {m.ativo && !ur.principal && (
-                               <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={(e) => { e.stopPropagation(); abrirModal("promoverTitular", m.id_usuario, m.nome_completo, ur.unidade.id_unidade); }}
-                                className="h-6 text-[9px] font-black uppercase text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 gap-1.5"
-                              >
-                                <UserCheck className="h-3 w-3" /> Tornar Titular
-                              </Button>
-                            )}
+                  {expandido && !isSimplificado && (
+                    <CardContent className="border-t bg-muted/10 p-5 space-y-6 animate-in slide-in-from-top-2 duration-300">
+                      <div className="grid gap-6 sm:grid-cols-2 text-sm">
+                        <div className="space-y-2">
+                          <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.15em]">Dados do Contato</p>
+                          <div className="space-y-1">
+                            <p className="font-bold">Telefone: <span className="font-medium text-muted-foreground ml-1">{m.telefone || "Não informado"}</span></p>
+                            <p className="font-bold">Membro desde: <span className="font-medium text-muted-foreground ml-1">{new Date(m.data_criacao).toLocaleDateString("pt-BR")}</span></p>
                           </div>
-
-                          {coabitantes.length === 0 ? (
-                            <p className="text-xs text-muted-foreground italic pl-2">Nenhum familiar ou coabitante registrado nesta unidade.</p>
-                          ) : (
-                            <div className="grid gap-3 sm:grid-cols-2">
-                              {coabitantes.map((co) => (
-                                <div key={co.usuario.id_usuario} className="flex items-center gap-3 p-3 rounded-xl border border-muted/50 bg-muted/5">
-                                  <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center font-bold text-xs text-muted-foreground">
-                                    {co.usuario.nome_completo.charAt(0)}
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="text-xs font-bold truncate">
-                                      {co.usuario.nome_completo} {co.principal && <span className="text-[8px] text-amber-600 bg-amber-50 border border-amber-200 px-1 rounded ml-1">Resp.</span>}
-                                    </p>
-                                    <p className="text-[10px] text-muted-foreground truncate">{co.usuario.telefone}</p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          );
-        })}
-      </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.15em] flex items-center gap-2">
+                          <LayoutList className="h-3 w-3" /> Núcleos Familiares (Coabitantes)
+                        </p>
+
+                        {m.unidades_residenciais.map((ur) => {
+                          const coabitantes = ur.unidade.moradores.filter(co => co.usuario.id_usuario !== m.id_usuario);
+                          return (
+                            <div key={ur.unidade.id_unidade} className="bg-background border rounded-2xl p-4 space-y-4 shadow-sm">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-black text-primary uppercase tracking-tight">
+                                  Unidade {ur.unidade.numero_unidade} • Bloco {ur.unidade.bloco_torre}
+                                </p>
+                                {m.ativo && !ur.principal && (
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={(e) => { e.stopPropagation(); abrirModal("promoverTitular", m.id_usuario, m.nome_completo, ur.unidade.id_unidade); }}
+                                    className="h-6 text-[9px] font-black uppercase text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 gap-1.5"
+                                  >
+                                    <UserCheck className="h-3 w-3" /> Tornar Titular
+                                  </Button>
+                                )}
+                              </div>
+
+                              {coabitantes.length === 0 ? (
+                                <p className="text-xs text-muted-foreground italic pl-2">Nenhum familiar ou coabitante registrado nesta unidade.</p>
+                              ) : (
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                  {coabitantes.map((co) => (
+                                    <div key={co.usuario.id_usuario} className="flex items-center gap-3 p-3 rounded-xl border border-muted/50 bg-muted/5">
+                                      <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center font-bold text-xs text-muted-foreground">
+                                        {co.usuario.nome_completo.charAt(0)}
+                                      </div>
+                                      <div className="min-w-0">
+                                        <p className="text-xs font-bold truncate">
+                                          {co.usuario.nome_completo} {co.principal && <span className="text-[8px] text-amber-600 bg-amber-50 border border-amber-200 px-1 rounded ml-1">Resp.</span>}
+                                        </p>
+                                        <p className="text-[10px] text-muted-foreground truncate">{co.usuario.telefone}</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  )}
+                </Card>
+              );
+            })
+          )}
+        </div>
+      </Tabs>
 
       {modalAberto && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">

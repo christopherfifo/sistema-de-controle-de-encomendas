@@ -5,14 +5,14 @@ import { SimpleSidebar } from "../components/sidebar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { FormasPagamentoContent } from "../components/formasPagamentoContent";
+import { FinanceiroContent } from "../components/financeiroContent";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ user?: string; perfil?: PerfilUsuario }>;
 }
 
-export default async function FormasPagamentoPage({
+export default async function FinanceiroPage({
   params,
   searchParams,
 }: PageProps) {
@@ -42,7 +42,7 @@ export default async function FormasPagamentoPage({
       </div>
 
       <main className="flex-1">
-        <header className="flex items-center p-4 border-b md:hidden sticky top-0 bg-background z-10">
+        <header className="flex items-center p-4 border-b md:hidden sticky top-0 bg-background z-10">        
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -60,7 +60,7 @@ export default async function FormasPagamentoPage({
         </header>
 
         <div className="p-4 md:p-8">
-            <FormasPagamentoContent />
+            <FinanceiroContent />
         </div>
       </main>
     </div>

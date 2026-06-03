@@ -5,14 +5,14 @@ import { SimpleSidebar } from "../components/sidebar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { PagamentosContent } from "../components/pagamentosContent";
+import { GerenciarUnidadesContent } from "../components/gerenciarUnidadesContent";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ user?: string; perfil?: PerfilUsuario }>;
 }
 
-export default async function PagamentosPage({
+export default async function GerenciarUnidadesPage({
   params,
   searchParams,
 }: PageProps) {
@@ -23,7 +23,10 @@ export default async function PagamentosPage({
 
   const data = await validateAndGetCondominioData(slug, user);
 
-  if (data.user.perfil !== PerfilUsuario.ADMINISTRADOR) {
+  if (
+    data.user.perfil !== PerfilUsuario.ADMINISTRADOR &&
+    data.user.perfil !== PerfilUsuario.SINDICO
+  ) {
     redirect(`/${slug}?user=${user}&perfil=${data.user.perfil}`);
   }
 
@@ -60,7 +63,7 @@ export default async function PagamentosPage({
         </header>
 
         <div className="p-4 md:p-8">
-            <PagamentosContent />
+            <GerenciarUnidadesContent condominioId={slug} />
         </div>
       </main>
     </div>

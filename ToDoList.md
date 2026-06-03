@@ -30,12 +30,14 @@
 - [X] quando criamos uma encomenda e pesquisamos o usuario pelo nome, ele seleciona 2 vezes
 - [X] a aba de encomendas pendentes (avisos de moradores) do porteiro não sincroniza com a mudança no banco de dados
 - [X] arrumar a aba de retirada de encomendas do porteiro, ta puxando varias pessoas para uma encomenda
-- [ ] permitir cadastro de síndico na tela administrativa (após contratação do sistema)
-- [ ] criar página de termos de uso (moradores/porteiro/síndico)
-- [ ] criar página de termos de uso (contratação)
+- [X] permitir cadastro de síndico na tela administrativa (após contratação do sistema)
+- [X] criar página de termos de uso (moradores/porteiro/síndico)
+- [X] criar página de termos de uso (contratação)
 - [ ] na parte do porteiro, onde tem a lista de retirada, ele ta contanto a quantidade errada, não sei se é por causa das criadas pelo seed
+- [ ] nas abas de gerenciar funcionario e sindico, colocar uma opção de desvincular eles como funcionario
+- [ ] tela do dono da empresa
 - [X] criar as abas do adm, ele vai ter todas as abas dos outros usuarios (porteiro, morador, sindico) além da aba do plano, upgrade, pagamentos, faturas, formas de pagamento e cadastro de sindico
-- lapidar cada aba e terminar de desenvolver elas, por exemplo, no historico do porteiro ele não puxa o historico por cada porteiro e tem um campo de meus registros, mas o adm não faz isso
+- [X] lapidar cada aba e terminar de desenvolver elas, por exemplo, no historico do porteiro ele não puxa o historico por cada porteiro e tem um campo de meus registros, mas o adm não faz isso
 - o sindico tem que ter acesso ao historico dos porteiros, tem que criar aba
 - [x] adicionar botões de "concordo com os termos de uso" e salvar no banco
 - [x] na hora inserir o codigo do condominio, selecionar automaticamente os blocos e apartamentos disponiveis

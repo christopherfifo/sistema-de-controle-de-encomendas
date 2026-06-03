@@ -21,6 +21,19 @@ export default function Slide0Abertura() {
           A portaria não precisa ser um estoque caótico.
         </p>
       </div>
+
+      {/* Créditos */}
+      <div className="absolute bottom-12 w-full flex justify-between px-16 text-sm text-zinc-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-700 fill-mode-both">
+        <div className="text-left">
+          <p className="text-zinc-400 font-semibold mb-1">Desenvolvido por:</p>
+          <p>Gabriel Vitor Grossi Lourenço - GU3054446</p>
+          <p>Christopher Willians Silva Couto - GU3054047</p>
+        </div>
+        <div className="text-right">
+          <p className="text-zinc-400 font-semibold mb-1">Orientador:</p>
+          <p>Giovani Fonseca Ravagnani Disperati</p>
+        </div>
+      </div>
     </div>
   );
 }

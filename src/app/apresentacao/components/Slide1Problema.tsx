@@ -38,16 +38,37 @@ export default function Slide1Problema() {
             <div className="absolute bottom-1/4 left-1/3 rotate-45 opacity-30 animate-[pulse_6s_ease-in-out_infinite_2s]"><Box className="w-24 h-24 text-red-500" /></div>
             <div className="absolute top-1/3 right-1/3 -rotate-45 opacity-50 animate-[pulse_3s_ease-in-out_infinite_0.5s]"><Box className="w-28 h-28 text-yellow-400" /></div>
             
-            <div className="z-10 bg-zinc-950/90 p-8 rounded-2xl border border-zinc-800 shadow-2xl backdrop-blur-md animate-in zoom-in duration-300 delay-700 fill-mode-both hover:scale-105 transition-transform cursor-default">
-               <pre className="text-red-400 font-mono text-lg leading-loose">
-                 <code>
-{`[CADERNO_PORTARIA]
-10:45 - Pacote apto 402??
-11:20 - Caixa mercado livre 
-14:00 - SUMIU PACOTE DO 101!
-16:30 - Assinatura ilegível`}
-                 </code>
-               </pre>
+            <div className="z-10 bg-[#fdfbf7] p-8 rounded-sm shadow-2xl animate-in zoom-in duration-300 delay-700 fill-mode-both hover:scale-105 transition-transform cursor-default relative overflow-hidden w-96 text-black font-sans rotate-3">
+              {/* Espiral do caderno (efeito lateral) */}
+              <div className="absolute top-0 bottom-0 left-0 w-6 bg-zinc-200/50 border-r border-zinc-300 flex flex-col justify-evenly py-4">
+                 {[...Array(12)].map((_, i) => (
+                    <div key={i} className="w-4 h-4 rounded-full bg-zinc-950 ml-1 shadow-inner"></div>
+                 ))}
+              </div>
+              
+              {/* Margem vertical */}
+              <div className="absolute top-0 bottom-0 left-16 w-px bg-red-400/60"></div>
+              
+              <div className="pl-12 pt-2">
+                {/* Cabeçalho */}
+                <div className="border-b-2 border-blue-300/40 pb-2 mb-2 flex justify-between items-end">
+                  <h3 className="font-bold text-xl text-zinc-800 tracking-wide font-mono uppercase">Controle</h3>
+                  <span className="text-sm text-zinc-500 font-mono">12/05</span>
+                </div>
+
+                {/* Linhas pautadas e anotações (simulando caneta azul) */}
+                <div 
+                  className="space-y-0 font-medium text-blue-900/90 leading-[2.5rem] rotate-[-1deg]"
+                  style={{ fontFamily: 'var(--font-caveat)', fontSize: '1.25rem' }}
+                >
+                  <div className="border-b-2 border-blue-300/40 h-10 flex items-end pb-0 overflow-hidden"><span className="opacity-90 whitespace-nowrap">10:45 - Pacote apto 402??</span></div>
+                  <div className="border-b-2 border-blue-300/40 h-10 flex items-end pb-0 overflow-hidden"><span className="opacity-90 whitespace-nowrap">11:20 - Caixa mercado livre</span></div>
+                  <div className="border-b-2 border-blue-300/40 h-10 flex items-end pb-0 overflow-hidden"><span className="opacity-90 whitespace-nowrap">14:00 - sumiu pacote do 101!</span></div>
+                  <div className="border-b-2 border-blue-300/40 h-10 flex items-end pb-0 overflow-hidden"><span className="opacity-70 whitespace-nowrap">16:30 - Assinatura ilegível</span></div>
+                  <div className="border-b-2 border-blue-300/40 h-10 flex items-end pb-0"><span></span></div>
+                  <div className="border-b-2 border-blue-300/40 h-10 flex items-end pb-0"><span></span></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -22,7 +22,7 @@ export default function Slide5Fim() {
           <p className="text-zinc-500">✓ Compiled successfully</p>
           <p className="text-zinc-400 mt-4"><span className="text-emerald-400">❯</span> npm run start</p>
           <p className="text-white mt-2">CondoDrop rodando na porta 3000.</p>
-          <p className="text-emerald-400 mt-4 animate-pulse">Aguardando demonstração ao vivo_</p>
+          <p className="text-emerald-400 mt-4 animate-pulse">Aguardando demonstração_</p>
         </div>
       </div>
       

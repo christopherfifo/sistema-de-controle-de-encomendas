@@ -39,6 +39,7 @@
     "html5-qrcode": "^2.3.8",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.548.0",
+    "mermaid": "^11.15.0",
     "next": "^15.5.18",
     "next-auth": "^4.24.11",
     "next-themes": "^0.4.6",

@@ -28,7 +28,7 @@ export default function Slide0Abertura() {
         </p>
       </div>
 
-      {/* Créditos */}
+      {}
       <div className="absolute bottom-12 w-full flex justify-between px-16 text-sm text-zinc-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-700 fill-mode-both">
         <div className="text-left">
           <p className="text-zinc-400 font-semibold mb-1">Desenvolvido por:</p>

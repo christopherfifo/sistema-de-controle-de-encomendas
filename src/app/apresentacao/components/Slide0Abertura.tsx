@@ -4,10 +4,16 @@ import { Package } from 'lucide-react';
 export default function Slide0Abertura() {
   return (
     <div className="flex flex-col items-center justify-center text-center h-full space-y-10 relative">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px] -z-10 animate-[pulse_6s_ease-in-out_infinite]"></div>
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px] -z-10"
+        style={{ animation: 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}
+      ></div>
       
       <div className="relative group cursor-default animate-in fade-in zoom-in-95 duration-500 delay-150 fill-mode-both">
-        <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-400 rounded-3xl blur opacity-25 animate-[pulse_5s_ease-in-out_infinite] group-hover:opacity-50 transition duration-700 group-hover:duration-200"></div>
+        <div 
+          className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-400 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-700 group-hover:duration-200"
+          style={{ animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}
+        ></div>
         <div className="relative bg-zinc-900 ring-1 ring-white/10 p-10 rounded-3xl">
           <Package className="w-24 h-24 text-emerald-400" />
         </div>

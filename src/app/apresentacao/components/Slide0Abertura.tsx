@@ -18,7 +18,7 @@ export default function Slide0Abertura() {
           Condo<span className="text-emerald-400">Drop</span>
         </h1>
         <p className="text-3xl md:text-4xl text-zinc-400 font-light tracking-tight max-w-3xl mx-auto mt-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
-          A portaria não precisa ser um estoque caótico.
+          Gestão inteligente e rastreável de encomendas para condomínios.
         </p>
       </div>
 

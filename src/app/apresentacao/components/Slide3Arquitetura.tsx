@@ -8,7 +8,7 @@ export default function Slide3Arquitetura() {
         Arquitetura Multi-Tenant
       </h2>
       <p className="text-2xl text-zinc-400 font-light mb-16 max-w-4xl animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
-        Desenhado para isolar perfeitamente as informações. Centenas de condomínios podem usar a mesma infraestrutura de nuvem com total segurança e performance.
+        Sistema projetado para atender múltiplos condomínios em uma única instância, garantindo isolamento lógico de dados, escalabilidade e segurança.
       </p>
       
       {/* Visual Flowchart */}
@@ -24,29 +24,29 @@ export default function Slide3Arquitetura() {
           {/* Top Node */}
           <div className="bg-zinc-900 border-2 border-emerald-500/30 p-8 rounded-3xl w-80 text-center shadow-[0_0_40px_-10px_rgb(16,185,129)] z-10 animate-in fade-in zoom-in-95 duration-500 delay-500 fill-mode-both hover:scale-105 transition-transform cursor-default">
              <Building className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
-             <h3 className="font-bold text-white text-xl">ID_CONDOMINIO</h3>
-             <p className="text-sm text-zinc-400 mt-2">A chave mestre que isola todo o escopo de dados no servidor.</p>
+             <h3 className="font-bold text-white text-xl">Tenant ID</h3>
+             <p className="text-sm text-zinc-400 mt-2">Identificador central que separa e protege as informações de cada condomínio no banco de dados.</p>
           </div>
 
           {/* Bottom Nodes */}
           <div className="flex flex-col md:flex-row justify-between w-full gap-8">
             <div className="bg-zinc-950 border-2 border-white/10 p-8 rounded-3xl flex-1 text-center z-10 hover:border-white/30 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500 delay-700 fill-mode-both">
                <ShieldCheck className="w-10 h-10 text-zinc-400 mx-auto mb-4" />
-               <h4 className="font-bold text-white text-lg">Síndicos</h4>
-               <p className="text-sm text-zinc-500 mt-3">Visão global, gestão de faturas, configurações e auditoria total.</p>
+               <h4 className="font-bold text-white text-lg">Painel Administrativo</h4>
+               <p className="text-sm text-zinc-500 mt-3">Visão gerencial (Síndico), configuração da entidade e auditoria do histórico de encomendas.</p>
             </div>
             
             <div className="bg-zinc-900 border-2 border-emerald-500/20 p-8 rounded-3xl flex-1 text-center z-10 relative shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-500 delay-1000 fill-mode-both">
                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-emerald-500 text-black text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider">Operação</div>
                <Package className="w-10 h-10 text-emerald-400 mx-auto mb-4" />
-               <h4 className="font-bold text-white text-lg">Portaria</h4>
-               <p className="text-sm text-zinc-400 mt-3">Dashboard ágil focado em alta velocidade de I/O de pacotes.</p>
+               <h4 className="font-bold text-white text-lg">Painel Operacional</h4>
+               <p className="text-sm text-zinc-400 mt-3">Interface otimizada para a Portaria, focada no fluxo rápido de entrada e saída de pacotes.</p>
             </div>
 
             <div className="bg-zinc-950 border-2 border-white/10 p-8 rounded-3xl flex-1 text-center z-10 hover:border-white/30 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500 delay-700 fill-mode-both">
                <Users className="w-10 h-10 text-zinc-400 mx-auto mb-4" />
-               <h4 className="font-bold text-white text-lg">Moradores</h4>
-               <p className="text-sm text-zinc-500 mt-3">Acesso restrito à sua unidade e geração de chaves seguras.</p>
+               <h4 className="font-bold text-white text-lg">Área do Morador</h4>
+               <p className="text-sm text-zinc-500 mt-3">Acesso restrito ao histórico individual e controle de autorização de retirada.</p>
             </div>
           </div>
         </div>

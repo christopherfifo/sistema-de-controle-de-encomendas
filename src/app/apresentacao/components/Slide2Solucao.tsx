@@ -8,8 +8,8 @@ export default function Slide2Solucao() {
         
         {/* Lado Esquerdo - Textos */}
         <div className="space-y-10 animate-in fade-in slide-in-from-left-4 duration-500 delay-150 fill-mode-both">
-          <h2 className="text-5xl md:text-6xl font-bold tracking-tighter text-white leading-[1.1]">
-            Fluxo digital, seguro e <span className="text-emerald-400">em tempo real.</span>
+          <h2 className="text-5xl md:text-5xl lg:text-6xl font-bold tracking-tighter text-white leading-[1.1]">
+            <span className="text-emerald-400">Rastreabilidade</span> e<br/>controle integrado.
           </h2>
           
           <div className="space-y-8">
@@ -18,8 +18,8 @@ export default function Slide2Solucao() {
                 <Zap className="w-7 h-7 text-emerald-400" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-white mb-2">Registro Expresso</h3>
-                <p className="text-xl text-zinc-400 font-light leading-relaxed">Porteiros registram chegadas em segundos, eliminando papéis e criando um rastro de auditoria permanente.</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Registro Otimizado</h3>
+                <p className="text-xl text-zinc-400 font-light leading-relaxed">Registro ágil de pacotes pela portaria, digitalizando o controle e gerando um histórico auditável do fluxo.</p>
               </div>
             </div>
 
@@ -28,8 +28,8 @@ export default function Slide2Solucao() {
                 <BellRing className="w-7 h-7 text-blue-400" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-white mb-2">Ping no Bolso</h3>
-                <p className="text-xl text-zinc-400 font-light leading-relaxed">O morador recebe um aviso automático via e-mail e Telegram informando que sua encomenda chegou.</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Notificação Automática</h3>
+                <p className="text-xl text-zinc-400 font-light leading-relaxed">Disparo automático de alertas via integração com API do Telegram e E-mail após o recebimento.</p>
               </div>
             </div>
 
@@ -38,8 +38,8 @@ export default function Slide2Solucao() {
                 <ShieldCheck className="w-7 h-7 text-purple-400" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-white mb-2">Retirada Inviolável</h3>
-                <p className="text-xl text-zinc-400 font-light leading-relaxed">Geração de Tokens únicos (QR/Código) para garantir que apenas o dono ou pessoa autorizada retire o pacote.</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Retirada Autenticada</h3>
+                <p className="text-xl text-zinc-400 font-light leading-relaxed">Validação via token de segurança, garantindo a entrega apenas ao destinatário correto.</p>
               </div>
             </div>
           </div>
@@ -97,15 +97,17 @@ export default function Slide2Solucao() {
 
           {/* Mock do Telegram Bubble (Flutuando) */}
           <div className="absolute -left-12 bottom-20 z-20" style={{ animation: 'floatTelegram 6s ease-in-out infinite' }}>
-            <div className="bg-[#182533] border border-[#2b3a4a] p-5 rounded-2xl rounded-bl-none shadow-2xl transform rotate-3 hover:scale-105 transition-transform duration-300">
+            <div className="bg-[#182533] border border-[#2b3a4a] p-5 rounded-2xl rounded-bl-none shadow-2xl transform rotate-3 hover:scale-105 transition-transform duration-300 min-w-[280px]">
                <div className="flex items-center gap-3 mb-3">
-                 <div className="w-10 h-10 bg-[#2AABEE] rounded-full flex items-center justify-center">
+                 <div className="w-10 h-10 bg-[#2AABEE] rounded-full flex items-center justify-center shrink-0">
                     <Send className="w-5 h-5 text-white -ml-1 mt-0.5" />
                  </div>
                  <span className="text-white font-bold text-base">CondoDrop Bot</span>
                </div>
-               <p className="text-blue-50 text-base leading-relaxed">📦 <strong>Nova Encomenda!</strong><br/>Seu pacote (Amazon) está te esperando na portaria.</p>
-               <span className="text-xs text-blue-300/50 float-right mt-2">Agora mesmo</span>
+               <p className="text-blue-50 text-base leading-relaxed mb-1">📦 <strong>Nova Encomenda!</strong><br/>Seu pacote (Amazon) está te esperando na portaria.</p>
+               <div className="flex justify-end w-full mt-1">
+                 <span className="text-xs text-blue-300/50">Agora mesmo</span>
+               </div>
             </div>
           </div>
         </div>

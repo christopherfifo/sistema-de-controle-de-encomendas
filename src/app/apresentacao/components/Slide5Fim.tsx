@@ -26,11 +26,11 @@ export default function Slide5Fim() {
         </div>
       </div>
       
-      <h2 className="text-5xl font-bold text-white mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">Vamos ver na prática?</h2>
+      <h2 className="text-5xl font-bold text-white mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">Demonstração Prática</h2>
       
       <div className="animate-in fade-in zoom-in-95 duration-500 delay-700 fill-mode-both">
         <Button size="lg" className="px-10 h-16 text-xl font-bold bg-white text-black hover:bg-zinc-200 hover:scale-105 transition-all duration-300 rounded-full group" onClick={() => window.location.href = '/'}>
-          Iniciar Demonstração do Sistema
+          Acessar Plataforma
           <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform" />
         </Button>
       </div>

@@ -44,7 +44,7 @@ export default function Slide4Tech() {
             <p className="text-xl text-zinc-400 font-medium mb-6">App Router & Server Actions</p>
           </div>
           <p className="text-lg text-zinc-500 font-light relative z-10 leading-relaxed">
-            Toda a lógica de backend (validações, banco, disparos) roda no próprio framework de forma segura via servidor, eliminando APIs separadas e reduzindo latência.
+            Framework principal do sistema. Toda a lógica de regras, validações e banco de dados roda direto no servidor, sem precisar criar APIs separadas.
           </p>
         </div>
 
@@ -56,7 +56,7 @@ export default function Slide4Tech() {
            <div className="relative z-10">
              <SiPostgresql className="w-10 h-10 text-[#336791] mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
              <h3 className="text-2xl font-bold text-white mb-2">PostgreSQL</h3>
-             <p className="text-base text-zinc-400">Banco relacional hospedado via serverless.</p>
+             <p className="text-base text-zinc-400">Banco de dados relacional robusto e escalável para garantir a integridade do sistema.</p>
            </div>
         </div>
 
@@ -68,7 +68,7 @@ export default function Slide4Tech() {
            <div className="relative z-10">
              <SiPrisma className="w-10 h-10 text-white mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
              <h3 className="text-2xl font-bold text-white mb-2">Prisma ORM</h3>
-             <p className="text-base text-zinc-400">Tipagem estrita de ponta a ponta em TypeScript.</p>
+             <p className="text-base text-zinc-400">Ferramenta que facilita a comunicação com o banco de dados de forma segura e padronizada.</p>
            </div>
         </div>
 
@@ -82,7 +82,7 @@ export default function Slide4Tech() {
                <SiTailwindcss className="w-6 h-6 text-[#38BDF8]" />
              </div>
              <h3 className="text-2xl font-bold text-white mb-2">Tailwind + Shadcn</h3>
-             <p className="text-base text-zinc-400">Design system utilitário com dark mode nativo.</p>
+             <p className="text-base text-zinc-400">Biblioteca de utilitários CSS e componentes para uma interface padronizada e responsiva.</p>
            </div>
         </div>
 
@@ -94,7 +94,7 @@ export default function Slide4Tech() {
            <div className="relative z-10">
              <SiTelegram className="w-10 h-10 text-[#2CA5E0] mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
              <h3 className="text-2xl font-bold text-white mb-2">Integrações</h3>
-             <p className="text-base text-zinc-400">Alertas push via API do Telegram e disparos de E-mail.</p>
+             <p className="text-base text-zinc-400">Envio automático de avisos pelo Telegram e por e-mail.</p>
            </div>
         </div>
 

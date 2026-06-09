@@ -21,13 +21,13 @@ async function validarTokenSindico(
     where: {
       id_usuario: sindicoId,
       id_condominio: condominioId,
-      perfil: PerfilUsuario.SINDICO,
+      perfil: { in: [PerfilUsuario.SINDICO, PerfilUsuario.ADMINISTRADOR] },
     },
     select: { token_acesso: true },
   });
 
   if (!sindico) {
-    throw new Error("Acesso negado. Apenas síndicos realizam esta ação.");
+    throw new Error("Acesso negado. Apenas síndicos e administradores realizam esta ação.");
   }
 
   const tokenLimpoDigitado = tokenDigitado.replace("-", "").trim();

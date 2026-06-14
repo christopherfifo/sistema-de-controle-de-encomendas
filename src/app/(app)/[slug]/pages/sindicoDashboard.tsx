@@ -37,7 +37,7 @@ export function SindicoDashboard({
             Configuração do Condomínio
           </h2>
           <p className="text-muted-foreground">
-            Acompanhe as estatísticas e limites de {condominioData.nome_condominio}. Para adicionar unidades, acesse o menu "Gerenciar Unidades".
+            Acompanhe as estatísticas e limites de {condominioData.nome_condominio}. Para adicionar unidades, acesse o menu &quot;Gerenciar Unidades&quot;.
           </p>
         </div>
       </div>
@@ -91,7 +91,7 @@ export function SindicoDashboard({
           </div>
           {condominioData.unidades.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Nenhuma unidade cadastrada. Vá até o menu "Gerenciar Unidades" para adicionar.
+              Nenhuma unidade cadastrada. Vá até o menu &quot;Gerenciar Unidades&quot; para adicionar.
             </p>
           )}
         </CardContent>

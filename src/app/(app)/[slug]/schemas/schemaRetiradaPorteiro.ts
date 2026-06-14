@@ -61,7 +61,7 @@ export const confirmarChegadaSchema = z.object({
   condicaoPorteiro: z
     .string()
     .min(3, { message: "Digite uma descrição sobre o estado do pacote." }),
-  foto_pacote: z.any().optional(),
+  foto_pacote: z.custom<FileList>().optional(),
 });
 
 export type ConfirmarChegadaFormData = z.infer<typeof confirmarChegadaSchema>;

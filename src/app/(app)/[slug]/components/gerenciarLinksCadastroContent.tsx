@@ -32,10 +32,8 @@ export function GerenciarLinksCadastroContent({
   const [origemLink, setOrigemLink] = useState("");
   const [linkGeradoNaHora, setLinkGeradoNaHora] = useState("");
 
-  // Obtém a URL base definida no arquivo .env
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-  // Garante a sincronização do valor padrão do select assim que as propriedades carregarem
   useEffect(() => {
     if (condominios.length > 0 && !condominioSelecionado) {
       setCondominioSelecionado(condominios[0].codigo_acesso);

@@ -15,7 +15,7 @@ export const registroEncomendaSchema = z.object({
   condicao: z
     .string()
     .min(3, { message: "Descreva o estado físico do pacote." }),
-  foto_pacote: z.any().optional(),
+  foto_pacote: z.string().optional().nullable(),
 });
 
 export type RegistroEncomendaFormData = z.infer<typeof registroEncomendaSchema>;

@@ -196,7 +196,7 @@ export function ModalRegistrarRetirada({
           }}
           className="w-full"
         >
-          <TabsList className="grid grid-cols-2 w-full">
+          <TabsList className="flex flex-col sm:grid sm:grid-cols-2 w-full h-auto gap-2 p-1">
             <TabsTrigger value="TOKEN" className="gap-2">
               <ScanQrCode className="h-4 w-4" /> Token / QR Code
             </TabsTrigger>

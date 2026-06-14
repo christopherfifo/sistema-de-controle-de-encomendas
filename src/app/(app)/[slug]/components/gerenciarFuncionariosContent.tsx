@@ -275,7 +275,7 @@ export function GerenciarFuncionariosContent({
       <Separator />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
+        <TabsList className="flex flex-col sm:grid sm:grid-cols-3 w-full h-auto gap-2 p-1 max-w-md">
           <TabsTrigger value="lista">Equipe Atual</TabsTrigger>
           <TabsTrigger value="formulario">
             {editandoPorteiroId ? "Editando Funcionário" : "Novo Porteiro"}
@@ -346,7 +346,7 @@ export function GerenciarFuncionariosContent({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-xs text-muted-foreground mt-1 break-words">
                         CPF: {maskCPF(p.cpf)} • Email: {p.email} • Tel:{" "}
                         {p.telefone}
                       </p>
@@ -770,18 +770,18 @@ export function GerenciarFuncionariosContent({
               {moradores.map((m) => (
                 <div
                   key={m.id_usuario}
-                  className="flex items-center justify-between p-4 bg-muted/30 border rounded-xl"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/30 border rounded-xl gap-4"
                 >
-                  <div>
-                    <p className="font-bold">{m.nome_completo}</p>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="min-w-0">
+                    <p className="font-bold truncate">{m.nome_completo}</p>
+                    <p className="text-xs text-muted-foreground break-words">
                       CPF: {maskCPF(m.cpf)} • {m.email}
                     </p>
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 border-primary text-primary hover:bg-primary/10"
+                    className="gap-2 border-primary text-primary hover:bg-primary/10 shrink-0 self-start sm:self-auto"
                     onClick={() =>
                       handlePromoverMorador(m.id_usuario, m.nome_completo)
                     }

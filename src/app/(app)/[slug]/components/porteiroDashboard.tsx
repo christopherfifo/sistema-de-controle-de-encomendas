@@ -84,7 +84,7 @@ export function PorteiroDashboard({
       </div>
 
       <Tabs defaultValue="avisos" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:w-[600px]">
+        <TabsList className="flex flex-col sm:grid sm:grid-cols-3 w-full h-auto gap-2 p-1 md:w-[600px]">
           <TabsTrigger value="avisos">
             <ClipboardCheck className="h-4 w-4 mr-2" />
             Avisos ({avisosMoradores.length})

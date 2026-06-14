@@ -14,10 +14,20 @@ interface GerenciarUnidadesContentProps {
   condominioId: string;
 }
 
+interface UnidadeComCount {
+  id_unidade: string;
+  bloco_torre: string;
+  numero_unidade: string;
+  _count: {
+    moradores: number;
+    encomendas: number;
+  };
+}
+
 export function GerenciarUnidadesContent({ condominioId }: GerenciarUnidadesContentProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [unidades, setUnidades] = useState<any[]>([]);
+  const [unidades, setUnidades] = useState<UnidadeComCount[]>([]);
   const [limite, setLimite] = useState(0);
   const [totalAtual, setTotalAtual] = useState(0);
   
@@ -127,7 +137,7 @@ export function GerenciarUnidadesContent({ condominioId }: GerenciarUnidadesCont
 
   // Group units by block
   const blocos = useMemo(() => {
-    const agrupado: Record<string, any[]> = {};
+    const agrupado: Record<string, UnidadeComCount[]> = {};
     unidades.forEach(u => {
       if (!agrupado[u.bloco_torre]) {
         agrupado[u.bloco_torre] = [];
@@ -208,7 +218,7 @@ export function GerenciarUnidadesContent({ condominioId }: GerenciarUnidadesCont
               )}
 
               <Tabs defaultValue="existente" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="flex flex-col sm:grid sm:grid-cols-2 w-full h-auto gap-2 p-1">
                   <TabsTrigger value="existente">Adicionar a Bloco Existente</TabsTrigger>
                   <TabsTrigger value="novo">Criar Novo Bloco</TabsTrigger>
                 </TabsList>
@@ -292,7 +302,7 @@ export function GerenciarUnidadesContent({ condominioId }: GerenciarUnidadesCont
             <div className="space-y-6 mt-2">
               {nomeBlocos.map((nomeBloco) => {
                 const unidadesDoBloco = blocos[nomeBloco];
-                const blocoTemEncomendas = unidadesDoBloco.some((u: any) => u._count.encomendas > 0);
+                const blocoTemEncomendas = unidadesDoBloco.some((u: UnidadeComCount) => u._count.encomendas > 0);
 
                 return (
                   <div key={nomeBloco} className="border rounded-lg p-4 bg-card">
@@ -317,7 +327,7 @@ export function GerenciarUnidadesContent({ condominioId }: GerenciarUnidadesCont
                       </Button>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                      {unidadesDoBloco.map((unidade: any) => {
+                      {unidadesDoBloco.map((unidade: UnidadeComCount) => {
                         const unidadeTemEncomendas = unidade._count.encomendas > 0;
                         return (
                           <div 

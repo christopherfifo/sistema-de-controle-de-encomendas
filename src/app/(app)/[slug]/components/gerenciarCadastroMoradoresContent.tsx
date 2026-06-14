@@ -32,7 +32,7 @@ import {
   alterarUnidadeMorador,
   promoverMoradorATitular,
 } from "../helpers/actionMorador";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface GerenciarCadastroMoradoresContentProps {
   moradores: {
@@ -163,8 +163,8 @@ export function GerenciarCadastroMoradoresContent({
 
       <Separator />
 
-      <Tabs value={tabAtual} onValueChange={(v) => setTabTabAtual(v as any)} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
+      <Tabs value={tabAtual} onValueChange={(v) => setTabTabAtual(v as "ativos" | "inativos")} className="w-full">
+        <TabsList className="flex flex-col sm:grid sm:grid-cols-2 w-full h-auto gap-2 p-1 mb-4">
           <TabsTrigger value="ativos" className="relative">
             Ativos
             <span className="ml-2 bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-bold">
@@ -224,24 +224,24 @@ export function GerenciarCadastroMoradoresContent({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 self-end md:self-center">
+                    <div className="flex flex-wrap items-center gap-2 self-start md:self-center w-full md:w-auto mt-3 md:mt-0">
                       {m.ativo ? (
                         <>
-                          <Button size="sm" variant="outline" className="gap-2 h-8 text-xs font-bold border-primary/20 text-primary hover:bg-primary/5" onClick={(e) => { e.stopPropagation(); abrirModal("alterarUnidade", m.id_usuario, m.nome_completo); }}>
-                            <RefreshCw className="h-3.5 w-3.5" /> Mudar Unidade
+                          <Button size="sm" variant="outline" className="gap-2 h-8 text-xs font-bold border-primary/20 text-primary hover:bg-primary/5 flex-1 md:flex-none" onClick={(e) => { e.stopPropagation(); abrirModal("alterarUnidade", m.id_usuario, m.nome_completo); }}>
+                            <RefreshCw className="h-3.5 w-3.5" shrink-0 /> Mudar Unidade
                           </Button>
-                          <Button size="sm" variant="destructive" className="gap-2 h-8 text-xs font-bold" onClick={(e) => { e.stopPropagation(); abrirModal("bloquear", m.id_usuario, m.nome_completo); }}>
-                            <UserMinus className="h-3.5 w-3.5" /> Desativar
+                          <Button size="sm" variant="destructive" className="gap-2 h-8 text-xs font-bold flex-1 md:flex-none" onClick={(e) => { e.stopPropagation(); abrirModal("bloquear", m.id_usuario, m.nome_completo); }}>
+                            <UserMinus className="h-3.5 w-3.5" shrink-0 /> Desativar
                           </Button>
                         </>
                       ) : (
-                        <Button size="sm" variant="outline" className="gap-2 h-8 text-xs font-bold border-emerald-600 text-emerald-600 hover:bg-emerald-50" onClick={(e) => { e.stopPropagation(); abrirModal("reativar", m.id_usuario, m.nome_completo); }}>
-                          <UserCheck className="h-3.5 w-3.5" /> Reativar
+                        <Button size="sm" variant="outline" className="gap-2 h-8 text-xs font-bold border-emerald-600 text-emerald-600 hover:bg-emerald-50 flex-1 md:flex-none" onClick={(e) => { e.stopPropagation(); abrirModal("reativar", m.id_usuario, m.nome_completo); }}>
+                          <UserCheck className="h-3.5 w-3.5" shrink-0 /> Reativar
                         </Button>
                       )}
                       
                       {!isSimplificado && (
-                        <Button size="icon" variant="ghost" className="h-8 w-8">
+                        <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0">
                           {expandido ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         </Button>
                       )}

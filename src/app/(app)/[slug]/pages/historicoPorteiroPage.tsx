@@ -115,7 +115,7 @@ export function HistoricoPorteiroPageContent({
                   if (val !== "SPECIFIC") setSpecificPorteiroId("");
                 }
               }}
-              className="justify-start"
+              className="justify-start flex-wrap"
             >
               <ToggleGroupItem value="ALL" aria-label="Todas as encomendas">
                 Todas as Encomendas

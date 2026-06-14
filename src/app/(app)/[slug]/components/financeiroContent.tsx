@@ -290,7 +290,7 @@ export function FinanceiroContent() {
       </div>
 
       <Tabs defaultValue="faturas" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
+        <TabsList className="flex flex-col sm:grid sm:grid-cols-3 w-full h-auto gap-2 p-1 md:w-[400px]">
           <TabsTrigger value="faturas">Faturas</TabsTrigger>
           <TabsTrigger value="pagamentos">Histórico</TabsTrigger>
           <TabsTrigger value="cartoes">Cartões</TabsTrigger>
@@ -479,31 +479,31 @@ export function FinanceiroContent() {
 
                     return (
                       <div key={card.id} className="flex flex-col p-4 border rounded-lg bg-card gap-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-4 min-w-0 w-full">
                             <div className="h-10 w-14 bg-muted flex items-center justify-center rounded text-xs font-bold uppercase shrink-0">
                               {card.brand}
                             </div>
-                            <div>
-                              <p className="font-medium tracking-widest">{displayNum}</p>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium tracking-widest truncate">{displayNum}</p>
                               {isRevealed && (
-                                <p className="text-sm text-muted-foreground mt-1">
+                                <p className="text-sm text-muted-foreground mt-1 truncate">
                                   Nome: {card.name} | Exp: {card.expiry} | CVV: {card.cvv}
                                 </p>
                               )}
                             </div>
                           </div>
                         </div>
-                        <div className="flex justify-end gap-2 mt-2">
-                          <Button variant="outline" size="sm" onClick={() => toggleReveal(card.id)}>
-                            {isRevealed ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
+                        <div className="flex flex-wrap justify-end gap-2 mt-2">
+                          <Button variant="outline" size="sm" onClick={() => toggleReveal(card.id)} className="flex-1 sm:flex-none">
+                            {isRevealed ? <EyeOff className="h-4 w-4 mr-1 shrink-0" /> : <Eye className="h-4 w-4 mr-1 shrink-0" />}
                             {isRevealed ? "Ocultar" : "Ver Dados"}
                           </Button>
-                          <Button variant="outline" size="sm" onClick={() => startEditing(card)}>
-                            <Edit className="h-4 w-4 mr-1" /> Editar
+                          <Button variant="outline" size="sm" onClick={() => startEditing(card)} className="flex-1 sm:flex-none">
+                            <Edit className="h-4 w-4 mr-1 shrink-0" /> Editar
                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleRemoveCard(card.id)} className="text-destructive shrink-0">
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4 shrink-0" />
                           </Button>
                         </div>
                       </div>

@@ -74,7 +74,7 @@ export function HistoricoPageSassContent({
               onValueChange={(val: "list" | "grouped") => {
                 if (val) setViewMode(val);
               }}
-              className="justify-start"
+              className="justify-start flex-wrap"
             >
               <ToggleGroupItem value="list" aria-label="Lista Cronológica">
                 <LayoutList className="h-4 w-4 mr-2" />

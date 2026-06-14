@@ -84,7 +84,7 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
+        <TabsList className="flex flex-col sm:grid sm:grid-cols-4 w-full h-auto gap-2 p-1">
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="packages">Encomendas ({stats.totalEncomendasPendentes})</TabsTrigger>
           <TabsTrigger value="units">Unidades ({stats.unidadesOcupadas}/{stats.totalUnidades})</TabsTrigger>
@@ -159,58 +159,55 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
               {encomendasPendentes.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Nenhuma encomenda pendente no momento.</p>
               ) : (
-                <div className="relative w-full overflow-auto">
-                  <table className="w-full caption-bottom text-sm">
-                    <thead className="[&_tr]:border-b">
-                      <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">ID / Unidade</th>
-                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Detalhes</th>
-                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Destinatário</th>
-                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Recebimento</th>
-                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="[&_tr:last-child]:border-0">
-                      {encomendasPendentes.map((_enc) => {
-                        const enc = _enc as unknown as EncomendaAdmin;
-                        return (
-                        <tr key={enc.id_encomenda} className="border-b transition-colors hover:bg-muted/50">
-                          <td className="p-2 align-middle font-medium">
-                            <div className="text-xs text-muted-foreground mb-1" title={enc.id_encomenda}>
-                              {enc.id_encomenda.split('-')[0]}...
-                            </div>
-                            {enc.unidade?.bloco_torre} - {enc.unidade?.numero_unidade}
-                          </td>
-                          <td className="p-2 align-middle text-xs">
-                            <div className="font-semibold uppercase">{enc.tipo_encomenda} ({enc.tamanho})</div>
-                            {enc.forma_entrega && <div>Entrega: {enc.forma_entrega}</div>}
-                            {enc.codigo_rastreio && <div>Rastreio: {enc.codigo_rastreio}</div>}
-                          </td>
-                          <td className="p-2 align-middle text-xs">
-                            {enc.usuario_cadastro ? (
-                              <>
-                                <div className="font-semibold">{enc.usuario_cadastro.nome_completo}</div>
-                                <div className="text-muted-foreground">{enc.usuario_cadastro.telefone}</div>
-                              </>
-                            ) : (
-                              <span className="text-muted-foreground italic">Não especificado</span>
-                            )}
-                          </td>
-                          <td className="p-2 align-middle text-xs">
-                            <div>{enc.data_recebimento ? new Date(enc.data_recebimento).toLocaleString() : ""}</div>
-                            {enc.porteiro_recebimento && (
-                              <div className="text-muted-foreground mt-1">Por: {enc.porteiro_recebimento.nome_completo}</div>
-                            )}
-                          </td>
-                          <td className="p-2 align-middle">
+                <div className="flex flex-col gap-4">
+                  {encomendasPendentes.map((_enc) => {
+                    const enc = _enc as unknown as EncomendaAdmin;
+                    return (
+                      <div key={enc.id_encomenda} className="flex flex-col sm:flex-row p-4 border rounded-xl bg-card gap-4 sm:items-center justify-between">
+                        <div className="flex flex-col gap-2 min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-200">
                               Pendente
                             </Badge>
-                          </td>
-                        </tr>
-                      )})}
-                    </tbody>
-                  </table>
+                            <span className="font-bold text-sm uppercase truncate">{enc.tipo_encomenda} ({enc.tamanho})</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                            <div className="min-w-0">
+                              <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-1">Local / Destino</p>
+                              <p className="font-semibold break-words">
+                                {enc.unidade?.bloco_torre} - Apt {enc.unidade?.numero_unidade}
+                              </p>
+                              {enc.usuario_cadastro ? (
+                                <p className="text-muted-foreground break-words">{enc.usuario_cadastro.nome_completo} • {enc.usuario_cadastro.telefone}</p>
+                              ) : (
+                                <p className="text-muted-foreground italic">Não especificado</p>
+                              )}
+                            </div>
+                            
+                            <div className="min-w-0">
+                              <p className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-1">Detalhes do Pacote</p>
+                              <p className="break-all"><span className="font-medium">Rastreio:</span> {enc.codigo_rastreio || "N/A"}</p>
+                              <p className="truncate"><span className="font-medium">Entrega:</span> {enc.forma_entrega || "N/A"}</p>
+                              <p className="text-xs text-muted-foreground mt-1" title={enc.id_encomenda}>
+                                ID: #{enc.id_encomenda.split('-')[0]}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-muted/30 p-3 rounded-lg sm:w-48 shrink-0 flex flex-col justify-center">
+                          <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-1">Recepção</p>
+                          <p className="text-sm font-medium">{enc.data_recebimento ? new Date(enc.data_recebimento).toLocaleString() : "N/A"}</p>
+                          {enc.porteiro_recebimento && (
+                            <p className="text-xs text-muted-foreground mt-1 truncate">
+                              Por: {enc.porteiro_recebimento.nome_completo}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
@@ -228,30 +225,30 @@ export function AdminDashboard({ stats, encomendasPendentes, funcionarios, unida
                 {unidades.map((_u) => {
                   const u = _u as unknown as UnidadeAdmin;
                   return (
-                  <div key={u.id_unidade} className="flex flex-col p-4 border rounded-lg bg-card shadow-sm">
-                    <div className="flex items-center justify-between mb-3 border-b pb-2">
-                      <div className="font-bold text-lg">{u.bloco_torre} - {u.numero_unidade}</div>
+                  <div key={u.id_unidade} className="flex flex-col p-4 border rounded-lg bg-card shadow-sm min-w-0">
+                    <div className="flex items-center justify-between mb-3 border-b pb-2 gap-2">
+                      <div className="font-bold text-lg truncate">{u.bloco_torre} - {u.numero_unidade}</div>
                       {u.moradores && u.moradores.length > 0 ? (
-                        <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/10">Ocupada</Badge>
+                        <Badge className="bg-green-500/10 text-green-600 hover:bg-green-500/10 shrink-0">Ocupada</Badge>
                       ) : (
-                        <Badge variant="outline" className="text-muted-foreground">Vaga</Badge>
+                        <Badge variant="outline" className="text-muted-foreground shrink-0">Vaga</Badge>
                       )}
                     </div>
                     
                     <div className="space-y-2 flex-1">
                       {u.moradores && u.moradores.length > 0 ? (
                         u.moradores.map((m, idx) => (
-                          <div key={idx} className="flex justify-between items-start text-sm p-2 rounded-md bg-muted/30">
-                            <div>
-                              <div className="font-medium flex items-center gap-2">
-                                {m.usuario?.nome_completo}
-                                {m.principal && <Badge variant="secondary" className="text-[10px] h-4 px-1 py-0">Responsável</Badge>}
+                          <div key={idx} className="flex flex-col sm:flex-row justify-between items-start text-sm p-2 rounded-md bg-muted/30 gap-2 overflow-hidden">
+                            <div className="min-w-0 flex-1">
+                              <div className="font-medium flex flex-wrap items-center gap-2">
+                                <span className="truncate break-words">{m.usuario?.nome_completo}</span>
+                                {m.principal && <Badge variant="secondary" className="text-[10px] h-4 px-1 py-0 shrink-0">Responsável</Badge>}
                               </div>
-                              <div className="text-xs text-muted-foreground mt-0.5">
+                              <div className="text-xs text-muted-foreground mt-0.5 break-all">
                                 {m.usuario?.telefone} • {m.usuario?.email}
                               </div>
                             </div>
-                            <div className="text-xs text-muted-foreground font-mono">
+                            <div className="text-xs text-muted-foreground font-mono shrink-0 truncate">
                               {m.usuario?.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4")}
                             </div>
                           </div>

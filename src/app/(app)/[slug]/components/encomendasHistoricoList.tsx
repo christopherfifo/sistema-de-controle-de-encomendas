@@ -115,25 +115,25 @@ export function EncomendasHistoricoList({
               <Package className="h-4 w-4" /> Detalhes do Pacote
             </div>
             <div className="space-y-1.5 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Rastreio:</span>
-                <span className="font-medium text-right">{encomenda.codigo_rastreio || "N/A"}</span>
+              <div className="flex justify-between gap-2">
+                <span className="text-muted-foreground shrink-0">Rastreio:</span>
+                <span className="font-medium text-right break-words min-w-0">{encomenda.codigo_rastreio || "N/A"}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Entrega Via:</span>
-                <span className="font-medium text-right">{encomenda.forma_entrega}</span>
+              <div className="flex justify-between gap-2">
+                <span className="text-muted-foreground shrink-0">Entrega Via:</span>
+                <span className="font-medium text-right truncate min-w-0">{encomenda.forma_entrega}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Condição:</span>
-                <span className="font-medium text-right">{encomenda.condicao || "N/A"}</span>
+              <div className="flex justify-between gap-2">
+                <span className="text-muted-foreground shrink-0">Condição:</span>
+                <span className="font-medium text-right truncate min-w-0">{encomenda.condicao || "N/A"}</span>
               </div>
               <div className="flex justify-between mt-2 pt-2 border-t border-border/50">
                 <span className="text-muted-foreground">Recepção:</span>
                 <span className="font-medium text-right">{formatarData(encomenda.data_recebimento)}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Por (Portaria):</span>
-                <span className="font-medium text-right">{encomenda.porteiro_recebimento?.nome_completo || "Desconhecido"}</span>
+              <div className="flex justify-between gap-2">
+                <span className="text-muted-foreground shrink-0">Por (Portaria):</span>
+                <span className="font-medium text-right break-words min-w-0">{encomenda.porteiro_recebimento?.nome_completo || "Desconhecido"}</span>
               </div>
             </div>
           </div>
@@ -145,13 +145,13 @@ export function EncomendasHistoricoList({
             <div className="space-y-1.5 text-sm">
               {encomenda.usuario_cadastro ? (
                 <>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Cadastrado por:</span>
-                    <span className="font-medium text-right">{encomenda.usuario_cadastro.nome_completo}</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted-foreground shrink-0">Cadastrado por:</span>
+                    <span className="font-medium text-right break-words min-w-0">{encomenda.usuario_cadastro.nome_completo}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Telefone:</span>
-                    <span className="font-medium text-right">{encomenda.usuario_cadastro.telefone}</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted-foreground shrink-0">Telefone:</span>
+                    <span className="font-medium text-right break-all min-w-0">{encomenda.usuario_cadastro.telefone}</span>
                   </div>
                   <div className="mt-2 text-xs text-blue-600 bg-blue-500/10 px-2 py-1 rounded w-fit">Pré-cadastro via App</div>
                 </>
@@ -171,17 +171,17 @@ export function EncomendasHistoricoList({
             <div className="space-y-1.5 text-sm">
               {encomenda.status === "ENTREGUE" && encomenda.retirada ? (
                 <>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Retirado por:</span>
-                    <span className="font-medium text-right">{encomenda.retirada.usuario_retirada.nome_completo}</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted-foreground shrink-0">Retirado por:</span>
+                    <span className="font-medium text-right break-words min-w-0">{encomenda.retirada.usuario_retirada.nome_completo}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Em:</span>
-                    <span className="font-medium text-right">{formatarData(encomenda.retirada.data_retirada)}</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted-foreground shrink-0">Em:</span>
+                    <span className="font-medium text-right min-w-0">{formatarData(encomenda.retirada.data_retirada)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Validação:</span>
-                    <span className="font-medium text-right">{encomenda.retirada.forma_confirmacao}</span>
+                  <div className="flex justify-between gap-2">
+                    <span className="text-muted-foreground shrink-0">Validação:</span>
+                    <span className="font-medium text-right min-w-0">{encomenda.retirada.forma_confirmacao}</span>
                   </div>
                 </>
               ) : encomenda.status === "CANCELADA" ? (

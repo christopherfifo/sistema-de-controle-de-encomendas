@@ -146,9 +146,9 @@ describe("Fluxo do Morador", () => {
           user="user-123"
           perfil="MORADOR"
           informationsOfUserAndCondominio={
-            mockInfoCondominio as unknown as unknown
+            mockInfoCondominio as unknown as Awaited<ReturnType<typeof import("@/data/get-data-by-slug").validateAndGetCondominioData>>
           }
-          encomendasPendentes={mockEncomendasPendentes as unknown as unknown}
+          encomendasPendentes={mockEncomendasPendentes as unknown as (import("@prisma/client").Encomenda & { unidade: { bloco_torre: string; numero_unidade: string } })[]}
           userId="user-123"
         />,
       );

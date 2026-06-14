@@ -12,7 +12,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-import { registroEncomendaSchema } from "../schemas/schemaRegistroPorteiro";
+import { registroEncomendaSchema, RegistroEncomendaFormData } from "../schemas/schemaRegistroPorteiro";
 import {
   registrarEncomendaPorteiro,
   buscarMoradoresPorNome,
@@ -156,8 +156,7 @@ useEffect(() => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: RegistroEncomendaFormData) => {
     startTransition(async () => {
       try {
         const res = await registrarEncomendaPorteiro(

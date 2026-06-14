@@ -12,6 +12,7 @@ import {
 } from "../schemas/schemaCadastroEncomendas";
 
 import { retiradaEncomendaSchema } from "../schemas/schemaRetiradaPorteiro";
+import { RegistroEncomendaFormData } from "../schemas/schemaRegistroPorteiro";
 
 export async function cancelarEncomendaMorador(
   encomendaId: string,
@@ -102,22 +103,10 @@ export async function cadastrarEncomendaMorador(
   });
 }
 
-interface EncomendaData {
-  id_usuario_morador?: string;
-  bloco_manual?: string;
-  apartamento_manual?: string;
-  tipo_encomenda: string;
-  forma_entrega: string;
-  codigo_rastreio?: string;
-  condicao?: string;
-  foto_pacote?: string;
-  nome_manual_retirante?: string;
-}
-
 export async function registrarEncomendaPorteiro(
   porteiroId: string,
   condominioId: string,
-  data: EncomendaData,
+  data: RegistroEncomendaFormData,
 ) {
   if (!porteiroId || !condominioId) {
     throw new Error("Usuário ou condomínio não identificado.");
@@ -433,7 +422,7 @@ async function enviarNotificacaoTelegram(
   tipo: string,
   origem: string,
   observacaoPorteiro: string,
-  fotoPacote?: string | Blob,
+  fotoPacote?: string | Blob | null,
   idUsuarioAlvo?: string,
 ) {
   try {

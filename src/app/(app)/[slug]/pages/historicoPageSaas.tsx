@@ -13,11 +13,13 @@ import { History, LayoutList, Layers } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Label } from "@/components/ui/label";
 
-import { Encomenda, Unidade, Usuario, Retirada } from "@prisma/client";
+import { Encomenda, Unidade, Usuario, Retirada, PerfilUsuario } from "@prisma/client";
 import { EncomendasHistoricoList } from "../components/encomendasHistoricoList";
 
 type EncomendaComDetalhes = Encomenda & {
-  unidade: Pick<Unidade, "id_unidade" | "bloco_torre" | "numero_unidade">;
+  unidade: Pick<Unidade, "id_unidade" | "bloco_torre" | "numero_unidade"> & {
+    moradores: { usuario: Pick<Usuario, "nome_completo"> }[];
+  };
   usuario_cadastro: Pick<Usuario, "id_usuario" | "nome_completo" | "telefone"> | null;
   retirada:
     | (Retirada & {
@@ -30,11 +32,13 @@ type EncomendaComDetalhes = Encomenda & {
 interface HistoricoPageSassProps {
   encomendasDoHistorico: EncomendaComDetalhes[];
   condominioName: string;
+  perfil?: PerfilUsuario;
 }
 
 export function HistoricoPageSassContent({
   encomendasDoHistorico,
   condominioName,
+  perfil,
 }: HistoricoPageSassProps) {
   const [viewMode, setViewMode] = useState<"list" | "grouped">("list");
 
@@ -53,41 +57,43 @@ export function HistoricoPageSassContent({
 
       <Separator />
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5" />
-            Opções de Visualização
-          </CardTitle>
-          <CardDescription>
-            Alterne entre a visão geral ou agrupe as encomendas por bloco/unidade familiar.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2 font-medium">
-              Modo de Exibição
-            </Label>
-            <ToggleGroup
-              type="single"
-              value={viewMode}
-              onValueChange={(val: "list" | "grouped") => {
-                if (val) setViewMode(val);
-              }}
-              className="justify-start flex-wrap"
-            >
-              <ToggleGroupItem value="list" aria-label="Lista Cronológica">
-                <LayoutList className="h-4 w-4 mr-2" />
-                Lista Cronológica
-              </ToggleGroupItem>
-              <ToggleGroupItem value="grouped" aria-label="Agrupado por Unidade">
-                <Layers className="h-4 w-4 mr-2" />
-                Por Bloco Familiar
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-        </CardContent>
-      </Card>
+      {perfil !== PerfilUsuario.MORADOR && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Opções de Visualização
+            </CardTitle>
+            <CardDescription>
+              Alterne entre a visão geral ou agrupe as encomendas por bloco/unidade familiar.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 font-medium">
+                Modo de Exibição
+              </Label>
+              <ToggleGroup
+                type="single"
+                value={viewMode}
+                onValueChange={(val: "list" | "grouped") => {
+                  if (val) setViewMode(val);
+                }}
+                className="justify-start flex-wrap"
+              >
+                <ToggleGroupItem value="list" aria-label="Lista Cronológica">
+                  <LayoutList className="h-4 w-4 mr-2" />
+                  Lista Cronológica
+                </ToggleGroupItem>
+                <ToggleGroupItem value="grouped" aria-label="Agrupado por Unidade">
+                  <Layers className="h-4 w-4 mr-2" />
+                  Por Bloco Familiar
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

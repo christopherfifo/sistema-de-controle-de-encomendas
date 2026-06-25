@@ -1,0 +1,27 @@
+Relatório de Refatoração - Integração com Novo Schema de Pagamentos
+
+1. src/app/cadastro/components/cadastroSaaSForm.tsx (Formulário de cadastro/pagamento)
+   - O formulário continuará coletando os dados completos do cartão (número, validade, CVV) para enviar ao backend, preservando a UX atual.
+   - Ajuste na chamada do `validarEProcessarPagamento`: Os dados de entrada (`validatePayload`) precisarão ser separados e formatados adequadamente (ex: separar `validadeCartao` em `mes_expiracao` e `ano_expiracao`, e adicionar `tipo: "CREDITO"`) para preparar o envio à API.
+
+2. src/app/cadastro/helpers/actionCadastro.ts (Serviços de API e Banco de Dados)
+   - Em `validarEProcessarPagamento`:
+     - O payload de validação (`/api/cartoes/validar`) usará o modelo `CartaoMock` (numero, nome_titular, validade, cvv).
+     - O payload de pagamento (`/api/pagamentos/processar`) será atualizado para o modelo `RequestPagamento` que engloba `valor_cobranca` e o `CartaoRequest` (numero_cartao, titular, mes_expiracao, ano_expiracao, cvv, bandeira, tipo).
+     - Retornará `dados_cartao_para_salvar` e `dados_fatura_para_salvar` vindos da resposta da API.
+   - Em `registerCondominioAndAdmin`:
+     - Receberá os dados do cartão e da fatura do processamento.
+     - Incluirá na transação do Prisma a criação dos registros de `Cartao` (usando `gateway_token`, `ultimos_digitos`, `bandeira`, etc) e `Fatura` vinculados ao novo Condomínio.
+
+3. src/app/(app)/[slug]/components/financeiroContent.tsx (Gerenciamento de Cartões e Faturas)
+   - Tipagens: Atualizar a interface `CreditCardData` para espelhar o banco de dados seguro (`ultimos_digitos`, `gateway_token`, `mes_expiracao`, `ano_expiracao`, `tipo`), removendo `fullNumber` e `cvv`.
+   - UI de Cartões Salvos:
+     - Substituir a renderização de `card.fullNumber.slice(-4)` por `card.ultimos_digitos`.
+     - Ocultar/remover o botão "Ver Dados", visto que o número completo e o CVV não estarão mais disponíveis por razões de segurança.
+   - UI de Adicionar Cartão: Continuará coletando todos os dados, mas ao "salvar" (simulando a API), armazenará apenas o formato seguro na listagem.
+   - Tipagem `Invoice`: Ajustar para refletir os campos da `Fatura` onde aplicável.
+
+4. src/app/cadastro/helpers/schemaCadastro.ts
+   - Tipagens e validação: Não sofrerá mudanças estruturais significativas, pois o formulário ainda precisa capturar as informações brutas na UI de forma íntegra.
+
+Nenhum outro arquivo crítico do fluxo de checkout ou gerenciamento de cartão será impactado visualmente.

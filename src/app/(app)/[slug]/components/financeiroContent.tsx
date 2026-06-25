@@ -12,11 +12,13 @@ import jsPDF from "jspdf";
 
 interface CreditCardData {
   id: string;
-  fullNumber: string;
-  brand: string;
-  expiry: string;
-  name: string;
-  cvv: string;
+  ultimos_digitos: string;
+  bandeira: string;
+  mes_expiracao: number;
+  ano_expiracao: number;
+  titular: string;
+  tipo: string;
+  gateway_token: string;
 }
 
 type InvoiceStatus = "PENDENTE" | "ATRASADA" | "PAGO";
@@ -35,11 +37,13 @@ export function FinanceiroContent() {
   const [cards, setCards] = useState<CreditCardData[]>([
     { 
       id: "1", 
-      fullNumber: "4111 1111 1111 1234", 
-      brand: "Visa", 
-      expiry: "12/28", 
-      name: "JOÃO SILVA",
-      cvv: "123"
+      ultimos_digitos: "1234", 
+      bandeira: "Visa", 
+      mes_expiracao: 12,
+      ano_expiracao: 28,
+      titular: "JOÃO SILVA",
+      tipo: "CREDITO",
+      gateway_token: "tok_mock_12345"
     }
   ]);
 
@@ -55,8 +59,7 @@ export function FinanceiroContent() {
   const [newCardExpiry, setNewCardExpiry] = useState("");
   const [newCardCvv, setNewCardCvv] = useState("");
   
-  const [revealedCards, setRevealedCards] = useState<Record<string, boolean>>({});
-  const [editingCardId, setEditingCardId] = useState<string | null>(null);
+    const [editingCardId, setEditingCardId] = useState<string | null>(null);
   
   const [isPaying, setIsPaying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -82,41 +85,34 @@ export function FinanceiroContent() {
     e.preventDefault();
     if (!newCardNumber || !newCardName || !newCardExpiry || !newCardCvv) return;
 
-    const brand = getCardBrand(newCardNumber) || "Desconhecido";
+    const brand = getCardBrand(newCardNumber) || "Desconhecida";
+    const ultimos_digitos = newCardNumber.slice(-4);
+    const partesData = newCardExpiry.split('/');
+    const mes_expiracao = parseInt(partesData[0], 10);
+    const ano_expiracao = parseInt(partesData[1], 10) + 2000;
+
+    const newCard = {
+        id: editingCardId || Math.random().toString(36).substring(2, 9),
+        ultimos_digitos,
+        bandeira: brand,
+        mes_expiracao,
+        ano_expiracao,
+        titular: newCardName,
+        tipo: "CREDITO",
+        gateway_token: "tok_mock_" + Math.random().toString(36).substring(2, 9)
+    };
 
     if (editingCardId) {
-      setCards(cards.map(card => card.id === editingCardId ? {
-        ...card,
-        fullNumber: newCardNumber,
-        brand,
-        expiry: newCardExpiry,
-        name: newCardName,
-        cvv: newCardCvv
-      } : card));
+      setCards(cards.map(card => card.id === editingCardId ? newCard : card));
       setEditingCardId(null);
     } else {
-      setCards([...cards, {
-        id: Math.random().toString(36).substring(2, 9),
-        fullNumber: newCardNumber,
-        brand,
-        expiry: newCardExpiry,
-        name: newCardName,
-        cvv: newCardCvv
-      }]);
+      setCards([...cards, newCard]);
     }
 
     setNewCardNumber("");
     setNewCardName("");
     setNewCardExpiry("");
     setNewCardCvv("");
-  };
-
-  const startEditing = (card: CreditCardData) => {
-    setEditingCardId(card.id);
-    setNewCardNumber(card.fullNumber);
-    setNewCardName(card.name);
-    setNewCardExpiry(card.expiry);
-    setNewCardCvv(card.cvv);
   };
 
   const handleRemoveCard = (id: string) => {
@@ -128,13 +124,6 @@ export function FinanceiroContent() {
       setNewCardExpiry("");
       setNewCardCvv("");
     }
-  };
-
-  const toggleReveal = (id: string) => {
-    setRevealedCards(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,7 +157,7 @@ export function FinanceiroContent() {
             ...inv,
             status: "PAGO",
             paymentDate: today,
-            paidWith: `Cartão de Crédito final ${card?.fullNumber.slice(-4) || 'N/A'}`
+            paidWith: `Cartão de Crédito final ${card?.ultimos_digitos || 'N/A'}`
           };
         }
         return inv;
@@ -251,7 +240,7 @@ export function FinanceiroContent() {
                     <option value="" disabled>Selecione um cartão</option>
                     {cards.map(c => (
                       <option key={c.id} value={c.id}>
-                        {c.brand} final {c.fullNumber.slice(-4)}
+                        {c.bandeira} final {c.ultimos_digitos}
                       </option>
                     ))}
                   </select>
@@ -472,36 +461,21 @@ export function FinanceiroContent() {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
                   {cards.map(card => {
-                    const isRevealed = revealedCards[card.id];
-                    const displayNum = isRevealed 
-                      ? card.fullNumber 
-                      : `**** **** **** ${card.fullNumber.slice(-4)}`;
+                    const displayNum = `**** **** **** ${card.ultimos_digitos}`;
 
                     return (
                       <div key={card.id} className="flex flex-col p-4 border rounded-lg bg-card gap-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="flex items-center gap-4 min-w-0 w-full">
                             <div className="h-10 w-14 bg-muted flex items-center justify-center rounded text-xs font-bold uppercase shrink-0">
-                              {card.brand}
+                              {card.bandeira}
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="font-medium tracking-widest truncate">{displayNum}</p>
-                              {isRevealed && (
-                                <p className="text-sm text-muted-foreground mt-1 truncate">
-                                  Nome: {card.name} | Exp: {card.expiry} | CVV: {card.cvv}
-                                </p>
-                              )}
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-wrap justify-end gap-2 mt-2">
-                          <Button variant="outline" size="sm" onClick={() => toggleReveal(card.id)} className="flex-1 sm:flex-none">
-                            {isRevealed ? <EyeOff className="h-4 w-4 mr-1 shrink-0" /> : <Eye className="h-4 w-4 mr-1 shrink-0" />}
-                            {isRevealed ? "Ocultar" : "Ver Dados"}
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => startEditing(card)} className="flex-1 sm:flex-none">
-                            <Edit className="h-4 w-4 mr-1 shrink-0" /> Editar
-                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleRemoveCard(card.id)} className="text-destructive shrink-0">
                             <Trash2 className="h-4 w-4 shrink-0" />
                           </Button>

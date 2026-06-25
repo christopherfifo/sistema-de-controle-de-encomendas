@@ -1,67 +1,16 @@
-"use server";
+import re
 
-import { z } from "zod";
-import { cadastroSchema } from "./schemaCadastro";
-import { db } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+with open("src/app/cadastro/helpers/actionCadastro.ts", "r") as f:
+    content = f.read()
 
-type CadastroResult = {
-  success?: boolean;
-  error?: string;
-  userId?: string;
-  condominioId?: string;
-  perfil?: string;
-};
+# 1. Update registerCondominioAndAdmin signature
+content = content.replace(
+    "export async function registerCondominioAndAdmin(\n  values: z.infer<typeof cadastroSchema>,\n): Promise<CadastroResult> {",
+    "export async function registerCondominioAndAdmin(\n  values: z.infer<typeof cadastroSchema>,\n  dadosCartao?: any,\n  dadosFatura?: any\n): Promise<CadastroResult> {"
+)
 
-export async function registerCondominioAndAdmin(
-  values: z.infer<typeof cadastroSchema>,
-  dadosCartao?: any,
-  dadosFatura?: any
-): Promise<CadastroResult> {
-  const validatedFields = await cadastroSchema.safeParseAsync(values);
-  if (!validatedFields.success) {
-    console.error(
-      "[ZOD_VALIDATION_ERROR]",
-      validatedFields.error.flatten().fieldErrors,
-    );
-    return { error: "Dados inválidos. Verifique os campos e tente novamente." };
-  }
-
-  const {
-    nomeCompleto,
-    email: rawEmail,
-    cpf: rawCpf,
-    senha,
-    telefone,
-    nomeCondominio,
-    cnpj,
-    planoId,
-  } = validatedFields.data;
-
-  const email = rawEmail.trim();
-  const cpf = rawCpf.trim();
-
-  const hashedPassword = await bcrypt.hash(senha, 10);
-  try {
-    const existingUser = await db.usuario.findFirst({
-      where: {
-        OR: [{ email: email }, { cpf: cpf }],
-      },
-    });
-
-    if (existingUser) {
-      return { error: "Email ou CPF já cadastrados." };
-    }
-
-    const existingCondominio = await db.condominio.findUnique({
-      where: { cnpj: cnpj },
-    });
-
-    if (existingCondominio) {
-      return { error: "CNPJ do condomínio já cadastrado." };
-    }
-
-    
+# 2. Add plano fetch before transaction
+new_tx_logic = """
     const planoSelecionado = await db.plano.findUnique({ where: { id_plano: planoId } });
     const valorPlano = planoSelecionado ? planoSelecionado.valor : 0;
 
@@ -119,62 +68,19 @@ export async function registerCondominioAndAdmin(
       }
 
       return { newCondominio, newAdmin };
-    });
+    });"""
 
-    return {
-      success: true,
-      userId: String(result.newAdmin.id_usuario),
-      condominioId: String(result.newCondominio.id_condominio),
-      perfil: String(result.newAdmin.perfil),
-    };
-  } catch (error) {
-    console.error("[REGISTER_ACTION_ERROR]", error);
-    return { error: "Ocorreu um erro no cadastro. Tente novamente." };
-  }
-}
+content = re.sub(r'const result = await db\.\$transaction\(async \(tx\) => \{.*?\n      return \{ newCondominio, newAdmin \};\n    \}\);', new_tx_logic, content, flags=re.DOTALL)
 
-export async function consultarBandeiraCartao(bin: string) {
-  try {
-    const res = await fetch(
-      `https://mock-pagamento-api.vercel.app/api/cartoes/bandeira/${bin}`,
-    );
-    if (res.ok) {
-      return await res.json();
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
-}
 
-export async function validarEProcessarPagamento(
-  validatePayload: Record<string, unknown>,
-  valor: number,
-  descricao: string,
-  bandeira: string,
-) {
-  try {
-    const validateRes = await fetch(
-      "https://mock-pagamento-api.vercel.app/api/cartoes/validar",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(validatePayload),
-      },
-    );
+# 3. Update validarEProcessarPagamento signature
+content = content.replace(
+    "export async function validarEProcessarPagamento(\n  validatePayload: Record<string, unknown>,\n  valor: number,\n  descricao: string,\n) {",
+    "export async function validarEProcessarPagamento(\n  validatePayload: Record<string, unknown>,\n  valor: number,\n  descricao: string,\n  bandeira: string,\n) {"
+)
 
-    if (validateRes.ok) {
-      const validateData = await validateRes.json();
-      if (!validateData.numero_valido || !validateData.data_valida) {
-        return {
-          error: validateData.mensagem_erro || "Dados do cartão inválidos.",
-        };
-      }
-    } else {
-      return { error: "Erro ao validar cartão." };
-    }
-
-    
+# 4. Update payment processing payload
+new_payment_logic = """
     const partesData = String(validatePayload.validade).split('/');
     const mes = parseInt(partesData[0], 10);
     const anoRaw = parseInt(partesData[1], 10);
@@ -215,10 +121,10 @@ export async function validarEProcessarPagamento(
       success: true,
       dadosCartao: paymentData.dados_cartao_para_salvar,
       dadosFatura: paymentData.dados_fatura_para_salvar
-    };
-  } catch (error) {
-    return {
-      error: "Ocorreu um erro de conexão ao processar. Tente novamente.",
-    };
-  }
-}
+    };"""
+
+content = re.sub(r'const paymentPayload = \{.*?\n    return \{ success: true \};', new_payment_logic, content, flags=re.DOTALL)
+
+with open("src/app/cadastro/helpers/actionCadastro.ts", "w") as f:
+    f.write(content)
+

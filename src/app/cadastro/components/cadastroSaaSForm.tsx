@@ -180,6 +180,7 @@ export function CadastroSaaSForm() {
           validatePayload,
           valorPlano,
           descricaoPlano,
+          bandeira,
         );
 
         if (pagamentoRes.error) {
@@ -188,7 +189,11 @@ export function CadastroSaaSForm() {
         }
 
         // Cadastro após pagamento com sucesso
-        const result = await registerCondominioAndAdmin(values);
+        const result = await registerCondominioAndAdmin(
+          values, 
+          pagamentoRes.dadosCartao, 
+          pagamentoRes.dadosFatura
+        );
 
         if (result.error) {
           setError(result.error);

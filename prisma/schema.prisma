@@ -7,6 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// ==========================================
+// ENUMS
+// ==========================================
+
 enum PerfilUsuario {
   ADMINISTRADOR
   SINDICO
@@ -34,59 +38,115 @@ enum StatusEncomenda {
   CANCELADA
 }
 
+enum TipoCartao {
+  CREDITO
+  DEBITO
+}
+
+// ==========================================
+// MODELOS DE NEGÓCIO (NÚCLEO E FINANCEIRO)
+// ==========================================
+
 model Condominio {
-  id_condominio   String @id @default(uuid())
-  nome_condominio String
-  cnpj            String @unique
-
-  codigo_acesso String? @unique @default(cuid())
-
+  id_condominio     String    @id @default(uuid())
+  nome_condominio   String
+  cnpj              String    @unique
+  codigo_acesso     String?   @unique @default(cuid())
   logradouro        String?
   numero            String?
   bairro            String?
   cidade            String?
-  uf                String? @db.Char(2)
+  uf                String?   @db.Char(2)
   qtd_unidades      Int?
   qtd_blocos_torres Int?
-
-  id_plano String?
-  plano    Plano?  @relation(fields: [id_plano], references: [id_plano])
-
   data_adesao       DateTime? @default(now())
   ativo             Boolean?  @default(true)
   identidade_visual Json?
 
+  // Relações com o Plano
+  id_plano String?
+  plano    Plano?  @relation(fields: [id_plano], references: [id_plano])
+
+  // Outras Relações
   usuarios Usuario[]
   unidades Unidade[]
   faturas  Fatura[]
   recados  Recado[]
+  cartoes  Cartao[]
 }
 
 model Plano {
-  id_plano        String  @id @default(uuid())
-  nome_plano      String  @unique
-  valor           Decimal @db.Decimal(10, 2)
-  limite_unidades Int
-
+  id_plano           String   @id @default(uuid())
+  nome_plano         String   @unique
+  valor              Decimal  @db.Decimal(10, 2)
+  limite_unidades    Int
   limite_condominios Int
-
-  data_inclusao DateTime @default(now())
+  data_inclusao      DateTime @default(now())
 
   condominios Condominio[]
   faturas     Fatura[]
 }
 
+model Cartao {
+  id_cartao       String     @id @default(uuid())
+  id_condominio   String
+  condominio      Condominio @relation(fields: [id_condominio], references: [id_condominio])
+  
+  // Dados seguros usados apenas para exibir ao administrador no Front-end (ex: "Termina em 4321")
+  titular         String
+  ultimos_digitos String     @db.Char(4) 
+  bandeira        String     
+  mes_expiracao   Int
+  ano_expiracao   Int
+  tipo            TipoCartao
+
+  // OBRIGATÓRIO: Identificador seguro gerado pela API de pagamento externa
+  gateway_token   String     @unique 
+
+  data_cadastro   DateTime   @default(now())
+  ativo           Boolean    @default(true)
+
+  faturas         Fatura[]
+}
+
+model Fatura {
+  id_fatura        String          @id @default(uuid())
+  id_condominio    String
+  condominio       Condominio      @relation(fields: [id_condominio], references: [id_condominio])
+  id_plano         String
+  plano            Plano           @relation(fields: [id_plano], references: [id_plano])
+  
+  // Relacionamento com o cartão utilizado (Opcional, pois pode ser pago via Pix/Boleto)
+  id_cartao        String?
+  cartao           Cartao?         @relation(fields: [id_cartao], references: [id_cartao])
+
+  valor_cobrado    Decimal         @db.Decimal(10, 2)
+  data_emissao     DateTime        @default(now())
+  data_vencimento  DateTime
+  data_pagamento   DateTime?
+  status_pagamento StatusPagamento
+  inadimplente     Boolean         @default(false)
+  forma_pagamento  String          
+  link_pagamento   String?
+}
+
+// ==========================================
+// MODELOS DE USUÁRIOS E UNIDADES
+// ==========================================
+
 model Usuario {
-  id_usuario    String        @id @default(uuid())
-  nome_completo String
-  cpf           String        @unique
-  email         String        @unique
-  telefone      String
-  senha_hash    String
-  perfil        PerfilUsuario
-  ativo         Boolean       @default(true)
-  data_criacao  DateTime      @default(now())
-  termo_aceite  Boolean       @default(false)
+  id_usuario       String        @id @default(uuid())
+  nome_completo    String
+  cpf              String        @unique
+  email            String        @unique
+  telefone         String
+  senha_hash       String
+  perfil           PerfilUsuario
+  ativo            Boolean       @default(true)
+  data_criacao     DateTime      @default(now())
+  termo_aceite     Boolean       @default(false)
+  token_acesso     String?       @unique
+  telegram_chat_id String?
 
   id_condominio String
   condominio    Condominio @relation(fields: [id_condominio], references: [id_condominio])
@@ -97,18 +157,13 @@ model Usuario {
   encomendas_recebidas   Encomenda[]         @relation("PorteiroRecebeu")
   retiradas_feitas       Retirada[]
   notificacoes_recebidas Notificacao[]
-
-  encomendas_cadastradas Encomenda[] @relation("MoradorCadastrou")
-  token_acesso           String?     @unique
-  telegram_chat_id       String?
+  encomendas_cadastradas Encomenda[]         @relation("MoradorCadastrou")
 }
 
 model Unidade {
-  id_unidade String @id @default(uuid())
-
-  id_condominio String
-  condominio    Condominio @relation(fields: [id_condominio], references: [id_condominio])
-
+  id_unidade     String @id @default(uuid())
+  id_condominio  String
+  condominio     Condominio @relation(fields: [id_condominio], references: [id_condominio])
   bloco_torre    String
   numero_unidade String
 
@@ -130,103 +185,76 @@ model MoradoresUnidades {
   @@unique([id_usuario, id_unidade])
 }
 
+// ==========================================
+// MODELOS DE OPERAÇÃO DIÁRIA (PORTARIA E COMUNICAÇÃO)
+// ==========================================
+
 model Encomenda {
-  id_encomenda String @id @default(uuid())
-
-  id_unidade String
-  unidade    Unidade @relation(fields: [id_unidade], references: [id_unidade])
-
-  id_usuario_cadastro String?
-  usuario_cadastro    Usuario? @relation("MoradorCadastrou", fields: [id_usuario_cadastro], references: [id_usuario])
-
+  id_encomenda            String          @id @default(uuid())
+  id_unidade              String
+  unidade                 Unidade         @relation(fields: [id_unidade], references: [id_unidade])
+  id_usuario_cadastro     String?
+  usuario_cadastro        Usuario?        @relation("MoradorCadastrou", fields: [id_usuario_cadastro], references: [id_usuario])
   id_porteiro_recebimento String?
-  porteiro_recebimento    Usuario? @relation("PorteiroRecebeu", fields: [id_porteiro_recebimento], references: [id_usuario])
-
-  tipo_encomenda   String
-  tamanho          String
-  forma_entrega    String
-  codigo_rastreio  String?
-  condicao         String?
-  data_recebimento DateTime?
-  status           StatusEncomenda @default(PENDENTE)
+  porteiro_recebimento    Usuario?        @relation("PorteiroRecebeu", fields: [id_porteiro_recebimento], references: [id_usuario])
+  tipo_encomenda          String
+  tamanho                 String
+  forma_entrega           String
+  codigo_rastreio         String?
+  condicao                String?
+  data_recebimento        DateTime?
+  status                  StatusEncomenda @default(PENDENTE)
 
   retirada     Retirada?
   notificacoes Notificacao[]
 }
 
 model Retirada {
-  id_retirada String @id @default(uuid())
-
-  id_encomenda String    @unique
-  encomenda    Encomenda @relation(fields: [id_encomenda], references: [id_encomenda])
-
+  id_retirada         String    @id @default(uuid())
+  id_encomenda        String    @unique
+  encomenda           Encomenda @relation(fields: [id_encomenda], references: [id_encomenda])
   id_usuario_retirada String
-  usuario_retirada    Usuario @relation(fields: [id_usuario_retirada], references: [id_usuario])
-
-  data_retirada     DateTime @default(now())
-  forma_confirmacao String
-  comprovante       String?
-}
-
-model Fatura {
-  id_fatura String @id @default(uuid())
-
-  id_condominio String
-  condominio    Condominio @relation(fields: [id_condominio], references: [id_condominio])
-  id_plano      String
-  plano         Plano      @relation(fields: [id_plano], references: [id_plano])
-
-  valor_cobrado    Decimal         @db.Decimal(10, 2)
-  data_emissao     DateTime        @default(now())
-  data_vencimento  DateTime
-  data_pagamento   DateTime?
-  status_pagamento StatusPagamento
-  inadimplente     Boolean         @default(false)
-  forma_pagamento  String
-  link_pagamento   String?
+  usuario_retirada    Usuario   @relation(fields: [id_usuario_retirada], references: [id_usuario])
+  data_retirada       DateTime  @default(now())
+  forma_confirmacao   String
+  comprovante         String?
 }
 
 model Recado {
-  id_recado String @id @default(uuid())
-
+  id_recado         String     @id @default(uuid())
   id_condominio     String
   condominio        Condominio @relation(fields: [id_condominio], references: [id_condominio])
   id_usuario_origem String
   usuario_origem    Usuario    @relation(fields: [id_usuario_origem], references: [id_usuario])
-
-  tipo_recado   TipoRecado
-  assunto       String
-  conteudo      String     @db.Text
-  status_recado String     @default("ABERTO")
-  data_criacao  DateTime   @default(now())
+  tipo_recado       TipoRecado
+  assunto           String
+  conteudo          String     @db.Text
+  status_recado     String     @default("ABERTO")
+  data_criacao      DateTime   @default(now())
 
   respostas RespostaRecado[]
 }
 
 model RespostaRecado {
-  id_resposta String @id @default(uuid())
-
+  id_resposta         String   @id @default(uuid())
   id_recado           String
-  recado              Recado  @relation(fields: [id_recado], references: [id_recado])
+  recado              Recado   @relation(fields: [id_recado], references: [id_recado])
   id_usuario_resposta String
-  usuario_resposta    Usuario @relation(fields: [id_usuario_resposta], references: [id_usuario])
-
-  data_resposta     DateTime @default(now())
-  conteudo_resposta String   @db.Text
+  usuario_resposta    Usuario  @relation(fields: [id_usuario_resposta], references: [id_usuario])
+  data_resposta       DateTime @default(now())
+  conteudo_resposta   String   @db.Text
 }
 
 model Notificacao {
-  id_notificacao String @id @default(uuid())
-
+  id_notificacao          String    @id @default(uuid())
   id_encomenda            String
   encomenda               Encomenda @relation(fields: [id_encomenda], references: [id_encomenda])
   id_usuario_destinatario String
   usuario_destinatario    Usuario   @relation(fields: [id_usuario_destinatario], references: [id_usuario])
-
-  tipo_envio   String
-  mensagem     String   @db.Text
-  data_envio   DateTime @default(now())
-  status_envio String
+  tipo_envio              String
+  mensagem                String    @db.Text
+  data_envio              DateTime  @default(now())
+  status_envio            String
 }
 
 model PasswordResetToken {
@@ -237,3 +265,4 @@ model PasswordResetToken {
 
   @@unique([email, token])
 }
+

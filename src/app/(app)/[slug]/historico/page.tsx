@@ -50,6 +50,15 @@ export default async function HistoricoPage({
           id_unidade: true,
           bloco_torre: true,
           numero_unidade: true,
+          moradores: {
+            select: {
+              usuario: {
+                select: {
+                  nome_completo: true,
+                },
+              },
+            },
+          },
         },
       },
       usuario_cadastro: {
@@ -117,6 +126,7 @@ export default async function HistoricoPage({
           <HistoricoPageSassContent
             encomendasDoHistorico={encomendasDoHistorico}
             condominioName={condominioName}
+            perfil={perfil}
           />
         </div>
       </main>

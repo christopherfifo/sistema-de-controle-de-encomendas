@@ -19,7 +19,9 @@ interface SlugPageProps {
 }
 
 type EncomendaComDetalhes = Encomenda & {
-  unidade: Pick<Unidade, "id_unidade" | "bloco_torre" | "numero_unidade">;
+  unidade: Pick<Unidade, "id_unidade" | "bloco_torre" | "numero_unidade"> & {
+    moradores: { usuario: Pick<Usuario, "nome_completo"> }[];
+  };
   usuario_cadastro: Pick<Usuario, "id_usuario" | "nome_completo" | "telefone"> | null;
   retirada:
     | (Retirada & {
@@ -47,6 +49,15 @@ async function getHistoricoPorteiro(
           id_unidade: true,
           bloco_torre: true,
           numero_unidade: true,
+          moradores: {
+            select: {
+              usuario: {
+                select: {
+                  nome_completo: true,
+                },
+              },
+            },
+          },
         },
       },
       usuario_cadastro: {

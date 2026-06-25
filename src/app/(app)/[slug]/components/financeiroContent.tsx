@@ -6,17 +6,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, Wallet, CreditCard, Trash2, Plus, Eye, EyeOff, Edit, CheckCircle2 } from "lucide-react";
+import { FileText, Wallet, CreditCard, Trash2, Plus, Eye, EyeOff, Edit, CheckCircle2, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import jsPDF from "jspdf";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { validarCartaoServidor } from "@/app/cadastro/helpers/actionCadastro";
 
 interface CreditCardData {
   id: string;
-  fullNumber: string;
-  brand: string;
-  expiry: string;
-  name: string;
-  cvv: string;
+  ultimos_digitos: string;
+  bandeira: string;
+  mes_expiracao: number;
+  ano_expiracao: number;
+  titular: string;
+  tipo: string;
+  gateway_token: string;
 }
 
 type InvoiceStatus = "PENDENTE" | "ATRASADA" | "PAGO";
@@ -35,11 +45,13 @@ export function FinanceiroContent() {
   const [cards, setCards] = useState<CreditCardData[]>([
     { 
       id: "1", 
-      fullNumber: "4111 1111 1111 1234", 
-      brand: "Visa", 
-      expiry: "12/28", 
-      name: "JOÃO SILVA",
-      cvv: "123"
+      ultimos_digitos: "1234", 
+      bandeira: "Visa", 
+      mes_expiracao: 12,
+      ano_expiracao: 28,
+      titular: "JOÃO SILVA",
+      tipo: "CREDITO",
+      gateway_token: "tok_mock_12345"
     }
   ]);
 
@@ -54,9 +66,11 @@ export function FinanceiroContent() {
   const [newCardName, setNewCardName] = useState("");
   const [newCardExpiry, setNewCardExpiry] = useState("");
   const [newCardCvv, setNewCardCvv] = useState("");
+  const [newCardType, setNewCardType] = useState("CREDITO");
+  const [addCardError, setAddCardError] = useState("");
+  const [isAddingCard, setIsAddingCard] = useState(false);
   
-  const [revealedCards, setRevealedCards] = useState<Record<string, boolean>>({});
-  const [editingCardId, setEditingCardId] = useState<string | null>(null);
+    const [editingCardId, setEditingCardId] = useState<string | null>(null);
   
   const [isPaying, setIsPaying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -78,45 +92,70 @@ export function FinanceiroContent() {
     return "";
   };
 
-  const handleAddOrEditCard = (e: React.FormEvent) => {
+  const handleAddOrEditCard = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCardNumber || !newCardName || !newCardExpiry || !newCardCvv) return;
+    setAddCardError("");
+    setIsAddingCard(true);
 
-    const brand = getCardBrand(newCardNumber) || "Desconhecido";
+    try {
+      const validatePayload = {
+        numero: newCardNumber.replace(/\D/g, ""),
+        nome_titular: newCardName,
+        validade: newCardExpiry,
+        cvv: newCardCvv,
+        tipoCartao: newCardType
+      };
+
+      const validateData = await validarCartaoServidor(validatePayload);
+
+      if (validateData.error) {
+        setAddCardError(validateData.error);
+        setIsAddingCard(false);
+        return;
+      }
+
+      if (!validateData.numero_valido || !validateData.data_valida) {
+        setAddCardError(validateData.mensagem_erro || "Dados do cartão inválidos.");
+        setIsAddingCard(false);
+        return;
+      }
+    } catch (err) {
+      setAddCardError("Ocorreu um erro de conexão ao validar o cartão.");
+      setIsAddingCard(false);
+      return;
+    }
+
+    const brand = getCardBrand(newCardNumber) || "Desconhecida";
+    const ultimos_digitos = newCardNumber.replace(/\D/g, "").slice(-4);
+    const partesData = newCardExpiry.split('/');
+    const mes_expiracao = parseInt(partesData[0], 10);
+    const ano_expiracao = parseInt(partesData[1], 10) + 2000;
+
+    const newCard = {
+        id: editingCardId || Math.random().toString(36).substring(2, 9),
+        ultimos_digitos,
+        bandeira: brand,
+        mes_expiracao,
+        ano_expiracao,
+        titular: newCardName,
+        tipo: newCardType,
+        gateway_token: "tok_mock_" + Math.random().toString(36).substring(2, 9)
+    };
 
     if (editingCardId) {
-      setCards(cards.map(card => card.id === editingCardId ? {
-        ...card,
-        fullNumber: newCardNumber,
-        brand,
-        expiry: newCardExpiry,
-        name: newCardName,
-        cvv: newCardCvv
-      } : card));
+      setCards(cards.map(card => card.id === editingCardId ? newCard : card));
       setEditingCardId(null);
     } else {
-      setCards([...cards, {
-        id: Math.random().toString(36).substring(2, 9),
-        fullNumber: newCardNumber,
-        brand,
-        expiry: newCardExpiry,
-        name: newCardName,
-        cvv: newCardCvv
-      }]);
+      setCards([...cards, newCard]);
     }
 
     setNewCardNumber("");
     setNewCardName("");
     setNewCardExpiry("");
     setNewCardCvv("");
-  };
-
-  const startEditing = (card: CreditCardData) => {
-    setEditingCardId(card.id);
-    setNewCardNumber(card.fullNumber);
-    setNewCardName(card.name);
-    setNewCardExpiry(card.expiry);
-    setNewCardCvv(card.cvv);
+    setNewCardType("CREDITO");
+    setIsAddingCard(false);
   };
 
   const handleRemoveCard = (id: string) => {
@@ -127,14 +166,9 @@ export function FinanceiroContent() {
       setNewCardName("");
       setNewCardExpiry("");
       setNewCardCvv("");
+      setNewCardType("CREDITO");
+      setAddCardError("");
     }
-  };
-
-  const toggleReveal = (id: string) => {
-    setRevealedCards(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
   };
 
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,7 +202,7 @@ export function FinanceiroContent() {
             ...inv,
             status: "PAGO",
             paymentDate: today,
-            paidWith: `Cartão de Crédito final ${card?.fullNumber.slice(-4) || 'N/A'}`
+            paidWith: `Cartão de Crédito final ${card?.ultimos_digitos || 'N/A'}`
           };
         }
         return inv;
@@ -251,7 +285,7 @@ export function FinanceiroContent() {
                     <option value="" disabled>Selecione um cartão</option>
                     {cards.map(c => (
                       <option key={c.id} value={c.id}>
-                        {c.brand} final {c.fullNumber.slice(-4)}
+                        {c.bandeira} final {c.ultimos_digitos}
                       </option>
                     ))}
                   </select>
@@ -472,36 +506,22 @@ export function FinanceiroContent() {
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
                   {cards.map(card => {
-                    const isRevealed = revealedCards[card.id];
-                    const displayNum = isRevealed 
-                      ? card.fullNumber 
-                      : `**** **** **** ${card.fullNumber.slice(-4)}`;
+                    const displayNum = `**** **** **** ${card.ultimos_digitos}`;
 
                     return (
                       <div key={card.id} className="flex flex-col p-4 border rounded-lg bg-card gap-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                           <div className="flex items-center gap-4 min-w-0 w-full">
-                            <div className="h-10 w-14 bg-muted flex items-center justify-center rounded text-xs font-bold uppercase shrink-0">
-                              {card.brand}
+                            <div className={`h-10 w-14 flex items-center justify-center rounded text-xs font-bold uppercase shrink-0 ${card.tipo === 'CREDITO' ? 'bg-primary/20 text-primary' : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'}`}>
+                              {card.bandeira}
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="font-medium tracking-widest truncate">{displayNum}</p>
-                              {isRevealed && (
-                                <p className="text-sm text-muted-foreground mt-1 truncate">
-                                  Nome: {card.name} | Exp: {card.expiry} | CVV: {card.cvv}
-                                </p>
-                              )}
+                              <p className="text-sm text-muted-foreground truncate uppercase">{card.titular} • {card.tipo === 'CREDITO' ? 'Crédito' : 'Débito'}</p>
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-wrap justify-end gap-2 mt-2">
-                          <Button variant="outline" size="sm" onClick={() => toggleReveal(card.id)} className="flex-1 sm:flex-none">
-                            {isRevealed ? <EyeOff className="h-4 w-4 mr-1 shrink-0" /> : <Eye className="h-4 w-4 mr-1 shrink-0" />}
-                            {isRevealed ? "Ocultar" : "Ver Dados"}
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => startEditing(card)} className="flex-1 sm:flex-none">
-                            <Edit className="h-4 w-4 mr-1 shrink-0" /> Editar
-                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleRemoveCard(card.id)} className="text-destructive shrink-0">
                             <Trash2 className="h-4 w-4 shrink-0" />
                           </Button>
@@ -523,6 +543,11 @@ export function FinanceiroContent() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleAddOrEditCard} className="space-y-4">
+                {addCardError && (
+                  <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+                    {addCardError}
+                  </div>
+                )}
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="cardNumber">Número do Cartão</Label>
@@ -575,22 +600,37 @@ export function FinanceiroContent() {
                       required
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cardType">Tipo de Cartão</Label>
+                    <Select value={newCardType} onValueChange={setNewCardType}>
+                      <SelectTrigger id="cardType">
+                        <SelectValue placeholder="Selecione o tipo..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CREDITO">Crédito</SelectItem>
+                        <SelectItem value="DEBITO">Débito</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" className="w-full md:w-auto">
-                    {editingCardId ? <Edit className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
-                    {editingCardId ? "Salvar Alterações" : "Adicionar Cartão"}
+                  <Button type="submit" className="w-full md:w-auto" disabled={isAddingCard}>
+                    {isAddingCard ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : (editingCardId ? <Edit className="h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />)}
+                    {isAddingCard ? "Validando..." : (editingCardId ? "Salvar Alterações" : "Adicionar Cartão")}
                   </Button>
                   {editingCardId && (
                     <Button 
                       type="button" 
                       variant="outline" 
+                      disabled={isAddingCard}
                       onClick={() => {
                         setEditingCardId(null);
                         setNewCardNumber("");
                         setNewCardName("");
                         setNewCardExpiry("");
                         setNewCardCvv("");
+                        setNewCardType("CREDITO");
+                        setAddCardError("");
                       }}
                     >
                       Cancelar

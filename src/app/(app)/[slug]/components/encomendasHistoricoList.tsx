@@ -15,7 +15,9 @@ import { Search, Package, User, CheckCircle, XCircle, Home, UserPlus, Info } fro
 import { Card, CardContent } from "@/components/ui/card";
 
 type EncomendaComDetalhes = Encomenda & {
-  unidade: Pick<Unidade, "id_unidade" | "bloco_torre" | "numero_unidade">;
+  unidade: Pick<Unidade, "id_unidade" | "bloco_torre" | "numero_unidade"> & {
+    moradores: { usuario: Pick<Usuario, "nome_completo"> }[];
+  };
   usuario_cadastro: Pick<Usuario, "id_usuario" | "nome_completo" | "telefone"> | null;
   retirada:
     | (Retirada & {
@@ -48,6 +50,7 @@ export function EncomendasHistoricoList({
       const porteiroNome = enc.porteiro_recebimento?.nome_completo.toLowerCase() || "";
       const moradorRetirada = enc.retirada?.usuario_retirada.nome_completo.toLowerCase() || "";
       const moradorCadastro = enc.usuario_cadastro?.nome_completo.toLowerCase() || "";
+      const moradoresUnidade = enc.unidade.moradores?.map(m => m.usuario.nome_completo.toLowerCase()).join(" ") || "";
       const tipo = enc.tipo_encomenda.toLowerCase();
       const rastreio = (enc.codigo_rastreio || "").toLowerCase();
 
@@ -56,6 +59,7 @@ export function EncomendasHistoricoList({
         porteiroNome.includes(searchLower) ||
         moradorRetirada.includes(searchLower) ||
         moradorCadastro.includes(searchLower) ||
+        moradoresUnidade.includes(searchLower) ||
         tipo.includes(searchLower) ||
         rastreio.includes(searchLower)
       );
@@ -143,6 +147,19 @@ export function EncomendasHistoricoList({
               <UserPlus className="h-4 w-4" /> Origem / Cadastro
             </div>
             <div className="space-y-1.5 text-sm">
+              <div className="flex flex-col gap-1 mb-3 pb-3 border-b border-border/50">
+                <span className="text-muted-foreground shrink-0 text-xs uppercase tracking-wider">Destinatário:</span>
+                <span className="font-medium text-sm leading-snug">
+                  {encomenda.usuario_cadastro?.nome_completo || encomenda.retirada?.usuario_retirada?.nome_completo || "Não especificado na entrada"}
+                </span>
+                
+                <span className="text-muted-foreground shrink-0 text-xs mt-2">Outros moradores da unidade:</span>
+                <span className="text-xs text-muted-foreground leading-snug">
+                  {encomenda.unidade.moradores?.length > 0
+                    ? encomenda.unidade.moradores.map(m => m.usuario.nome_completo).join(", ")
+                    : "Nenhum morador cadastrado"}
+                </span>
+              </div>
               {encomenda.usuario_cadastro ? (
                 <>
                   <div className="flex justify-between gap-2">

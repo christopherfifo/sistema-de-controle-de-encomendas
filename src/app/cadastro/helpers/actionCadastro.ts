@@ -15,7 +15,9 @@ type CadastroResult = {
 
 export async function registerCondominioAndAdmin(
   values: z.infer<typeof cadastroSchema>,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   dadosCartao?: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dadosFatura?: any
 ): Promise<CadastroResult> {
   const validatedFields = await cadastroSchema.safeParseAsync(values);
@@ -147,6 +149,53 @@ export async function consultarBandeiraCartao(bin: string) {
   }
 }
 
+export async function verificarCadastroExistente(email: string, cpf: string, cnpj: string) {
+  try {
+    const existingUser = await db.usuario.findFirst({
+      where: {
+        OR: [{ email: email }, { cpf: cpf }],
+      },
+    });
+
+    if (existingUser) {
+      return { exists: true, error: "Email ou CPF já cadastrados." };
+    }
+
+    const existingCondominio = await db.condominio.findUnique({
+      where: { cnpj: cnpj },
+    });
+
+    if (existingCondominio) {
+      return { exists: true, error: "CNPJ do condomínio já cadastrado." };
+    }
+
+    return { exists: false };
+  } catch (error) {
+    return { exists: true, error: "Erro ao verificar dados. Tente novamente." };
+  }
+}
+
+export async function validarCartaoServidor(validatePayload: Record<string, unknown>) {
+  try {
+    const validateRes = await fetch(
+      "https://mock-pagamento-api.vercel.app/api/cartoes/validar",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validatePayload),
+      },
+    );
+
+    if (validateRes.ok) {
+      return await validateRes.json();
+    } else {
+      return { error: "Erro ao validar cartão." };
+    }
+  } catch (error) {
+    return { error: "Ocorreu um erro de conexão ao validar o cartão." };
+  }
+}
+
 export async function validarEProcessarPagamento(
   validatePayload: Record<string, unknown>,
   valor: number,
@@ -189,7 +238,7 @@ export async function validarEProcessarPagamento(
         ano_expiracao: ano,
         cvv: validatePayload.cvv,
         bandeira: bandeira,
-        tipo: "CREDITO"
+        tipo: validatePayload.tipoCartao || "CREDITO"
       }
     };
 

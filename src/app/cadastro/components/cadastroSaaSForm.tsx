@@ -39,6 +39,7 @@ import {
   registerCondominioAndAdmin,
   consultarBandeiraCartao,
   validarEProcessarPagamento,
+  verificarCadastroExistente,
 } from "../helpers/actionCadastro";
 import { getPlanos } from "../../planos/actionPlanos";
 
@@ -108,6 +109,7 @@ export function CadastroSaaSForm() {
       nomeTitularCartao: "",
       validadeCartao: "",
       cvvCartao: "",
+      tipoCartao: "CREDITO",
     },
   });
 
@@ -124,8 +126,17 @@ export function CadastroSaaSForm() {
     ]);
 
     if (isValid) {
-      setStep(2);
-      window.scrollTo(0, 0);
+      setError(undefined);
+      startTransition(async () => {
+        const { email, cpf, cnpj } = form.getValues();
+        const verify = await verificarCadastroExistente(email, cpf, cnpj);
+        if (verify.exists) {
+          setError(verify.error);
+        } else {
+          setStep(2);
+          window.scrollTo(0, 0);
+        }
+      });
     }
   }
 
@@ -174,6 +185,7 @@ export function CadastroSaaSForm() {
           nome_titular: values.nomeTitularCartao,
           validade: values.validadeCartao,
           cvv: values.cvvCartao,
+          tipoCartao: values.tipoCartao,
         };
 
         const pagamentoRes = await validarEProcessarPagamento(
@@ -203,7 +215,7 @@ export function CadastroSaaSForm() {
           );
           form.reset();
           setTimeout(() => {
-            router.push(`/`);
+            router.push(`/${result.condominioId}?user=${result.userId}&perfil=${result.perfil}`);
           }, 2000);
         }
       } catch (err) {
@@ -572,6 +584,28 @@ export function CadastroSaaSForm() {
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="tipoCartao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tipo de Cartão</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tipo..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="CREDITO">Crédito</SelectItem>
+                        <SelectItem value="DEBITO">Débito</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </fieldset>
 
             <FormField

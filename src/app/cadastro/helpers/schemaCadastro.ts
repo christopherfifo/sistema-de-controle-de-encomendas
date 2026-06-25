@@ -47,6 +47,7 @@ export const cadastroSchema = z.object({
     .string()
     .min(3, { message: "CVV inválido." })
     .max(4, { message: "CVV inválido." }),
+  tipoCartao: z.enum(["CREDITO", "DEBITO"]),
 });
 
 export type CadastroFormValues = z.infer<typeof cadastroSchema>;

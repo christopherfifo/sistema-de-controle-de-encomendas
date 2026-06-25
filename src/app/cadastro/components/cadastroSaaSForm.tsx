@@ -64,7 +64,6 @@ export function CadastroSaaSForm() {
       const p = await getPlanos();
       setPlanos(p);
 
-      // Se tiver um plano na URL, garante que o formulário o selecione
       if (planoIdFromUrl) {
         form.setValue("planoId", planoIdFromUrl);
       }
@@ -158,7 +157,6 @@ export function CadastroSaaSForm() {
           setBandeira("Desconhecida");
         }
       } catch (e) {
-        // Ignora erro de rede silenciosamente
         setBandeira("Desconhecida");
       }
     } else {
@@ -200,7 +198,6 @@ export function CadastroSaaSForm() {
           return;
         }
 
-        // Cadastro após pagamento com sucesso
         const result = await registerCondominioAndAdmin(
           values, 
           pagamentoRes.dadosCartao, 
@@ -232,7 +229,6 @@ export function CadastroSaaSForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Indicador de Passos */}
         <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground mb-4">
           <span className={`font-medium ${step === 1 ? "text-primary" : ""}`}>
             1. Dados

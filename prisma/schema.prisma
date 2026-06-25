@@ -7,9 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// ==========================================
-// ENUMS
-// ==========================================
 
 enum PerfilUsuario {
   ADMINISTRADOR
@@ -43,9 +40,6 @@ enum TipoCartao {
   DEBITO
 }
 
-// ==========================================
-// MODELOS DE NEGÓCIO (NÚCLEO E FINANCEIRO)
-// ==========================================
 
 model Condominio {
   id_condominio     String    @id @default(uuid())
@@ -63,11 +57,9 @@ model Condominio {
   ativo             Boolean?  @default(true)
   identidade_visual Json?
 
-  // Relações com o Plano
   id_plano String?
   plano    Plano?  @relation(fields: [id_plano], references: [id_plano])
 
-  // Outras Relações
   usuarios Usuario[]
   unidades Unidade[]
   faturas  Fatura[]
@@ -92,7 +84,6 @@ model Cartao {
   id_condominio   String
   condominio      Condominio @relation(fields: [id_condominio], references: [id_condominio])
   
-  // Dados seguros usados apenas para exibir ao administrador no Front-end (ex: "Termina em 4321")
   titular         String
   ultimos_digitos String     @db.Char(4) 
   bandeira        String     
@@ -100,7 +91,6 @@ model Cartao {
   ano_expiracao   Int
   tipo            TipoCartao
 
-  // OBRIGATÓRIO: Identificador seguro gerado pela API de pagamento externa
   gateway_token   String     @unique 
 
   data_cadastro   DateTime   @default(now())
@@ -116,7 +106,6 @@ model Fatura {
   id_plano         String
   plano            Plano           @relation(fields: [id_plano], references: [id_plano])
   
-  // Relacionamento com o cartão utilizado (Opcional, pois pode ser pago via Pix/Boleto)
   id_cartao        String?
   cartao           Cartao?         @relation(fields: [id_cartao], references: [id_cartao])
 
@@ -130,9 +119,6 @@ model Fatura {
   link_pagamento   String?
 }
 
-// ==========================================
-// MODELOS DE USUÁRIOS E UNIDADES
-// ==========================================
 
 model Usuario {
   id_usuario       String        @id @default(uuid())
@@ -185,9 +171,6 @@ model MoradoresUnidades {
   @@unique([id_usuario, id_unidade])
 }
 
-// ==========================================
-// MODELOS DE OPERAÇÃO DIÁRIA (PORTARIA E COMUNICAÇÃO)
-// ==========================================
 
 model Encomenda {
   id_encomenda            String          @id @default(uuid())

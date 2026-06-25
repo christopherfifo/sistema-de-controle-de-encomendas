@@ -41,7 +41,6 @@ export async function adicionarUnidades(
   isNovoBloco: boolean = false
 ) {
   try {
-    // Padroniza para "Title Case" (ex: Bloco A, Torre Norte)
     const blocoPadronizado = bloco
       .trim()
       .toLowerCase()

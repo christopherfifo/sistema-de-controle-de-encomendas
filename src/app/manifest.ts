@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Gerenciamento inteligente de encomendas para o seu condomínio',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
+    background_color: '#09090b',
     theme_color: '#09090b', // hsl(240, 10%, 3.9%) approx background dark
     icons: [
       {

@@ -30,6 +30,13 @@ export async function adicionarUnidade(
   }
 
   const { bloco_torre, numero_unidade } = validatedData.data;
+  
+  const blocoPadronizado = bloco_torre
+    .trim()
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 
   const user = await db.usuario.findUnique({
     where: { id_usuario: sindicoId },
@@ -73,7 +80,7 @@ export async function adicionarUnidade(
   const unidadeExistente = await db.unidade.findFirst({
     where: {
       id_condominio: condominioId,
-      bloco_torre: bloco_torre,
+      bloco_torre: blocoPadronizado,
       numero_unidade: numero_unidade,
     },
   });
@@ -90,7 +97,7 @@ export async function adicionarUnidade(
       await prisma.unidade.create({
         data: {
           id_condominio: condominioId,
-          bloco_torre: bloco_torre,
+          bloco_torre: blocoPadronizado,
           numero_unidade: numero_unidade,
         },
       });
@@ -109,7 +116,7 @@ export async function adicionarUnidade(
 
     return {
       success: true,
-      message: `Unidade ${bloco_torre} - ${numero_unidade} adicionada com sucesso!`,
+      message: `Unidade ${blocoPadronizado} - ${numero_unidade} adicionada com sucesso!`,
     };
   } catch (error) {
     console.error("Erro ao adicionar unidade:", error);

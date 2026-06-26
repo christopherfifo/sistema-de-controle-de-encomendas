@@ -179,7 +179,7 @@ export async function deletarUnidade(unidadeId: string) {
 
 export async function deletarBloco(condominioId: string, blocoTorre: string) {
   try {
-    const blocoPadronizado = blocoTorre.trim().toUpperCase();
+    const blocoPadronizado = blocoTorre;
 
     const unidadesDoBloco = await db.unidade.findMany({
       where: { 

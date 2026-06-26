@@ -123,10 +123,20 @@ export async function registrarEncomendaPorteiro(
   }
 
   if (!unidadeIdFinal) {
+    const blocoManual = data.bloco_manual || "";
+    const blocoPadronizado = blocoManual
+      ? blocoManual
+          .trim()
+          .toLowerCase()
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      : "";
+
     let unidadeExistente = await db.unidade.findFirst({
       where: {
         id_condominio: condominioId,
-        bloco_torre: data.bloco_manual || "",
+        bloco_torre: blocoPadronizado,
         numero_unidade: data.apartamento_manual || "",
       },
     });
@@ -135,7 +145,7 @@ export async function registrarEncomendaPorteiro(
       unidadeExistente = await db.unidade.create({
         data: {
           id_condominio: condominioId,
-          bloco_torre: data.bloco_manual || "",
+          bloco_torre: blocoPadronizado,
           numero_unidade: data.apartamento_manual || "",
         },
       });

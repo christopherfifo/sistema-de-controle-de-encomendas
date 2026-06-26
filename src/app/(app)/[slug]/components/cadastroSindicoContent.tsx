@@ -259,8 +259,8 @@ export function CadastroSindicoContent({
   };
 
   const handleExcluir = (id: string) => {
-    toast("Excluir permanentemente?", {
-      description: "Se houver histórico no banco, o sistema impedirá por segurança.",
+    toast("Remover Síndico?", {
+      description: "Se for morador, perderá apenas o acesso de síndico e voltará a ser morador comum. Caso não seja, será excluído do sistema se não houver histórico.",
       action: {
         label: "Confirmar",
         onClick: () => {

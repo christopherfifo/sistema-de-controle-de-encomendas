@@ -21,7 +21,7 @@ const SiTelegram = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
 );
 
-export default function Slide4Tech() {
+export default function Slide7Tech() {
   return (
     <div className="flex flex-col justify-center h-full px-12 md:px-32">
       <h2 className="text-5xl md:text-6xl font-bold tracking-tighter text-white mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">
@@ -44,57 +44,57 @@ export default function Slide4Tech() {
             <p className="text-xl text-zinc-400 font-medium mb-6">App Router & Server Actions</p>
           </div>
           <p className="text-lg text-zinc-500 font-light relative z-10 leading-relaxed">
-            Framework principal do sistema. Toda a lógica de regras, validações e banco de dados roda direto no servidor, sem precisar criar APIs separadas.
+            Framework principal. Centraliza interface e regras de negócio no servidor, sem necessidade de APIs separadas.
           </p>
         </div>
 
-        {}
+        {/* PostgreSQL */}
         <div className="bg-zinc-900 border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-[#336791]/50 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500 fill-mode-both">
            <div className="absolute -bottom-6 -right-6 opacity-[0.03] group-hover:opacity-5 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
              <SiPostgresql className="w-48 h-48 text-[#336791]" />
            </div>
            <div className="relative z-10">
-             <SiPostgresql className="w-10 h-10 text-[#336791] mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
-             <h3 className="text-2xl font-bold text-white mb-2">PostgreSQL</h3>
-             <p className="text-base text-zinc-400">Banco de dados relacional robusto e escalável para garantir a integridade do sistema.</p>
+             <SiPostgresql className="w-12 h-12 text-[#336791] mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
+             <h3 className="text-3xl font-bold text-white mb-3">PostgreSQL</h3>
+             <p className="text-lg text-zinc-400 font-light leading-relaxed">Banco de dados relacional.</p>
            </div>
         </div>
 
-        {}
+        {/* Prisma */}
         <div className="bg-zinc-900 border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-white/30 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500 delay-600 fill-mode-both">
            <div className="absolute -bottom-6 -right-6 opacity-[0.03] group-hover:opacity-5 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
              <SiPrisma className="w-48 h-48 text-white" />
            </div>
            <div className="relative z-10">
-             <SiPrisma className="w-10 h-10 text-white mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
-             <h3 className="text-2xl font-bold text-white mb-2">Prisma ORM</h3>
-             <p className="text-base text-zinc-400">Ferramenta que facilita a comunicação com o banco de dados de forma segura e padronizada.</p>
+             <SiPrisma className="w-12 h-12 text-white mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
+             <h3 className="text-3xl font-bold text-white mb-3">Prisma ORM</h3>
+             <p className="text-lg text-zinc-400 font-light leading-relaxed">Comunicação rápida e padronizada com o banco.</p>
            </div>
         </div>
 
-        {}
+        {/* Tailwind */}
         <div className="bg-zinc-900 border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-[#38BDF8]/50 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500 delay-700 fill-mode-both">
            <div className="absolute -bottom-6 -right-6 opacity-[0.03] group-hover:opacity-5 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
              <SiTailwindcss className="w-48 h-48 text-[#38BDF8]" />
            </div>
            <div className="relative z-10">
-             <div className="w-12 h-12 bg-[#38BDF8]/10 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-               <SiTailwindcss className="w-6 h-6 text-[#38BDF8]" />
+             <div className="w-14 h-14 bg-[#38BDF8]/10 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+               <SiTailwindcss className="w-8 h-8 text-[#38BDF8]" />
              </div>
-             <h3 className="text-2xl font-bold text-white mb-2">Tailwind + Shadcn</h3>
-             <p className="text-base text-zinc-400">Biblioteca de utilitários CSS e componentes para uma interface padronizada e responsiva.</p>
+             <h3 className="text-3xl font-bold text-white mb-3">Tailwind + Shadcn</h3>
+             <p className="text-lg text-zinc-400 font-light leading-relaxed">Design moderno, padronizado e responsivo.</p>
            </div>
         </div>
 
-        {}
+        {/* Integrações */}
         <div className="bg-zinc-900 border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-[#2CA5E0]/50 transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500 delay-1000 fill-mode-both">
            <div className="absolute -bottom-6 -right-6 opacity-[0.03] group-hover:opacity-5 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500">
              <SiTelegram className="w-48 h-48 text-[#2CA5E0]" />
            </div>
            <div className="relative z-10">
-             <SiTelegram className="w-10 h-10 text-[#2CA5E0] mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
-             <h3 className="text-2xl font-bold text-white mb-2">Integrações</h3>
-             <p className="text-base text-zinc-400">Envio automático de avisos pelo Telegram e por e-mail.</p>
+             <SiTelegram className="w-12 h-12 text-[#2CA5E0] mb-5 group-hover:-translate-y-1 transition-transform duration-300" />
+             <h3 className="text-3xl font-bold text-white mb-3">Integrações</h3>
+             <p className="text-lg text-zinc-400 font-light leading-relaxed">Avisos automáticos e em tempo real via Telegram e E-mail.</p>
            </div>
         </div>
 

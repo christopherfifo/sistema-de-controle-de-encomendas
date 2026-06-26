@@ -2,7 +2,7 @@ import React from 'react';
 import { Terminal, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function Slide5Fim() {
+export default function Slide10Fim() {
   return (
     <div className="flex flex-col items-center justify-center text-center h-full px-4">
       <div className="w-full max-w-3xl bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl mb-12 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">

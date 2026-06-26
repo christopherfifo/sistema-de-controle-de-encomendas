@@ -352,6 +352,24 @@ export async function excluirSindico(
   condominioId: string,
 ) {
   try {
+    const usuario = await db.usuario.findUnique({
+      where: { id_usuario: sindicoId, id_condominio: condominioId },
+      include: { unidades_residenciais: true },
+    });
+
+    if (!usuario) {
+      return { success: false, message: "Usuário não encontrado." };
+    }
+
+    if (usuario.unidades_residenciais.length > 0) {
+      await db.usuario.update({
+        where: { id_usuario: sindicoId, id_condominio: condominioId },
+        data: { perfil: PerfilUsuario.MORADOR },
+      });
+      revalidatePath(`/(app)/[slug]/cadastroSindico`, "page");
+      return { success: true, message: "Cargo removido. Usuário voltou a ser morador." };
+    }
+
     await db.usuario.delete({
       where: { id_usuario: sindicoId, id_condominio: condominioId },
     });

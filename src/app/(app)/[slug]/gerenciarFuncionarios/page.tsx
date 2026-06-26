@@ -4,7 +4,7 @@ import { PerfilUsuario } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { GerenciarFuncionariosContent } from "../components/gerenciarFuncionariosContent";
 import { SimpleSidebar } from "../components/sidebar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
@@ -71,7 +71,7 @@ export default async function GerenciarFuncionariosPage({
         <SimpleSidebar {...sidebarProps} />
       </div>
 
-      <main className="flex-1">
+      <main className="flex-1 min-w-0 overflow-x-hidden">
         <header className="flex items-center p-4 border-b md:hidden sticky top-0 bg-background z-10">
           <Sheet>
             <SheetTrigger asChild>
@@ -81,6 +81,9 @@ export default async function GerenciarFuncionariosPage({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0 w-64">
+              <SheetHeader className="p-4 border-b text-left">
+                <SheetTitle>Gerenciar Funcionário</SheetTitle>
+              </SheetHeader>
               <SimpleSidebar {...sidebarProps} />
             </SheetContent>
           </Sheet>

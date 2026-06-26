@@ -305,7 +305,7 @@ export function GerenciarFuncionariosContent({
                     key={p.id_usuario}
                     className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/40 border rounded-xl gap-4"
                   >
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-bold text-lg">
                           {p.nome_completo}

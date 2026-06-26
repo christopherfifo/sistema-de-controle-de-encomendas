@@ -213,6 +213,24 @@ export async function excluirPorteiro(
   condominioId: string,
 ) {
   try {
+    const porteiro = await db.usuario.findFirst({
+      where: { id_usuario: porteiroId, id_condominio: condominioId },
+      include: { unidades_residenciais: true },
+    });
+
+    if (!porteiro) {
+      return { success: false, message: "Porteiro não encontrado." };
+    }
+
+    if (porteiro.unidades_residenciais.length > 0) {
+      await db.usuario.update({
+        where: { id_usuario: porteiroId },
+        data: { perfil: PerfilUsuario.MORADOR },
+      });
+      revalidatePath(`/(app)/[slug]/gerenciarFuncionarios`, "page");
+      return { success: true, message: "Porteiro removido do cargo. Como reside no local, voltou a ser apenas Morador." };
+    }
+
     await db.usuario.delete({
       where: { id_usuario: porteiroId, id_condominio: condominioId },
     });

@@ -59,7 +59,7 @@ export default async function MeuPerfilPage({
         <SimpleSidebar {...sidebarProps} />
       </div>
 
-      <main className="flex-1 bg-muted/10">
+      <main className="flex-1 bg-muted/10 min-w-0 overflow-x-hidden">
         <header className="flex items-center p-4 border-b md:hidden sticky top-0 bg-background z-10">
           <Sheet>
             <SheetTrigger asChild>
@@ -72,7 +72,7 @@ export default async function MeuPerfilPage({
               <SimpleSidebar {...sidebarProps} />
             </SheetContent>
           </Sheet>
-          <h2 className="text-lg font-semibold ml-4">{condominioName}</h2>
+          <h2 className="text-lg font-semibold ml-4 truncate">{condominioName}</h2>
         </header>
 
         <div className="p-4 md:p-8 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-screen">

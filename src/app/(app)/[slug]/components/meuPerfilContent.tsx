@@ -35,6 +35,27 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { updateDadosPessoais, updateTelegramId } from "../helpers/actionPerfil";
+import { maskCPF } from "@/helpers/cpf";
+
+function maskPhone(value: string) {
+  if (!value) return "";
+  const digits = value.replace(/\D/g, "");
+  if (digits.length <= 10) {
+    return digits.replace(/(\d{2})(\d{0,4})(\d{0,4})/, (match, p1, p2, p3) => {
+      let res = `(${p1}`;
+      if (p2) res += `) ${p2}`;
+      if (p3) res += `-${p3}`;
+      return res;
+    }).trim();
+  } else {
+    return digits.replace(/(\d{2})(\d{0,5})(\d{0,4})/, (match, p1, p2, p3) => {
+      let res = `(${p1}`;
+      if (p2) res += `) ${p2}`;
+      if (p3) res += `-${p3}`;
+      return res;
+    }).trim();
+  }
+}
 
 interface MeuPerfilContentProps {
   user: {
@@ -169,12 +190,12 @@ export function MeuPerfilContent({ user }: MeuPerfilContentProps) {
     <div className="w-full max-w-2xl mx-auto space-y-6 p-4">
       <Card className="border shadow-xl rounded-3xl bg-background overflow-hidden">
         <CardHeader className="bg-gradient-to-b from-primary/5 via-transparent to-transparent border-b p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="bg-primary/10 p-3 rounded-2xl">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="bg-primary/10 p-3 rounded-2xl shrink-0">
                 <User className="h-6 w-6 text-primary" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <CardTitle className="text-2xl font-bold tracking-tight">Meu Perfil</CardTitle>
                 <CardDescription className="text-sm font-medium">Informações de conta e notificações</CardDescription>
               </div>
@@ -243,7 +264,7 @@ export function MeuPerfilContent({ user }: MeuPerfilContentProps) {
           {viewMode === "overview" && (
             <div className="space-y-10 animate-in fade-in duration-500">
               <div className="group">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
                   <div className="flex items-center gap-3">
                     <UserPen className="h-4 w-4 text-primary" />
                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Dados Pessoais</h3>
@@ -258,27 +279,27 @@ export function MeuPerfilContent({ user }: MeuPerfilContentProps) {
                   </Button>
                 </div>
                 <div className="grid gap-6 sm:grid-cols-2 p-6 rounded-3xl bg-muted/40 dark:bg-muted/30 border border-muted shadow-md dark:shadow-none group-hover:border-primary/20 transition-all duration-300">
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0">
                     <Label className="text-[10px] font-bold text-muted-foreground/60 uppercase">Nome Completo</Label>
                     <p className="text-sm font-bold text-foreground truncate">{user.nome_completo}</p>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0">
                     <Label className="text-[10px] font-bold text-muted-foreground/60 uppercase">CPF</Label>
-                    <p className="text-sm font-medium text-muted-foreground tabular-nums">{user.cpf}</p>
+                    <p className="text-sm font-medium text-muted-foreground tabular-nums truncate">{maskCPF(user.cpf)}</p>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0">
                     <Label className="text-[10px] font-bold text-muted-foreground/60 uppercase">E-mail</Label>
                     <p className="text-sm font-bold text-foreground truncate">{user.email}</p>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0">
                     <Label className="text-[10px] font-bold text-muted-foreground/60 uppercase">Telefone</Label>
-                    <p className="text-sm font-bold text-foreground">{user.telefone}</p>
+                    <p className="text-sm font-bold text-foreground truncate">{maskPhone(user.telefone)}</p>
                   </div>
                 </div>
               </div>
 
               <div className="group">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-wrap items-center justify-between mb-4 gap-2">
                   <div className="flex items-center gap-3">
                     <BellRing className="h-4 w-4 text-blue-500" />
                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Notificações</h3>
@@ -292,15 +313,15 @@ export function MeuPerfilContent({ user }: MeuPerfilContentProps) {
                     Configurar Telegram
                   </Button>
                 </div>
-                <div className="p-6 rounded-3xl bg-blue-100/30 dark:bg-blue-950/10 border border-blue-200/50 dark:border-transparent shadow-md dark:shadow-none group-hover:border-blue-500/30 transition-all duration-300 flex items-center justify-between">
-                  <div className="space-y-1">
-                    <Label className="text-[10px] font-bold text-blue-500/60 uppercase">ID do Telegram</Label>
-                    <div className="flex items-center gap-2">
-                      <Send className="h-3.5 w-3.5 text-blue-500/50" />
-                      <p className="text-sm font-black tabular-nums">{user.telegram_chat_id || "Não vinculado"}</p>
+                <div className="p-6 rounded-3xl bg-blue-100/30 dark:bg-blue-950/10 border border-blue-200/50 dark:border-transparent shadow-md dark:shadow-none group-hover:border-blue-500/30 transition-all duration-300 flex items-center justify-between gap-4">
+                  <div className="space-y-1 min-w-0">
+                    <Label className="text-[10px] font-bold text-blue-500/60 uppercase truncate block">ID do Telegram</Label>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Send className="h-3.5 w-3.5 text-blue-500/50 shrink-0" />
+                      <p className="text-sm font-black tabular-nums truncate">{user.telegram_chat_id || "Não vinculado"}</p>
                     </div>
                   </div>
-                  <div className="h-10 w-10 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                  <div className="h-10 w-10 shrink-0 rounded-2xl bg-blue-500/10 flex items-center justify-center">
                     <Send className="h-5 w-5 text-blue-500" />
                   </div>
                 </div>

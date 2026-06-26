@@ -31,6 +31,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 type EncomendaParaRetirada = Encomenda & {
   unidade: Pick<Unidade, "bloco_torre" | "numero_unidade">;
@@ -153,7 +154,7 @@ export function ModalRegistrarRetirada({
           porteiroId,
         );
         if (result.success) {
-          alert(result.message);
+          toast.info(result.message);
           onRetiradaSuccess();
         }
       } catch (error) {

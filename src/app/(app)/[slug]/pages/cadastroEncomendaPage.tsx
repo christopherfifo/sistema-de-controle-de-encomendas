@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 type UnidadeProps = {
   unidade: {
@@ -107,13 +108,13 @@ export function CadastroEncomendaPageContent({
     startTransition(async () => {
       try {
         await cadastrarEncomendaMorador(userId, condominioSlug, data);
-        alert("Encomenda pré-cadastrada com sucesso!");
+        toast.info("Encomenda pré-cadastrada com sucesso!");
         router.push(`/${condominioSlug}?user=${userId}&perfil=MORADOR`);
       } catch (error) {
         if (error instanceof Error) {
-          alert(`Erro: ${error.message}`);
+          toast.error(`Erro: ${error.message}`);
         } else {
-          alert("Ocorreu um erro desconhecido.");
+          toast.error("Ocorreu um erro desconhecido.");
         }
       }
     });

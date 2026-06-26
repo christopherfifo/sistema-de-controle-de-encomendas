@@ -52,6 +52,7 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { maskCPF } from "@/helpers/cpf";
+import { toast } from "sonner";
 
 interface SindicoInfo {
   id_usuario: string;
@@ -186,11 +187,11 @@ export function CadastroSindicoContent({
       );
 
       if (res.success) {
-        alert("Ok");
+        toast.success("Ação realizada com sucesso!");
         formCadastro.reset();
         setActiveTab("lista");
       } else {
-        alert(res.message);
+        toast.info(res.message);
       }
     });
   };
@@ -207,7 +208,7 @@ export function CadastroSindicoContent({
         condominioId,
         adminId,
       );
-      alert(res.message);
+      toast.info(res.message);
       if (res.success) {
         setEditandoSindicoId(null);
         setTokenSindicoEdicao("");
@@ -218,51 +219,63 @@ export function CadastroSindicoContent({
   };
 
   const handlePromoverMorador = (moradorId: string, nome: string) => {
-    if (
-      confirm(
-        `Confirmar a promoção de "${nome}" como Síndico do sistema? Ele manterá os dados de moradia originais.`,
-      )
-    ) {
-      startTransition(async () => {
-        const res = await transformarMoradorEmSindico(
-          moradorId,
-          condominioId,
-          adminId,
-        );
+    toast(`Confirmar a promoção de "${nome}" como Síndico do sistema?`, {
+      description: "Ele manterá os dados de moradia originais.",
+      action: {
+        label: "Confirmar",
+        onClick: () => {
+          startTransition(async () => {
+            const res = await transformarMoradorEmSindico(
+              moradorId,
+              condominioId,
+              adminId,
+            );
 
-        if (res.success) {
-          alert("Ok");
-          setActiveTab("lista");
-        } else {
-          alert(res.message);
+            if (res.success) {
+              toast.success("Ação realizada com sucesso!");
+              setActiveTab("lista");
+            } else {
+              toast.info(res.message);
+            }
+          });
         }
-      });
-    }
+      },
+      cancel: { label: "Cancelar", onClick: () => {} }
+    });
   };
 
   const handleAlternarStatus = (id: string, ativo: boolean) => {
-    if (confirm("Deseja alterar o status de atividade deste síndico?")) {
-      startTransition(async () => {
-        await alternarStatusSindico(id, ativo, condominioId);
-      });
-    }
+    toast("Deseja alterar o status de atividade deste síndico?", {
+      action: {
+        label: "Confirmar",
+        onClick: () => {
+          startTransition(async () => {
+            await alternarStatusSindico(id, ativo, condominioId);
+          });
+        }
+      },
+      cancel: { label: "Cancelar", onClick: () => {} }
+    });
   };
 
   const handleExcluir = (id: string) => {
-    if (
-      confirm(
-        "Excluir permanentemente? Se houver histórico no banco, o sistema impedirá por segurança.",
-      )
-    ) {
-      startTransition(async () => {
-        const res = await excluirSindico(id, condominioId);
-        alert(res.message);
-      });
-    }
+    toast("Excluir permanentemente?", {
+      description: "Se houver histórico no banco, o sistema impedirá por segurança.",
+      action: {
+        label: "Confirmar",
+        onClick: () => {
+          startTransition(async () => {
+            const res = await excluirSindico(id, condominioId);
+            toast.info(res.message);
+          });
+        }
+      },
+      cancel: { label: "Cancelar", onClick: () => {} }
+    });
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full max-w-5xl mx-auto">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">
           Gestão de Síndicos
@@ -303,7 +316,7 @@ export function CadastroSindicoContent({
                     key={s.id_usuario}
                     className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/40 border rounded-xl gap-4"
                   >
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-bold text-lg">
                           {s.nome_completo}
@@ -344,13 +357,16 @@ export function CadastroSindicoContent({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1 break-words">
-                        CPF: {maskCPF(s.cpf)} • Email: {s.email} • Tel:{" "}
-                        {s.telefone}
-                      </p>
+                      <div className="text-xs text-muted-foreground mt-1 flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-2 gap-y-0.5">
+                        <span>CPF: {maskCPF(s.cpf)}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span className="break-all min-w-0">Email: {s.email}</span>
+                        <span className="hidden sm:inline">•</span>
+                        <span>Tel: {s.telefone}</span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-2 self-end sm:self-center">
+                    <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                       <Button
                         variant="outline"
                         size="icon"
@@ -769,11 +785,13 @@ export function CadastroSindicoContent({
                   key={m.id_usuario}
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/30 border rounded-xl gap-4"
                 >
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="font-bold truncate">{m.nome_completo}</p>
-                    <p className="text-xs text-muted-foreground break-words">
-                      CPF: {maskCPF(m.cpf)} • {m.email}
-                    </p>
+                    <div className="text-xs text-muted-foreground mt-0.5 flex flex-col sm:flex-row sm:items-center sm:gap-x-2 gap-y-0.5">
+                      <span>CPF: {maskCPF(m.cpf)}</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span className="break-all min-w-0">{m.email}</span>
+                    </div>
                   </div>
                   <Button
                     variant="outline"

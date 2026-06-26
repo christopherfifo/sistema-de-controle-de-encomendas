@@ -33,6 +33,7 @@ import {
   promoverMoradorATitular,
 } from "../helpers/actionMorador";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 export interface GerenciarCadastroMoradoresContentProps {
   moradores: {
@@ -128,7 +129,7 @@ export function GerenciarCadastroMoradoresContent({
         res = await promoverMoradorATitular({ moradorId: moradorAlvo.id, condominioId, sindicoId, tokenSindico: tokenConfirmacao, idUnidade: moradorAlvo.idUnidade });
       }
 
-      alert(res.message);
+      toast.info(res.message);
       if (res.success) setModalAberto(false);
     });
   };

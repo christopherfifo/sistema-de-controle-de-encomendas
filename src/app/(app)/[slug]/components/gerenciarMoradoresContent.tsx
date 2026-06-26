@@ -30,6 +30,7 @@ import {
   reativarMoradorNoCondominio,
   alterarUnidadeMorador,
 } from "../helpers/actionMorador";
+import { toast } from "sonner";
 
 interface GerenciarMoradoresContentProps {
   moradores: {
@@ -184,7 +185,7 @@ export function GerenciarMoradoresContent({
         });
       }
 
-      alert(res.message);
+      toast.info(res.message);
       if (res.success) {
         setModalAberto(false);
         setMoradorAlvo(null);
@@ -194,7 +195,7 @@ export function GerenciarMoradoresContent({
   };
 
   return (
-    <div className="space-y-6 w-full max-w-5xl">
+    <div className="space-y-6 w-full max-w-5xl mx-auto">
       <div>
         <h2 className="text-3xl font-bold tracking-tight">
           Controle de Ocupação & Cadastro

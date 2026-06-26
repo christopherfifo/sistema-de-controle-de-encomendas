@@ -22,6 +22,7 @@ import {
   ConfirmarChegadaFormData,
 } from "../schemas/schemaRetiradaPorteiro";
 import { confirmarChegadaEncomendaMorador } from "../helpers/encomendas";
+import { toast } from "sonner";
 
 interface ItemAvisoFormProps {
   encomendaId: string;
@@ -66,7 +67,7 @@ export function ItemAvisoForm({
         );
 
         if (result.success) {
-          alert(result.message);
+          toast.info(result.message);
           onSuccess(encomendaId);
         }
       } catch (error) {

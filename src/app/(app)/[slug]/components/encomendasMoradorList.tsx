@@ -16,6 +16,7 @@ import { cancelarEncomendaMorador } from "../helpers/encomendas";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 type EncomendaComUnidade = Encomenda & {
   unidade: Pick<Unidade, "bloco_torre" | "numero_unidade">;
@@ -44,12 +45,12 @@ export function EncomendasMoradorList({
         setEncomendasVisiveis((prev) =>
           prev.filter((enc) => enc.id_encomenda !== encomendaId),
         );
-        alert("Encomenda cancelada com sucesso!");
+        toast.info("Encomenda cancelada com sucesso!");
       } catch (error) {
         if (error instanceof Error) {
-          alert(`Erro: ${error.message}`);
+          toast.error(`Erro: ${error.message}`);
         } else {
-          alert("Ocorreu um erro desconhecido.");
+          toast.error("Ocorreu um erro desconhecido.");
         }
       }
     });

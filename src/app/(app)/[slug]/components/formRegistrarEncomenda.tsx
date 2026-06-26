@@ -42,6 +42,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { toast } from "sonner";
 
 type MoradorBusca = {
   id_usuario: string;
@@ -165,7 +166,7 @@ useEffect(() => {
           data,
         );
         if (res.success) {
-          alert(res.message);
+          toast.info(res.message);
           form.reset();
           setTermoBusca("");
           setPreviewFoto(null);
@@ -174,16 +175,16 @@ useEffect(() => {
         }
       } catch (err: unknown) {
         if (err instanceof Error) {
-          alert(err.message);
+          toast.info(err.message);
         } else {
-          alert("Erro ao salvar");
+          toast.error("Erro ao salvar");
         }
       }
     });
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-sm border">
+    <Card className="w-full max-w-2xl mx-auto shadow-sm border min-w-0">
       <CardHeader>
         <CardTitle>Registrar Encomenda Surpresa</CardTitle>
         <CardDescription>
@@ -218,10 +219,10 @@ useEffect(() => {
                       key={m.id_usuario}
                       type="button"
                       onClick={() => handleSelecionarMorador(m)}
-                      className="flex items-center justify-between w-full p-2.5 text-left text-sm hover:bg-muted transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between w-full p-2.5 text-left text-sm hover:bg-muted transition-colors min-w-0 gap-1 sm:gap-2"
                     >
-                      <span className="font-medium">{m.nome_completo}</span>
-                      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded font-mono">
+                      <span className="font-medium truncate w-full sm:w-auto">{m.nome_completo}</span>
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded font-mono shrink-0">
                         Bloco {m.bloco} - Apt {m.apartamento}
                       </span>
                     </button>
@@ -229,16 +230,16 @@ useEffect(() => {
                   <button
                     type="button"
                     onClick={ativarInsercaoManual}
-                    className="flex items-center gap-2 w-full p-2.5 text-left text-xs text-sky-600 bg-sky-50/50 hover:bg-sky-50 font-semibold"
+                    className="flex items-start sm:items-center gap-2 w-full p-2.5 text-left text-xs text-sky-600 bg-sky-50/50 hover:bg-sky-50 font-semibold"
                   >
-                    <UserPlus className="h-3.5 w-3.5" /> Não encontrou? Digitar
-                    bloco/apartamento na mão
+                    <UserPlus className="h-3.5 w-3.5 shrink-0 mt-0.5 sm:mt-0" />
+                    <span>Não encontrou? Digitar bloco/apartamento na mão</span>
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="bloco_manual"
@@ -308,9 +309,9 @@ useEffect(() => {
                     </div>
                   </FormControl>
                   {rastreioVerificado === true && (
-                    <p className="text-xs font-medium text-emerald-600 flex items-center gap-1 mt-1">
-                      <CheckCircle className="h-3.5 w-3.5" /> Objeto localizado
-                      nos Correios! Empresa alterada automaticamente.
+                    <p className="text-xs font-medium text-emerald-600 flex items-start sm:items-center gap-1 mt-1">
+                      <CheckCircle className="h-3.5 w-3.5 shrink-0 mt-0.5 sm:mt-0" />
+                      <span>Objeto localizado nos Correios! Empresa alterada automaticamente.</span>
                     </p>
                   )}
                   {rastreioVerificado === false && (
@@ -413,15 +414,15 @@ useEffect(() => {
               <FormLabel>
                 Foto do Pacote (Opcional - Envia para o Telegram)
               </FormLabel>
-              <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full sm:w-auto relative gap-2"
+                  className="w-full sm:w-auto relative gap-2 h-auto whitespace-normal text-left items-start sm:items-center"
                   disabled={isPending}
                 >
-                  <Camera className="h-4 w-4" />
-                  Capturar Imagem do Pacote
+                  <Camera className="h-4 w-4 shrink-0 mt-0.5 sm:mt-0" />
+                  <span>Capturar Imagem do Pacote</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -431,9 +432,9 @@ useEffect(() => {
                   />
                 </Button>
                 {previewFoto && (
-                  <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
-                    <ImageIcon className="h-4 w-4" /> Imagem em anexo pronta
-                    para o Telegram!
+                  <div className="flex items-start sm:items-center gap-2 text-xs text-emerald-600 font-medium">
+                    <ImageIcon className="h-4 w-4 shrink-0 mt-0.5 sm:mt-0" />
+                    <span>Imagem em anexo pronta para o Telegram!</span>
                   </div>
                 )}
               </div>
@@ -441,13 +442,13 @@ useEffect(() => {
 
             <Button
               type="submit"
-              className="w-full font-semibold mt-2"
+              className="w-full font-semibold mt-2 h-auto whitespace-normal"
               disabled={
                 isPending || (!form.getValues("bloco_manual") && !modoManual)
               }
             >
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Registrar Entrada e Notificar Morador
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin shrink-0" />}
+              <span>Registrar Entrada e Notificar Morador</span>
             </Button>
           </form>
         </Form>

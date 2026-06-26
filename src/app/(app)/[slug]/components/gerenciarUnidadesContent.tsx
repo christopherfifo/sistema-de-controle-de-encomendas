@@ -9,6 +9,7 @@ import { Plus, Trash2, Home, RefreshCw, CheckCircle2, Building, AlertCircle } fr
 import { getUnidadesDoCondominio, adicionarUnidades, deletarUnidade, deletarBloco } from "../gerenciarUnidades/actions";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 interface GerenciarUnidadesContentProps {
   condominioId: string;
@@ -100,38 +101,50 @@ export function GerenciarUnidadesContent({ condominioId }: GerenciarUnidadesCont
   };
 
   const handleDeleteUnidade = (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir esta unidade?")) return;
-    
-    setErrorMsg(null);
-    setSuccessMsg(null);
-    
-    startTransition(async () => {
-      const res = await deletarUnidade(id);
-      if (res.success) {
-        setSuccessMsg("Unidade excluída com sucesso.");
-        carregarDados();
-        router.refresh();
-      } else {
-        setErrorMsg(res.error || "Erro ao excluir unidade.");
-      }
+    toast("Tem certeza que deseja excluir esta unidade?", {
+      action: {
+        label: "Confirmar",
+        onClick: () => {
+          setErrorMsg(null);
+          setSuccessMsg(null);
+          
+          startTransition(async () => {
+            const res = await deletarUnidade(id);
+            if (res.success) {
+              setSuccessMsg("Unidade excluída com sucesso.");
+              carregarDados();
+              router.refresh();
+            } else {
+              setErrorMsg(res.error || "Erro ao excluir unidade.");
+            }
+          });
+        }
+      },
+      cancel: { label: "Cancelar", onClick: () => {} }
     });
   };
 
   const handleDeleteBloco = (nomeBloco: string) => {
-    if (!confirm(`ATENÇÃO: Tem certeza que deseja excluir o bloco '${nomeBloco}' inteiro e todas as suas unidades?`)) return;
-    
-    setErrorMsg(null);
-    setSuccessMsg(null);
-    
-    startTransition(async () => {
-      const res = await deletarBloco(condominioId, nomeBloco);
-      if (res.success) {
-        setSuccessMsg(`Bloco '${nomeBloco}' excluído com sucesso.`);
-        carregarDados();
-        router.refresh();
-      } else {
-        setErrorMsg(res.error || "Erro ao excluir o bloco.");
-      }
+    toast(`ATENÇÃO: Tem certeza que deseja excluir o bloco '${nomeBloco}' inteiro e todas as suas unidades?`, {
+      action: {
+        label: "Confirmar",
+        onClick: () => {
+          setErrorMsg(null);
+          setSuccessMsg(null);
+          
+          startTransition(async () => {
+            const res = await deletarBloco(condominioId, nomeBloco);
+            if (res.success) {
+              setSuccessMsg(`Bloco '${nomeBloco}' excluído com sucesso.`);
+              carregarDados();
+              router.refresh();
+            } else {
+              setErrorMsg(res.error || "Erro ao excluir o bloco.");
+            }
+          });
+        }
+      },
+      cancel: { label: "Cancelar", onClick: () => {} }
     });
   };
 

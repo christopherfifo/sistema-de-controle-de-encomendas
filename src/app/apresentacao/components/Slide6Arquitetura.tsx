@@ -1,7 +1,7 @@
 import React from 'react';
 import { Building, ShieldCheck, Package, Users } from 'lucide-react';
 
-export default function Slide3Arquitetura() {
+export default function Slide6Arquitetura() {
   return (
     <div className="flex flex-col justify-center h-full px-12 md:px-32">
       <h2 className="text-5xl md:text-6xl font-bold tracking-tighter text-white mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">

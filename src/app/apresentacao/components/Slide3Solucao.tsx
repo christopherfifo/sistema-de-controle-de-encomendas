@@ -1,7 +1,7 @@
 import React from 'react';
 import { Zap, BellRing, ShieldCheck, Box, Package, Send } from 'lucide-react';
 
-export default function Slide2Solucao() {
+export default function Slide3Solucao() {
   return (
     <div className="flex flex-col justify-center h-full px-12 md:px-32">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto w-full">

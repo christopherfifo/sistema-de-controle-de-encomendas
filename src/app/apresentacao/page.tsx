@@ -4,12 +4,16 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import Slide0Abertura from "./components/Slide0Abertura";
-import Slide1Problema from "./components/Slide1Problema";
-import Slide2Solucao from "./components/Slide2Solucao";
-import Slide3Arquitetura from "./components/Slide3Arquitetura";
-import Slide4Tech from "./components/Slide4Tech";
-import Slide5Fim from "./components/Slide5Fim";
+import Slide1Capa from './components/Slide1Capa';
+import Slide2Problema from './components/Slide2Problema';
+import Slide3Solucao from './components/Slide3Solucao';
+import Slide4Fluxo from './components/Slide4Fluxo';
+import Slide5Perfis from './components/Slide5Perfis';
+import Slide6Arquitetura from './components/Slide6Arquitetura';
+import Slide7Tech from './components/Slide7Tech';
+import Slide8Diferenciais from './components/Slide8Diferenciais';
+import Slide9Resultados from './components/Slide9Resultados';
+import Slide10Fim from './components/Slide10Fim';
 import SlideExtraBanco from "./components/SlideExtraBanco";
 
  
@@ -25,12 +29,16 @@ export default function ApresentacaoPage() {
   const [showBackup, setShowBackup] = useState(false);
 
   const slides = [
-    <Slide0Abertura key="capa" />,
-    <Slide1Problema key="problema" />,
-    <Slide2Solucao key="solucao" />,
-    <Slide3Arquitetura key="arquitetura" />,
-    <Slide4Tech key="tech" />,
-    <Slide5Fim key="end" />
+    <Slide1Capa key="1" />,
+    <Slide2Problema key="2" />,
+    <Slide3Solucao key="3" />,
+    <Slide4Fluxo key="4" />,
+    <Slide5Perfis key="5" />,
+    <Slide6Arquitetura key="6" />,
+    <Slide7Tech key="7" />,
+    <Slide8Diferenciais key="8" />,
+    <Slide9Resultados key="9" />,
+    <Slide10Fim key="10" />
   ];
 
   const handleNext = useCallback(() => {

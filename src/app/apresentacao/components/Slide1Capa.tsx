@@ -1,7 +1,7 @@
 import React from 'react';
 import { Package } from 'lucide-react';
 
-export default function Slide0Abertura() {
+export default function Slide1Capa() {
   return (
     <div className="flex flex-col items-center justify-center text-center h-full space-y-10 relative">
       <div 

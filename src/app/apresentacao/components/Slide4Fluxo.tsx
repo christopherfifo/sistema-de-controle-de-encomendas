@@ -1,6 +1,17 @@
 import React from 'react';
 import { UserPlus, Package, Camera, Send, Smartphone, KeySquare, History, ChevronRight } from 'lucide-react';
 
+interface Step {
+  icon: React.ElementType;
+  title: string;
+  desc: string;
+  color: string;
+  hoverBg: string;
+  hoverBorder: string;
+  delay: string;
+  arrowDelay?: string;
+}
+
 export default function Slide4Fluxo() {
   const steps = [
     { icon: UserPlus, title: "Previsão", desc: "Morador cadastra", color: "text-blue-400", hoverBg: "group-hover:bg-blue-500/5", hoverBorder: "group-hover:border-blue-500/20", delay: "delay-[300ms]", arrowDelay: "delay-[350ms]" },
@@ -12,7 +23,7 @@ export default function Slide4Fluxo() {
     { icon: History, title: "Auditoria", desc: "Histórico rastreável", color: "text-zinc-300", hoverBg: "group-hover:bg-zinc-500/5", hoverBorder: "group-hover:border-zinc-500/20", delay: "delay-[900ms]" },
   ];
 
-  const Node = ({ step }: { step: any }) => (
+  const Node = ({ step }: { step: Step }) => (
     <div className={`flex flex-col items-center text-center group z-10 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both ${step.delay} w-[140px] md:w-[160px] lg:w-[180px]`}>
        <div className={`w-14 h-14 md:w-16 md:h-16 lg:w-[72px] lg:h-[72px] rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center mb-5 transition-all duration-300 shadow-xl ${step.hoverBg} ${step.hoverBorder} relative`}>
          <step.icon className={`w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 ${step.color} opacity-80 transition-all duration-300 group-hover:scale-110 group-hover:opacity-100`} />
@@ -22,7 +33,7 @@ export default function Slide4Fluxo() {
     </div>
   );
 
-  const Arrow = ({ delay }: { delay: string }) => (
+  const Arrow = ({ delay = '' }: { delay?: string }) => (
     <div className={`hidden md:flex items-center justify-center h-16 lg:h-[72px] text-zinc-700 animate-in fade-in zoom-in duration-500 ${delay} fill-mode-both px-2 lg:px-6`}>
        <ChevronRight className="w-6 h-6 lg:w-8 lg:h-8 opacity-50" />
     </div>

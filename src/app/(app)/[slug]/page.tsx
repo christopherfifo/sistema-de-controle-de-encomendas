@@ -41,6 +41,11 @@ async function getMoradorData(unitIds: string[], idCondominio: string) {
           numero_unidade: true,
         },
       },
+      porteiro_recebimento: {
+        select: {
+          nome_completo: true,
+        },
+      },
     },
     orderBy: {
       data_recebimento: "desc",

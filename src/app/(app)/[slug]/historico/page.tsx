@@ -1,6 +1,6 @@
 import { validateAndGetCondominioData } from "@/data/get-data-by-slug";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { db } from "@/lib/prisma";
 import { SimpleSidebar } from "../components/sidebar";
@@ -116,6 +116,9 @@ export default async function HistoricoPage({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0 w-64">
+              <SheetHeader className="p-4 border-b text-left">
+                <SheetTitle>Histórico de Ações</SheetTitle>
+              </SheetHeader>
               <SimpleSidebar {...sidebarProps} />
             </SheetContent>
           </Sheet>

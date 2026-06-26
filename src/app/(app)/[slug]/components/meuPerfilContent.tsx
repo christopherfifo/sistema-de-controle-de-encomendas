@@ -433,7 +433,6 @@ export function MeuPerfilContent({ user }: MeuPerfilContentProps) {
         </CardFooter>
       </Card>
 
-      {/* Redirect Dialog */}
       <Dialog open={showTelegramModal} onOpenChange={setShowTelegramModal}>
         <DialogContent className="sm:max-w-md border-none shadow-2xl rounded-3xl">
           <DialogHeader>

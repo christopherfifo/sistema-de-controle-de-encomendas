@@ -148,7 +148,6 @@ export function GerenciarUnidadesContent({ condominioId }: GerenciarUnidadesCont
     });
   };
 
-  // Group units by block
   const blocos = useMemo(() => {
     const agrupado: Record<string, UnidadeComCount[]> = {};
     unidades.forEach(u => {

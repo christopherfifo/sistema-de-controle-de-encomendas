@@ -33,13 +33,11 @@ function validarCnpjLocalmente(cnpj: string): boolean {
   return v2 === numbers[13];
 }
 
-// NOVA FUNÇÃO ASSÍNCRONA INTEGRADA À API MINHA RECEITA / BRASILAPI
 export const isValidCNPJ = async (cnpj: string): Promise<boolean> => {
   const cleaned = removeCnpjPunctuation(cnpj);
   if (cleaned.length !== 14) return false;
 
   try {
-    // Usando a API pública e estável da BrasilAPI para validar o CNPJ ativo
     const response = await axios.get(
       `https://brasilapi.com.br/api/cnpj/v1/${cleaned}`,
       {
@@ -48,7 +46,6 @@ export const isValidCNPJ = async (cnpj: string): Promise<boolean> => {
     );
     return response.status === 200;
   } catch (error: unknown) {
-    // Se a API retornar 404 é porque o CNPJ não existe (inválido)
     if (
       typeof error === "object" &&
       error !== null &&

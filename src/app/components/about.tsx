@@ -25,7 +25,6 @@ const About = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Feature block 1: Admin */}
           <div className="bg-muted/30 border border-border rounded-2xl p-8 lg:p-10 hover:border-emerald-500/20 transition-colors flex flex-col h-full">
             <div className="h-12 w-12 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-6">
               <Building2 className="h-6 w-6 text-emerald-500" />
@@ -49,7 +48,6 @@ const About = () => {
               </div>
             </div>
 
-            {/* UI Mockup - Admin Widgets */}
             <div className="relative h-72 w-full rounded-xl overflow-hidden border border-border bg-background flex flex-col shadow-inner">
               <div className="h-8 bg-muted/50 border-b border-border flex items-center px-4 gap-2">
                 <div className="w-2 h-2 rounded-full bg-border"></div>
@@ -95,7 +93,6 @@ const About = () => {
             </div>
           </div>
 
-          {/* Feature block 2: Resident */}
           <div className="bg-muted/30 border border-border rounded-2xl p-8 lg:p-10 hover:border-blue-500/20 transition-colors flex flex-col h-full">
             <div className="h-12 w-12 bg-blue-500/10 rounded-lg flex items-center justify-center mb-6">
               <UserCircle className="h-6 w-6 text-blue-500" />
@@ -118,22 +115,18 @@ const About = () => {
               </div>
             </div>
 
-            {/* UI Mockup - Resident Mobile */}
             <div className="relative h-72 w-full rounded-xl overflow-hidden border border-border bg-gradient-to-b from-muted to-background flex items-center justify-center p-4">
-              {/* Mobile Phone shape */}
               <div className="w-[160px] h-[120%] bg-foreground border-[4px] border-border rounded-[28px] flex flex-col overflow-hidden relative shadow-2xl">
                 <div className="absolute top-0 inset-x-0 h-4 bg-foreground flex justify-center z-20">
                   <div className="w-12 h-3 bg-background/20 rounded-b-xl border-b border-x border-border/10"></div>
                 </div>
                 <div className="flex-1 bg-background p-3 flex flex-col gap-3 pt-6 relative z-10">
-                  {/* App header */}
                   <div className="flex items-center justify-between pb-2 border-b">
                     <div className="h-2 w-16 bg-muted rounded"></div>
                     <div className="w-4 h-4 rounded-full bg-blue-500/10 flex items-center justify-center border">
                       <UserCircle className="w-2.5 h-2.5 text-blue-500" />
                     </div>
                   </div>
-                  {/* Notification bubble */}
                   <div className="p-2.5 rounded-lg bg-blue-500/5 border border-blue-500/10 flex items-start gap-2 relative">
                     <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-500 animate-ping"></div>
                     <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-500"></div>
@@ -143,10 +136,8 @@ const About = () => {
                       <div className="h-1.5 w-10 bg-blue-500/50 rounded"></div>
                     </div>
                   </div>
-                  {/* QR Code placeholder */}
                   <div className="mt-auto bg-card p-3 rounded-lg flex items-center justify-center relative shadow-sm border">
                     <QrCode className="w-12 h-12 text-foreground" />
-                    {/* Fake Scan Line */}
                     <div className="absolute inset-0 overflow-hidden rounded-lg">
                       <div className="w-full h-0.5 bg-blue-500/30 shadow-[0_0_8px_#3b82f6] absolute top-1/2 -translate-y-1/2"></div>
                     </div>

@@ -179,7 +179,6 @@ export async function getUnidadesByCodigoAcesso(codigo_acesso: string) {
 
     if (!condominio) return null;
 
-    // Agrupar unidades por bloco
     const blocosMap = new Map<string, string[]>();
     for (const unidade of condominio.unidades) {
       if (!blocosMap.has(unidade.bloco_torre)) {

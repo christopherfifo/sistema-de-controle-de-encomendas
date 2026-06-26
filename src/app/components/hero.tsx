@@ -43,7 +43,6 @@ const Hero = () => {
     <section className="relative w-full pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-background border-b">
       <div className="container mx-auto px-6 max-w-7xl">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          {/* Text content */}
           <div className="max-w-2xl z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 mb-6">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -95,13 +94,10 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Code Mockup Content instead of Image */}
           <div className="relative w-full h-[400px] lg:h-[550px] bg-muted border rounded-2xl p-4 shadow-2xl z-10 hidden md:block">
             <div className="absolute inset-0 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-2xl pointer-events-none"></div>
 
-            {/* Window Chrome */}
             <div className="relative w-full h-full rounded-xl overflow-hidden bg-background border flex flex-col shadow-inner">
-              {/* Fake Dashboard Header */}
               <div className="h-14 border-b bg-muted/30 flex items-center px-6 justify-between">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-destructive/50"></div>
@@ -122,9 +118,7 @@ const Hero = () => {
                 </div>
               </div>
 
-              {/* Fake Dashboard Body */}
               <div className="flex-1 p-6 flex flex-col gap-4 overflow-hidden relative">
-                {/* Page Title & Stats */}
                 <div className="flex items-end justify-between mb-4">
                   <div>
                     <div className="h-5 w-40 bg-muted-foreground/20 rounded mb-2"></div>
@@ -136,7 +130,6 @@ const Hero = () => {
                   </div>
                 </div>
 
-                {/* List Items */}
                 <div className="flex flex-col gap-3">
                   {packages.map((item, i) => (
                     <div
@@ -180,7 +173,6 @@ const Hero = () => {
                   ))}
                 </div>
 
-                {/* Fade out gradient at bottom */}
                 <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent pointer-events-none"></div>
               </div>
             </div>

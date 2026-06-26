@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Caveat } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -24,7 +24,12 @@ export const metadata: Metadata = {
   description: "Gerenciamento inteligente de encomendas para o seu condomínio",
   icons: {
     icon: "/favicon.svg",
+    apple: "/favicon.svg", // Fallback for iOS
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#09090b",
 };
 
 export default function RootLayout({

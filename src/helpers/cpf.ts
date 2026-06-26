@@ -14,7 +14,6 @@ export const maskCPF = (value: string) => {
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 };
 
-// Validação matemática local
 export const validarCpfLocalmente = (cpf: string): boolean => {
   cpf = cpf.replace(/\D/g, "");
 
@@ -38,18 +37,14 @@ export const validarCpfLocalmente = (cpf: string): boolean => {
   return secondVerifier === parseInt(cpf.charAt(10));
 };
 
-// Função assíncrona integrada à API externa
 export const isValideCPF = async (cpf: string): Promise<boolean> => {
   const cleaned = removeCpfPunctuation(cpf);
 
-  // 1. Validação matemática local primeiro para evitar requests desnecessários
   if (!validarCpfLocalmente(cleaned)) {
     return false;
   }
 
-  // 2. Se for matematicamente válido, consulta a API para verificar a existência real
   try {
-    // Timeout de 4 segundos para a API não travar o fluxo caso a Vercel demore
     const response = await axios.get(
       `https://valida-cpf-api.vercel.app/api/validar/${cleaned}`,
       {
@@ -62,7 +57,6 @@ export const isValideCPF = async (cpf: string): Promise<boolean> => {
       "[CPF_API_WARNING] Falha na comunicação com API de CPF. Usando fallback local.",
       error,
     );
-    // Se a API falhar ou der timeout, já sabemos que é matematicamente válido
     return true;
   }
 };

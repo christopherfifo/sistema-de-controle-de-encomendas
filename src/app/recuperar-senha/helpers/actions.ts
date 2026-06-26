@@ -25,7 +25,6 @@ export async function sendPasswordResetEmail(values: { email: string }) {
   });
 
   if (!existingUser) {
-    // Return success anyway to prevent email enumeration
     return {
       success:
         "Se o email estiver cadastrado, um link de recuperação será enviado.",

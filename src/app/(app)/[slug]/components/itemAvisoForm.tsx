@@ -51,7 +51,6 @@ export function ItemAvisoForm({
         const formData = new FormData();
         formData.append("condicaoPorteiro", data.condicaoPorteiro);
 
-        // Captura o arquivo de imagem diretamente do estado do input controlado do hook form
         if (
           data.foto_pacote &&
           data.foto_pacote instanceof FileList &&
